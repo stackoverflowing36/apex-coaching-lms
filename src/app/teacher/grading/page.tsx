@@ -25,6 +25,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
+export const dynamic = 'force-dynamic';
+
 export default function TeacherGradingHubPage() {
   const supabase = createClient();
   const [submissions, setSubmissions] = useState<any[]>([]);

@@ -45,6 +45,8 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+export const dynamic = 'force-dynamic';
+
 export default function CourseBuilderDetailPage() {
   const params = useParams();
   const router = useRouter();

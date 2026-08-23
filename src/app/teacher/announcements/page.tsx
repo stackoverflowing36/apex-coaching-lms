@@ -36,6 +36,8 @@ const noticePresets = [
   '📢 Next week classroom timings updated for Advanced Batch.',
 ];
 
+export const dynamic = 'force-dynamic';
+
 export default function TeacherAnnouncementsPage() {
   const supabase = createClient();
   const [courses, setCourses] = useState<any[]>([]);

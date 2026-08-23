@@ -44,6 +44,8 @@ const feedbackQuickTags = [
   'Please review standard units and error margins.',
 ];
 
+export const dynamic = 'force-dynamic';
+
 export default function SplitScreenGradingPage() {
   const params = useParams();
   const router = useRouter();

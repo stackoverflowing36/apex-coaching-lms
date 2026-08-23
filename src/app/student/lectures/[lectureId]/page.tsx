@@ -16,6 +16,8 @@ import { createClient } from '@/lib/supabase/client';
 import { getLectureById, getLectures } from '@/lib/supabase/queries';
 import { Badge } from '@/components/ui/badge';
 
+export const dynamic = 'force-dynamic';
+
 export default function LectureViewerPage() {
   const params = useParams();
   const lectureId = params.lectureId as string;

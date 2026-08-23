@@ -36,6 +36,8 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 
+export const dynamic = 'force-dynamic';
+
 interface CourseWithCounts {
   id: string;
   title: string;

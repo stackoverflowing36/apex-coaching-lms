@@ -27,9 +27,11 @@ import {
   createSubmission,
   uploadSubmissionFile,
 } from '@/lib/supabase/queries';
-import { useUser } from '../../layout';
+import { useAuthUser } from '@/hooks/useAuthUser';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+
+export const dynamic = 'force-dynamic';
 
 const ACCEPTED_TYPES = [
   'application/pdf',
@@ -43,7 +45,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export default function AssignmentDetailPage() {
   const params = useParams();
   const assignmentId = params.assignmentId as string;
-  const user = useUser();
+  const { user } = useAuthUser();
   const supabase = createClient();
 
   const [assignment, setAssignment] = useState<any>(null);

@@ -14,12 +14,14 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getAssignments, getMySubmissions, getCourses } from '@/lib/supabase/queries';
-import { useUser } from '../layout';
+import { useAuthUser } from '@/hooks/useAuthUser';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 
+export const dynamic = 'force-dynamic';
+
 export default function AssignmentsPage() {
-  const user = useUser();
+  const { user } = useAuthUser();
   const supabase = createClient();
   const [assignments, setAssignments] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);

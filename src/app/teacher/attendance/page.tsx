@@ -31,6 +31,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
+export const dynamic = 'force-dynamic';
+
 type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
 
 interface StudentRosterItem {

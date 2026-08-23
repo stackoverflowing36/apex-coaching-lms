@@ -27,13 +27,15 @@ import {
   getAnnouncements,
   getCourses,
 } from '@/lib/supabase/queries';
-import { useTeacherUser } from '@/app/teacher/layout';
+import { useAuthUser } from '@/hooks/useAuthUser';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
+export const dynamic = 'force-dynamic';
+
 export default function TeacherDashboardPage() {
-  const user = useTeacherUser();
+  const { user } = useAuthUser();
   const supabase = createClient();
 
   const [stats, setStats] = useState({

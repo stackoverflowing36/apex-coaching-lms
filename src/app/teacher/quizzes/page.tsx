@@ -39,6 +39,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+export const dynamic = 'force-dynamic';
+
 interface QuestionDraft {
   question_text: string;
   options: string[];

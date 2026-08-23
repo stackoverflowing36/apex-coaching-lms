@@ -21,11 +21,13 @@ import {
   getAssignments,
   getMySubmissions,
 } from '@/lib/supabase/queries';
-import { useUser } from '../layout';
+import { useAuthUser } from '@/hooks/useAuthUser';
 import { Badge } from '@/components/ui/badge';
 
+export const dynamic = 'force-dynamic';
+
 export default function StudentDashboard() {
-  const user = useUser();
+  const { user } = useAuthUser();
   const supabase = createClient();
 
   const [stats, setStats] = useState({
