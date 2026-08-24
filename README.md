@@ -90,7 +90,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to view the portal.
+Visit (https://apex-coaching-lms.vercel.app) to view the portal.
 
 ---
 
