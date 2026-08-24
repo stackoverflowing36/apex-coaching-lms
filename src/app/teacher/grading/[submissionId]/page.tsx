@@ -248,7 +248,7 @@ export default function SplitScreenGradingPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column: Digital Correction Canvas / Document Viewer (60% width -> 7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden flex flex-col h-[780px]">
+        <div className="lg:col-span-7 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden flex flex-col h-[520px] sm:h-[650px] lg:h-[780px]">
           
           {/* Viewer Mode Selector Header */}
           <div className="p-3 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">

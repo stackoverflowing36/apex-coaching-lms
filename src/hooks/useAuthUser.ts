@@ -40,7 +40,7 @@ export function useAuthUser() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
       if (session?.user) {
         const profile = await getCurrentUser(supabase);
         if (mounted) setUser(profile);

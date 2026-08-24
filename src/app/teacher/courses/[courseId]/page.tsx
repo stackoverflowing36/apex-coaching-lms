@@ -261,22 +261,24 @@ export default function CourseBuilderDetailPage() {
 
       {/* Tabs for Lecture Modules vs Syllabus Materials */}
       <Tabs defaultValue="lectures" className="space-y-6">
-        <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80">
-          <TabsTrigger
-            value="lectures"
-            className="rounded-full text-xs font-bold px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-sm"
-          >
-            <Video className="h-3.5 w-3.5 mr-1.5" />
-            Lecture Modules ({lectures.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="materials"
-            className="rounded-full text-xs font-bold px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-sm"
-          >
-            <FileText className="h-3.5 w-3.5 mr-1.5" />
-            PDF Notes &amp; Syllabus ({materials.length})
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1 -mb-1">
+          <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80 inline-flex flex-nowrap min-w-max">
+            <TabsTrigger
+              value="lectures"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-sm"
+            >
+              <Video className="h-3.5 w-3.5 mr-1.5" />
+              Lecture Modules ({lectures.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="materials"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-sm"
+            >
+              <FileText className="h-3.5 w-3.5 mr-1.5" />
+              PDF Notes &amp; Syllabus ({materials.length})
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ============================================================
             TAB 1: LECTURE MODULES MANAGER

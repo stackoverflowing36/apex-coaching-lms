@@ -173,7 +173,7 @@ export function HandwrittenAnnotationCanvas({
   }, [imageLoaded, redrawCanvas]);
 
   // Coordinate helper relative to canvas
-  const getCanvasCoords = (e: React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } | null => {
+  const getCanvasCoords = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } | null => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();
@@ -186,9 +186,10 @@ export function HandwrittenAnnotationCanvas({
     };
   };
 
-  // Mouse Handlers
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Pointer Handlers (supports touch, pen/stylus, mouse)
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (readOnly) return;
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     const coords = getCanvasCoords(e);
     if (!coords) return;
 
@@ -240,7 +241,7 @@ export function HandwrittenAnnotationCanvas({
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isDrawing || readOnly) return;
     const coords = getCanvasCoords(e);
     if (!coords) return;
@@ -256,8 +257,13 @@ export function HandwrittenAnnotationCanvas({
     });
   };
 
-  const handleMouseUp = () => {
-    setIsDrawing(false);
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isDrawing) {
+      setIsDrawing(false);
+      try {
+        (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+      } catch {}
+    }
   };
 
   // History management
@@ -521,11 +527,11 @@ export function HandwrittenAnnotationCanvas({
               ref={canvasRef}
               width={800}
               height={1100}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              className="max-w-none block bg-white"
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              className="max-w-none block bg-white touch-none"
             />
 
             {/* Floating Text Input Box when clicking on sheet */}

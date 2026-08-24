@@ -152,29 +152,31 @@ export default function LecturesPage() {
 
       {/* Resource Tabs */}
       <Tabs defaultValue="lectures" className="space-y-6">
-        <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80">
-          <TabsTrigger
-            value="lectures"
-            className="rounded-full text-xs font-bold px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
-          >
-            <Video className="h-3.5 w-3.5 mr-1.5" />
-            Video Lectures ({filteredLectures.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="materials"
-            className="rounded-full text-xs font-bold px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
-          >
-            <FileText className="h-3.5 w-3.5 mr-1.5" />
-            PDF Syllabus &amp; Notes ({filteredMaterials.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="quizzes"
-            className="rounded-full text-xs font-bold px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
-          >
-            <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
-            Practice Quizzes ({filteredQuizzes.length})
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1 -mb-1">
+          <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80 inline-flex flex-nowrap min-w-max">
+            <TabsTrigger
+              value="lectures"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+            >
+              <Video className="h-3.5 w-3.5 mr-1.5" />
+              Video Lectures ({filteredLectures.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="materials"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+            >
+              <FileText className="h-3.5 w-3.5 mr-1.5" />
+              PDF Notes ({filteredMaterials.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="quizzes"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+            >
+              <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
+              Practice Quizzes ({filteredQuizzes.length})
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* TAB 1: LECTURES */}
         <TabsContent value="lectures" className="space-y-6">

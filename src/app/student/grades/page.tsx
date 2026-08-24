@@ -183,22 +183,24 @@ export default function GradesPage() {
 
       {/* ========== TABS: ASSIGNMENT GRADES VS ATTENDANCE REGISTER ========== */}
       <Tabs defaultValue="grades" className="space-y-6">
-        <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80">
-          <TabsTrigger
-            value="grades"
-            className="rounded-full text-xs font-bold px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
-          >
-            <Award className="h-3.5 w-3.5 mr-1.5" />
-            Assignment Evaluations ({submissions.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="attendance"
-            className="rounded-full text-xs font-bold px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm"
-          >
-            <CalendarCheck className="h-3.5 w-3.5 mr-1.5" />
-            My Attendance History ({attendance.records.length})
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1 -mb-1">
+          <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80 inline-flex flex-nowrap min-w-max">
+            <TabsTrigger
+              value="grades"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+            >
+              <Award className="h-3.5 w-3.5 mr-1.5" />
+              Assignment Evaluations ({submissions.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="attendance"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm"
+            >
+              <CalendarCheck className="h-3.5 w-3.5 mr-1.5" />
+              My Attendance History ({attendance.records.length})
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* TAB 1: GRADES & FEEDBACK */}
         <TabsContent value="grades" className="space-y-4">

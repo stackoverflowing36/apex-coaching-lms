@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Outfit } from 'next/font/google';
 import { Toaster } from 'sonner';
 import './globals.css';
@@ -17,11 +17,17 @@ const outfit = Outfit({
   weight: ['700', '800'],
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
-  title: 'EduFlow — Online Learning Management System',
+  title: 'Apex Institute — Coaching Management Portal',
   description:
-    'EduFlow makes it easy to create, manage, and deliver engaging online courses. Built for educators and learners who demand excellence.',
-  keywords: ['LMS', 'Online Learning', 'Education', 'Courses', 'E-Learning'],
+    'Apex Institute LMS makes it easy to manage classes, live and recorded lectures, assignments, grading, and assessments.',
+  keywords: ['LMS', 'Coaching Institute', 'IIT-JEE', 'NEET', 'Lectures', 'Assignments'],
 };
 
 export default function RootLayout({

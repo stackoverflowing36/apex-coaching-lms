@@ -10,13 +10,37 @@ export async function getCurrentUser(supabase: SupabaseClient) {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  try {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
 
-  return profile;
+    if (profile) return profile;
+
+    // If profile not yet created in table (e.g., OAuth direct login), build from metadata
+    const newProfile = {
+      id: user.id,
+      email: user.email || '',
+      full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+      role: user.user_metadata?.role || 'student',
+      avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+      batch_name: user.user_metadata?.batch_name || 'General Batch',
+    };
+
+    await supabase.from('users').upsert(newProfile);
+    return newProfile;
+  } catch (err) {
+    console.error('Error fetching/creating profile:', err);
+    return {
+      id: user.id,
+      email: user.email || '',
+      full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
+      role: user.user_metadata?.role || 'student',
+      avatar_url: user.user_metadata?.avatar_url || null,
+    };
+  }
 }
 
 export async function getAllStudents(supabase: SupabaseClient) {

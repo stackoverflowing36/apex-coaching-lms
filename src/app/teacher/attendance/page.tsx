@@ -56,21 +56,20 @@ export default function TeacherAttendancePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSavedPreviously, setIsSavedPreviously] = useState(false);
 
-  // Load initial courses
   const loadCourses = useCallback(async () => {
     try {
       setLoading(true);
       const coursesData = await getCourses(supabase);
       setCourses(coursesData);
-      if (coursesData.length > 0 && !selectedCourseId) {
-        setSelectedCourseId(coursesData[0].id);
+      if (coursesData.length > 0) {
+        setSelectedCourseId((prev) => prev || coursesData[0].id);
       }
     } catch (err: any) {
       toast.error('Failed to load courses', { description: err.message });
     } finally {
       setLoading(false);
     }
-  }, [selectedCourseId, supabase]);
+  }, [supabase]);
 
   useEffect(() => {
     loadCourses();
