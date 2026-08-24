@@ -52,7 +52,7 @@ export default function StudentLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -73,7 +73,7 @@ export default function StudentLayout({
       }
     }
     loadUser();
-  }, []);
+  }, [router, supabase]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

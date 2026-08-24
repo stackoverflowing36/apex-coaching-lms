@@ -78,20 +78,6 @@ export function HandwrittenAnnotationCanvas({
     { label: 'Orange (Notice)', value: '#f97316', bg: 'bg-orange-500' },
   ];
 
-  // Load Image onto Canvas
-  useEffect(() => {
-    if (isPdf) return;
-
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = checkedCopyUrl || imageUrl;
-    img.onload = () => {
-      imageRef.current = img;
-      setImageLoaded(true);
-      redrawCanvas();
-    };
-  }, [imageUrl, checkedCopyUrl, isPdf]);
-
   // Redraw All Annotations
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -166,9 +152,25 @@ export function HandwrittenAnnotationCanvas({
     });
   }, [strokes]);
 
+  // Load Image onto Canvas
   useEffect(() => {
-    redrawCanvas();
-  }, [strokes, redrawCanvas]);
+    if (isPdf) return;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = checkedCopyUrl || imageUrl;
+    img.onload = () => {
+      imageRef.current = img;
+      setImageLoaded(true);
+      redrawCanvas();
+    };
+  }, [imageUrl, checkedCopyUrl, isPdf, redrawCanvas]);
+
+  useEffect(() => {
+    if (imageLoaded) {
+      redrawCanvas();
+    }
+  }, [imageLoaded, redrawCanvas]);
 
   // Coordinate helper relative to canvas
   const getCanvasCoords = (e: React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } | null => {

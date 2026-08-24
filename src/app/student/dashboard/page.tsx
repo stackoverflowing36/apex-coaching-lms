@@ -28,7 +28,7 @@ export const dynamic = 'force-dynamic';
 
 export default function StudentDashboard() {
   const { user } = useAuthUser();
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
 
   const [stats, setStats] = useState({
     totalLectures: 0,
@@ -72,7 +72,7 @@ export default function StudentDashboard() {
       }
     }
     loadDashboard();
-  }, [user]);
+  }, [user, supabase]);
 
   function getTimeUntil(dateStr: string) {
     const diff = new Date(dateStr).getTime() - Date.now();

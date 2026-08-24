@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { getCurrentUser } from '@/lib/supabase/queries';
 
@@ -16,7 +16,7 @@ export interface UserProfile {
 export function useAuthUser() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     let mounted = true;
@@ -53,7 +53,7 @@ export function useAuthUser() {
       mounted = false;
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   return { user, loading };
 }

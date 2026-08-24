@@ -46,7 +46,7 @@ export default function AssignmentDetailPage() {
   const params = useParams();
   const assignmentId = params.assignmentId as string;
   const { user } = useAuthUser();
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
 
   const [assignment, setAssignment] = useState<any>(null);
   const [submission, setSubmission] = useState<any>(null);
@@ -75,7 +75,7 @@ export default function AssignmentDetailPage() {
       }
     }
     load();
-  }, [assignmentId, user]);
+  }, [assignmentId, user, supabase]);
 
   const validateFile = (file: File): string | null => {
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
@@ -91,21 +91,21 @@ export default function AssignmentDetailPage() {
     return null;
   };
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = useCallback((file: File) => {
     const error = validateFile(file);
     if (error) {
       toast.error('Invalid file', { description: error });
       return;
     }
     setSelectedFile(file);
-  };
+  }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file) handleFileSelect(file);
-  }, []);
+  }, [handleFileSelect]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -385,6 +385,7 @@ export default function AssignmentDetailPage() {
                     </div>
 
                     <div className="rounded-xl overflow-hidden border border-orange-200/80 bg-white shadow-md max-h-96 overflow-y-auto">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={submission.checked_copy_url}
                         alt="Teacher evaluated and checked answer copy"

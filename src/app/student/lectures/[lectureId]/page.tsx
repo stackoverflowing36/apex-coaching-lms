@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
 export default function LectureViewerPage() {
   const params = useParams();
   const lectureId = params.lectureId as string;
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
 
   const [lecture, setLecture] = useState<any>(null);
   const [siblingLectures, setSiblingLectures] = useState<any[]>([]);
@@ -44,7 +44,7 @@ export default function LectureViewerPage() {
       }
     }
     load();
-  }, [lectureId]);
+  }, [lectureId, supabase]);
 
   if (loading) {
     return (

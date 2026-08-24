@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 
 export default function AssignmentsPage() {
   const { user } = useAuthUser();
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
@@ -48,7 +48,7 @@ export default function AssignmentsPage() {
       }
     }
     load();
-  }, []);
+  }, [supabase]);
 
   const submittedMap = new Map(
     submissions.map((s: any) => [s.assignment_id, s])

@@ -319,6 +319,7 @@ export default function SplitScreenGradingPage() {
               />
             ) : (
               <div className="w-full h-full overflow-auto flex items-center justify-center p-4 bg-white rounded-2xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={fileUrl}
                   alt="Student handwritten answer sheet"
