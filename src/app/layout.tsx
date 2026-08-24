@@ -24,10 +24,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Apex Institute — Coaching Management Portal',
+  title: 'EduFlow — Coaching & Academic Management Portal',
   description:
-    'Apex Institute LMS makes it easy to manage classes, live and recorded lectures, assignments, grading, and assessments.',
-  keywords: ['LMS', 'Coaching Institute', 'IIT-JEE', 'NEET', 'Lectures', 'Assignments'],
+    'EduFlow LMS makes it easy to manage classes, live and recorded lectures, assignments, digital grading, and assessments.',
+  keywords: ['EduFlow', 'LMS', 'Coaching Institute', 'IIT-JEE', 'NEET', 'Lectures', 'Assignments'],
 };
 
 export default function RootLayout({

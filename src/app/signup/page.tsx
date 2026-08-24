@@ -175,7 +175,7 @@ function SignupForm() {
         }
 
         toast.success('Registration successful!', {
-          description: `Welcome to Apex Institute, ${fullName.trim()}! Redirecting to dashboard...`,
+          description: `Welcome to EduFlow, ${fullName.trim()}! Redirecting to dashboard...`,
         });
 
         const dest = role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
@@ -309,7 +309,7 @@ function SignupForm() {
               id="email"
               type="email"
               required
-              placeholder="student@apex.edu"
+              placeholder="student@eduflow.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-10 h-11 rounded-2xl border-slate-200 focus-visible:ring-emerald-500 text-sm"
@@ -406,7 +406,7 @@ export default function SignupPage() {
           </div>
           <div className="flex flex-col">
             <span className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight leading-none">
-              Apex Institute
+              EduFlow
             </span>
             <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
               Academic Portal

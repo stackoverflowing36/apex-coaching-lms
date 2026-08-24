@@ -291,8 +291,8 @@ export default function LandingPage() {
             <div className="h-8 w-8 rounded-full bg-emerald-600 flex items-center justify-center text-white">
               <GraduationCap className="h-4 w-4" />
             </div>
-            <span className="font-heading font-extrabold text-slate-900">Apex Institute LMS</span>
-            <span className="text-xs text-slate-400 pl-2">© 2026 Academic Operations. All rights reserved.</span>
+            <span className="font-heading font-extrabold text-slate-900">EduFlow LMS</span>
+            <span className="text-xs text-slate-400 pl-2">© 2026 EduFlow Academic Operations. All rights reserved.</span>
           </div>
 
           <div className="flex items-center gap-3">

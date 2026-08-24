@@ -108,7 +108,7 @@ export default function TeacherDashboardPage() {
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-bold">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>Apex Institute Academic Operations</span>
+              <span>EduFlow Academic Operations</span>
             </div>
             <h1 className="font-heading font-extrabold text-2xl sm:text-4xl tracking-tight leading-tight">
               Welcome back, {firstName} 👋

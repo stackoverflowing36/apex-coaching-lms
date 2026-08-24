@@ -36,11 +36,11 @@ export function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="font-heading font-extrabold text-base text-slate-900 tracking-tight flex items-center gap-1.5 leading-none">
-              Apex Institute
+              EduFlow
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block"></span>
             </span>
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
-              Academic Portal
+              Academic LMS
             </span>
           </div>
         </Link>
