@@ -60,6 +60,7 @@ export default function TeacherQuizEnginePage() {
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [quizTitle, setQuizTitle] = useState('');
   const [quizDescription, setQuizDescription] = useState('');
+  const [allowReattempt, setAllowReattempt] = useState(false);
   const [timeLimitMinutes, setTimeLimitMinutes] = useState(30);
   const [questions, setQuestions] = useState<QuestionDraft[]>([
     {
@@ -203,13 +204,15 @@ export default function TeacherQuizEnginePage() {
     }
 
     try {
+      const finalDescription = (quizDescription.trim() + (allowReattempt ? ' \n[REATTEMPT_ALLOWED]' : '')).trim();
+      
       setIsSubmitting(true);
       await createQuizWithQuestions(
         supabase,
         {
           course_id: selectedCourseId,
           title: quizTitle.trim(),
-          description: quizDescription.trim() || undefined,
+          description: finalDescription || undefined,
           time_limit_minutes: Number(timeLimitMinutes) || 30,
         },
         questions
@@ -219,6 +222,7 @@ export default function TeacherQuizEnginePage() {
       setIsCreateOpen(false);
       setQuizTitle('');
       setQuizDescription('');
+      setAllowReattempt(false);
       setTimeLimitMinutes(30);
       setQuestions([
         {
@@ -370,6 +374,19 @@ export default function TeacherQuizEnginePage() {
                   onChange={(e) => setQuizDescription(e.target.value)}
                   className="rounded-2xl min-h-[60px] text-xs resize-none"
                 />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="allowReattempt"
+                  checked={allowReattempt}
+                  onChange={(e) => setAllowReattempt(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                />
+                <Label htmlFor="allowReattempt" className="text-xs font-bold text-slate-700 cursor-pointer">
+                  Allow students to re-attempt this quiz multiple times
+                </Label>
               </div>
 
               {/* Dynamic Questions Builder */}

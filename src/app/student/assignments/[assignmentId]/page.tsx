@@ -296,25 +296,51 @@ export default function AssignmentDetailPage() {
               </p>
               
               {attachmentUrl && (
-                <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
-                      <FileText className="h-5 w-5" />
+                <div className="mt-4 space-y-4">
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">Assignment File</p>
+                        <p className="text-xs text-slate-500">Reference document for this assignment</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">Assignment File</p>
-                      <p className="text-xs text-slate-500">Download the attached reference document</p>
-                    </div>
+                    <a
+                      href={attachmentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 h-9 px-4 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors whitespace-nowrap"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open Full Screen
+                    </a>
                   </div>
-                  <a
-                    href={attachmentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 h-9 px-4 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors whitespace-nowrap"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download File
-                  </a>
+                  
+                  {/* Inline Preview */}
+                  <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 h-[500px] w-full">
+                    {attachmentUrl.toLowerCase().endsWith('.pdf') ? (
+                      <iframe 
+                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(attachmentUrl)}&embedded=true`}
+                        className="w-full h-full border-0"
+                        title="Assignment Preview"
+                      />
+                    ) : attachmentUrl.match(/\.(jpeg|jpg|gif|png)$/i) ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img 
+                        src={attachmentUrl} 
+                        alt="Assignment Preview" 
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <iframe 
+                        src={attachmentUrl}
+                        className="w-full h-full border-0"
+                        title="Assignment Preview"
+                      />
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -365,7 +391,7 @@ export default function AssignmentDetailPage() {
                     </div>
 
                     <a
-                      href={submission.file_url}
+                      href={submission.file_url?.startsWith('http') ? submission.file_url : supabase.storage.from('assignment-submissions').getPublicUrl(submission.file_url).data.publicUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"

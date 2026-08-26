@@ -33,7 +33,7 @@ export default function StudentQuizPage() {
         setLoading(true);
         const data = await getQuizWithQuestions(supabase, quizId);
         setQuiz(data);
-        setQuestions(data.questions || []);
+        setQuestions(data.quiz_questions || []);
       } catch (err: any) {
         console.error(err);
       } finally {
@@ -139,6 +139,16 @@ export default function StudentQuizPage() {
             </div>
           </div>
 
+          <div className="flex justify-end pt-2">
+            <Button
+              onClick={handleSubmit}
+              variant="destructive"
+              className="rounded-full px-6 h-10 text-xs font-bold shadow-md shadow-red-500/20"
+            >
+              End Attempt & Submit
+            </Button>
+          </div>
+
           {questions.length > 0 ? (
             <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 space-y-8">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -195,11 +205,10 @@ export default function StudentQuizPage() {
                 {currentQuestionIndex === questions.length - 1 ? (
                   <Button
                     onClick={handleSubmit}
-                    disabled={!allAnswered}
                     className={`rounded-full px-8 h-11 text-xs font-bold shadow-lg transition-all ${
                       allAnswered 
                         ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25' 
-                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                        : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                     }`}
                   >
                     Submit Quiz
@@ -242,13 +251,27 @@ export default function StudentQuizPage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-slate-100">
+          <div className="pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               onClick={() => router.push('/student/lectures')}
-              className="rounded-full bg-slate-900 hover:bg-slate-800 text-white h-12 px-8 font-bold"
+              className="rounded-full bg-slate-900 hover:bg-slate-800 text-white h-12 px-8 font-bold w-full sm:w-auto"
             >
               Return to Course
             </Button>
+            {quiz.description?.includes('[REATTEMPT_ALLOWED]') && (
+              <Button
+                onClick={() => {
+                  setIsSubmitted(false);
+                  setScore(0);
+                  setSelectedOptions({});
+                  setCurrentQuestionIndex(0);
+                }}
+                variant="outline"
+                className="rounded-full border-slate-300 text-slate-700 hover:bg-slate-50 h-12 px-8 font-bold w-full sm:w-auto"
+              >
+                Re-attempt Quiz
+              </Button>
+            )}
           </div>
         </div>
       )}
