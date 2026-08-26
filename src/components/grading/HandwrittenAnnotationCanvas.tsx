@@ -154,23 +154,37 @@ export function HandwrittenAnnotationCanvas({
 
   // Load Image onto Canvas
   useEffect(() => {
-    if (isPdf) return;
+    if (isPdf) {
+      setImageLoaded(true); // Treat as loaded so redraw can fire if needed
+      return;
+    }
 
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = checkedCopyUrl || imageUrl;
+    
     img.onload = () => {
       imageRef.current = img;
       setImageLoaded(true);
       redrawCanvas();
     };
+
+    img.onerror = () => {
+      console.warn('CORS blocked image load. Falling back to non-CORS (export may fail).');
+      const fallbackImg = new Image();
+      fallbackImg.onload = () => {
+        imageRef.current = fallbackImg;
+        setImageLoaded(true);
+        redrawCanvas();
+      };
+      fallbackImg.src = checkedCopyUrl || imageUrl;
+    };
+
+    img.src = checkedCopyUrl || imageUrl;
   }, [imageUrl, checkedCopyUrl, isPdf, redrawCanvas]);
 
   useEffect(() => {
-    if (imageLoaded) {
-      redrawCanvas();
-    }
-  }, [imageLoaded, redrawCanvas]);
+    redrawCanvas();
+  }, [strokes, imageLoaded, redrawCanvas]);
 
   // Coordinate helper relative to canvas
   const getCanvasCoords = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } | null => {
@@ -334,7 +348,7 @@ export function HandwrittenAnnotationCanvas({
     <div className="flex flex-col h-full bg-slate-900 text-slate-100 rounded-2xl overflow-hidden relative shadow-2xl">
       
       {/* Top Digital Correction Toolbar */}
-      {!readOnly && (
+      {!readOnly && !isPdf && (
         <div className="p-3 bg-slate-900/95 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 select-none z-20">
           
           {/* Main Pen / Stamp Tools */}
@@ -511,10 +525,13 @@ export function HandwrittenAnnotationCanvas({
         style={{ cursor: activeTool === 'pen' ? 'crosshair' : activeTool === 'tick' || activeTool === 'cross' ? 'cell' : 'default' }}
       >
         {isPdf ? (
-          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-4">
+          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-4 bg-slate-100 relative">
+            <div className="absolute top-4 left-4 right-4 z-10 bg-blue-50/90 backdrop-blur border border-blue-200 text-blue-700 px-4 py-3 rounded-xl shadow-sm text-sm font-medium">
+              <span className="font-bold">Note:</span> Digital correction pen tools are only supported for Image uploads. For PDFs, please use the general feedback area on the right.
+            </div>
             <iframe
               src={`${imageUrl}#toolbar=1`}
-              className="w-full h-full rounded-xl border border-slate-700 bg-white"
+              className="w-full h-full rounded-xl border border-slate-300 bg-white"
               title="PDF Document"
             />
           </div>
