@@ -781,7 +781,7 @@ export async function uploadSubmissionFile(
   const filePath = `${studentId}/${assignmentId}/${Date.now()}_${sanitizedFileName}`;
 
   const { data, error } = await supabase.storage
-    .from('assignment-submissions')
+    .from('course-materials')
     .upload(filePath, file, {
       cacheControl: '3600',
       upsert: true,
@@ -791,7 +791,7 @@ export async function uploadSubmissionFile(
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from('assignment-submissions').getPublicUrl(data.path);
+  } = supabase.storage.from('course-materials').getPublicUrl(data.path);
 
   return { path: data.path, publicUrl };
 }

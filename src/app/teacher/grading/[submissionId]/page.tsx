@@ -176,7 +176,11 @@ export default function SplitScreenGradingPage() {
     .toUpperCase()
     .slice(0, 2);
 
-  const fileUrl = submission.file_url;
+  const rawFileUrl = submission.file_url || '';
+  const fileUrl = rawFileUrl.startsWith('http') 
+    ? rawFileUrl 
+    : supabase.storage.from('course-materials').getPublicUrl(rawFileUrl).data.publicUrl;
+    
   const isPdf =
     submission.file_name?.toLowerCase().endsWith('.pdf') ||
     submission.file_type?.includes('pdf') ||

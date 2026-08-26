@@ -391,7 +391,7 @@ export default function AssignmentDetailPage() {
                     </div>
 
                     <a
-                      href={submission.file_url?.startsWith('http') ? submission.file_url : supabase.storage.from('assignment-submissions').getPublicUrl(submission.file_url).data.publicUrl}
+                      href={submission.file_url?.startsWith('http') ? submission.file_url : supabase.storage.from('course-materials').getPublicUrl(submission.file_url).data.publicUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
