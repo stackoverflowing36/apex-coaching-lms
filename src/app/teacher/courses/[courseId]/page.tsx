@@ -19,6 +19,7 @@ import {
   BookOpen,
   Eye,
   AlertCircle,
+  Clock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
@@ -31,6 +32,9 @@ import {
   getCourseMaterials,
   uploadCourseMaterial,
   deleteCourseMaterial,
+  getAssignments,
+  createAssignment,
+  deleteAssignment,
 } from '@/lib/supabase/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,6 +60,7 @@ export default function CourseBuilderDetailPage() {
   const [course, setCourse] = useState<any>(null);
   const [lectures, setLectures] = useState<any[]>([]);
   const [materials, setMaterials] = useState<any[]>([]);
+  const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // New Lecture Dialog State
@@ -71,19 +76,31 @@ export default function CourseBuilderDetailPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Add Assignment State
+  const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
+  const [assignmentTitle, setAssignmentTitle] = useState('');
+  const [assignmentDescription, setAssignmentDescription] = useState('');
+  const [assignmentDueDate, setAssignmentDueDate] = useState('');
+  const [assignmentMaxMarks, setAssignmentMaxMarks] = useState(100);
+  const [assignmentFile, setAssignmentFile] = useState<File | null>(null);
+  const assignmentFileInputRef = useRef<HTMLInputElement>(null);
+  const [isCreatingAssignment, setIsCreatingAssignment] = useState(false);
+
   const loadData = useCallback(async () => {
     if (!courseId) return;
     try {
       setLoading(true);
-      const [courseData, lecturesData, materialsData] = await Promise.all([
+      const [courseData, lecturesData, materialsData, assignmentsData] = await Promise.all([
         getCourseById(supabase, courseId),
         getLectures(supabase, courseId),
         getCourseMaterials(supabase, courseId),
+        getAssignments(supabase, courseId),
       ]);
 
       setCourse(courseData);
       setLectures(lecturesData);
       setMaterials(materialsData);
+      setAssignments(assignmentsData);
     } catch (err: any) {
       toast.error('Failed to load course details', { description: err.message });
     } finally {
@@ -210,6 +227,73 @@ export default function CourseBuilderDetailPage() {
     }
   };
 
+  // Handle Create Assignment
+  const handleCreateAssignment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!assignmentTitle.trim() || !assignmentDueDate) {
+      toast.error('Please fill required fields');
+      return;
+    }
+
+    try {
+      setIsCreatingAssignment(true);
+      let finalDescription = assignmentDescription.trim();
+
+      if (assignmentFile) {
+        const sanitizedFileName = assignmentFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const filePath = `assignments/${courseId}/${Date.now()}_${sanitizedFileName}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('course-materials')
+          .upload(filePath, assignmentFile, {
+            cacheControl: '3600',
+            upsert: true,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('course-materials')
+          .getPublicUrl(uploadData.path);
+
+        finalDescription += `\n\n[ATTACHMENT:${publicUrl}]`;
+      }
+
+      await createAssignment(supabase, {
+        course_id: courseId,
+        title: assignmentTitle.trim(),
+        description: finalDescription,
+        due_date: new Date(assignmentDueDate).toISOString(),
+        max_marks: assignmentMaxMarks,
+      });
+
+      toast.success('Assignment created!');
+      setAssignmentTitle('');
+      setAssignmentDescription('');
+      setAssignmentDueDate('');
+      setAssignmentMaxMarks(100);
+      setAssignmentFile(null);
+      setIsAssignmentDialogOpen(false);
+      loadData();
+    } catch (err: any) {
+      toast.error('Failed to create assignment', { description: err.message });
+    } finally {
+      setIsCreatingAssignment(false);
+    }
+  };
+
+  // Handle Delete Assignment
+  const handleDeleteAssignment = async (assignmentId: string) => {
+    if (!confirm('Are you sure you want to delete this assignment?')) return;
+    try {
+      await deleteAssignment(supabase, assignmentId);
+      toast.success('Assignment deleted');
+      loadData();
+    } catch (err: any) {
+      toast.error('Failed to delete assignment', { description: err.message });
+    }
+  };
+
   if (loading && !course) {
     return (
       <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-3">
@@ -276,6 +360,13 @@ export default function CourseBuilderDetailPage() {
             >
               <FileText className="h-3.5 w-3.5 mr-1.5" />
               PDF Notes &amp; Syllabus ({materials.length})
+            </TabsTrigger>
+            <TabsTrigger
+              value="assignments"
+              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-sm"
+            >
+              <FileCheck className="h-3.5 w-3.5 mr-1.5" />
+              Assignments ({assignments.length})
             </TabsTrigger>
           </TabsList>
         </div>
@@ -381,7 +472,7 @@ export default function CourseBuilderDetailPage() {
                 No Lectures in this Batch
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Click &quot;Add Lecture Module&quot; above to create your first class video entry.
+                Click "Add Lecture Module" above to create your first class video entry.
               </p>
             </div>
           ) : (
@@ -467,7 +558,7 @@ export default function CourseBuilderDetailPage() {
                 Upload Syllabus PDFs &amp; Formula Handouts
               </h2>
               <p className="text-xs text-slate-500">
-                Uploaded files are stored in the secure Supabase storage bucket &quot;course-materials&quot; and made available to all enrolled batch students.
+                Uploaded files are stored in the secure Supabase storage bucket "course-materials" and made available to all enrolled batch students.
               </p>
             </div>
 
@@ -612,6 +703,205 @@ export default function CourseBuilderDetailPage() {
             )}
           </div>
 
+        </TabsContent>
+
+        {/* ============================================================
+            TAB 3: ASSIGNMENTS
+            ============================================================ */}
+        <TabsContent value="assignments" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h2 className="font-heading font-extrabold text-lg text-slate-900">
+                Assignments
+              </h2>
+              <p className="text-xs text-slate-500">
+                Create assignments and upload attachments for students to complete.
+              </p>
+            </div>
+
+            <Dialog open={isAssignmentDialogOpen} onOpenChange={setIsAssignmentDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-9 px-4 shadow-md shadow-orange-600/20">
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Create Assignment
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-lg">
+                <DialogHeader className="space-y-1 text-left">
+                  <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
+                    Create Assignment
+                  </DialogTitle>
+                  <p className="text-xs text-slate-500">
+                    Set a due date, max marks, and upload an optional attachment.
+                  </p>
+                </DialogHeader>
+
+                <form onSubmit={handleCreateAssignment} className="space-y-4 pt-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="assignTitle" className="text-xs font-bold text-slate-700">
+                      Title
+                    </Label>
+                    <Input
+                      id="assignTitle"
+                      placeholder="e.g. Chapter 4 Practice Sheet"
+                      value={assignmentTitle}
+                      onChange={(e) => setAssignmentTitle(e.target.value)}
+                      className="rounded-2xl h-11 text-xs"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="assignDesc" className="text-xs font-bold text-slate-700">
+                      Instructions
+                    </Label>
+                    <textarea
+                      id="assignDesc"
+                      placeholder="Instructions for the assignment..."
+                      value={assignmentDescription}
+                      onChange={(e) => setAssignmentDescription(e.target.value)}
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs h-24 focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="assignDueDate" className="text-xs font-bold text-slate-700">
+                        Due Date
+                      </Label>
+                      <Input
+                        id="assignDueDate"
+                        type="datetime-local"
+                        value={assignmentDueDate}
+                        onChange={(e) => setAssignmentDueDate(e.target.value)}
+                        className="rounded-2xl h-11 text-xs"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="assignMaxMarks" className="text-xs font-bold text-slate-700">
+                        Max Marks
+                      </Label>
+                      <Input
+                        id="assignMaxMarks"
+                        type="number"
+                        min="1"
+                        value={assignmentMaxMarks}
+                        onChange={(e) => setAssignmentMaxMarks(Number(e.target.value))}
+                        className="rounded-2xl h-11 text-xs"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-700">
+                      Attachment (PDF/Image)
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => assignmentFileInputRef.current?.click()}
+                        className="rounded-full text-xs h-9"
+                      >
+                        <UploadCloud className="h-4 w-4 mr-2" />
+                        Choose File
+                      </Button>
+                      <span className="text-xs text-slate-500 truncate max-w-[200px]">
+                        {assignmentFile ? assignmentFile.name : 'No file selected'}
+                      </span>
+                    </div>
+                    <input
+                      ref={assignmentFileInputRef}
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setAssignmentFile(e.target.files[0]);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isCreatingAssignment}
+                    className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-11 shadow-lg shadow-orange-600/25 mt-2"
+                  >
+                    {isCreatingAssignment ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Creating...
+                      </span>
+                    ) : (
+                      'Create Assignment'
+                    )}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {assignments.length === 0 ? (
+            <div className="bg-white rounded-3xl p-10 text-center shadow-xl border border-slate-100 space-y-3">
+              <FileCheck className="h-10 w-10 text-slate-300 mx-auto" />
+              <h3 className="font-heading font-extrabold text-base text-slate-900">
+                No Assignments Created
+              </h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Create assignments with PDF or image attachments for students to submit.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {assignments.map((assignment) => (
+                <div
+                  key={assignment.id}
+                  className="bg-white rounded-3xl p-4 sm:p-5 shadow-xl border border-slate-100/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-orange-200 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
+                      <FileCheck className="h-5 w-5" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4 className="font-heading font-bold text-sm sm:text-base text-slate-900">
+                        {assignment.title}
+                      </h4>
+                      <div className="flex items-center gap-3 text-xs text-slate-500">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          Due: {new Date(assignment.due_date).toLocaleDateString()}
+                        </span>
+                        <span>•</span>
+                        <span>{assignment.max_marks} Marks</span>
+                        {assignment.description?.includes('[ATTACHMENT:') && (
+                          <>
+                            <span>•</span>
+                            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                              <ExternalLink className="h-3 w-3" />
+                              Has Attachment
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
+                    <button
+                      onClick={() => handleDeleteAssignment(assignment.id)}
+                      className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      title="Delete Assignment"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
