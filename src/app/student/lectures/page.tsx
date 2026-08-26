@@ -303,10 +303,10 @@ export default function LecturesPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredQuizzes.map((quiz) => (
-                <div
-                  key={quiz.id}
-                  className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 hover:border-emerald-200 transition-all flex flex-col justify-between space-y-4"
-                >
+                <Link key={quiz.id} href={`/student/quizzes/${quiz.id}`}>
+                  <div
+                    className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 hover:border-emerald-200 transition-all flex flex-col justify-between space-y-4 h-full cursor-pointer hover:shadow-2xl"
+                  >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Badge className="bg-emerald-50 text-emerald-700 font-bold text-xs">
@@ -330,7 +330,8 @@ export default function LecturesPage() {
                       Active Test
                     </Badge>
                   </div>
-                </div>
+                  </div>
+                </Link>
               ))}
             </div>
           )}

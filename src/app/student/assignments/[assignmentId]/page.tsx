@@ -17,6 +17,7 @@ import {
   Award,
   FileImage,
   FileType2,
+  ExternalLink,
   Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -215,6 +216,15 @@ export default function AssignmentDetailPage() {
   const isPastDue = new Date(assignment.due_date) < new Date();
   const hasSubmitted = !!submission;
 
+  // Parse attachment from description
+  let parsedDescription = assignment.description || 'No additional instructions provided.';
+  let attachmentUrl: string | null = null;
+  const attachmentMatch = parsedDescription.match(/\[ATTACHMENT:(https?:\/\/[^\]]+)\]/);
+  if (attachmentMatch) {
+    attachmentUrl = attachmentMatch[1];
+    parsedDescription = parsedDescription.replace(/\[ATTACHMENT:(https?:\/\/[^\]]+)\]/, '').trim();
+  }
+
   return (
     <div className="space-y-6 animate-fade-in-up">
       {/* Back */}
@@ -282,8 +292,31 @@ export default function AssignmentDetailPage() {
             <div>
               <h3 className="font-semibold text-sm text-slate-700 mb-2">Instructions</h3>
               <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
-                {assignment.description || 'No additional instructions provided.'}
+                {parsedDescription}
               </p>
+              
+              {attachmentUrl && (
+                <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Assignment File</p>
+                      <p className="text-xs text-slate-500">Download the attached reference document</p>
+                    </div>
+                  </div>
+                  <a
+                    href={attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 h-9 px-4 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors whitespace-nowrap"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download File
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 
