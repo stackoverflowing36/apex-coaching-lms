@@ -14,6 +14,7 @@ import {
   Bell,
   Menu,
   X,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { getCurrentUser } from '@/lib/supabase/queries';
@@ -146,6 +147,20 @@ export default function StudentLayout({
 
               {/* Right Section */}
               <div className="flex items-center gap-3">
+                {/* Teacher View Toggle */}
+                {user?.role === 'teacher' && (
+                  <Link href="/teacher/dashboard">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="hidden sm:flex items-center gap-2 rounded-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 h-9"
+                    >
+                      <ArrowRightLeft className="h-3.5 w-3.5" />
+                      Switch to Faculty View
+                    </Button>
+                  </Link>
+                )}
+
                 {/* Notifications (placeholder) */}
                 <button className="relative p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
                   <Bell className="h-5 w-5" />

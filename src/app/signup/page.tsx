@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
+import { getCourses } from '@/lib/supabase/queries';
 import { BackgroundGrid } from '@/components/layout/BackgroundGrid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,20 +53,28 @@ function SignupForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'student' | 'teacher'>('student');
-  const [batchName, setBatchName] = useState('JEE Target 2026');
+  const [selectedBatches, setSelectedBatches] = useState<string[]>([]);
+  const [availableBatches, setAvailableBatches] = useState<{ id: string; code: string; title: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const supabase = createClient();
 
-  const batchOptions = [
-    'JEE Target 2026',
-    'NEET Batch A',
-    'Class 11 Foundations',
-    'Class 12 Advanced Rankers',
-    'Crash Course 2026'
-  ];
+  React.useEffect(() => {
+    async function loadBatches() {
+      try {
+        const courses = await getCourses(supabase);
+        setAvailableBatches(courses);
+        if (courses.length > 0) {
+          setSelectedBatches([courses[0].code]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+      }
+    }
+    loadBatches();
+  }, [supabase]);
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true);
@@ -128,7 +137,7 @@ function SignupForm() {
           data: {
             full_name: fullName.trim(),
             role: role,
-            batch_name: role === 'student' ? batchName : 'Faculty Staff',
+            batch_name: role === 'student' ? selectedBatches.join(', ') : 'Faculty Staff',
           },
         },
       });
@@ -170,7 +179,7 @@ function SignupForm() {
             email: email.trim(),
             full_name: fullName.trim(),
             role: role,
-            batch_name: role === 'student' ? batchName : 'Faculty Staff',
+            batch_name: role === 'student' ? selectedBatches.join(', ') : 'Faculty Staff',
           });
         }
 
@@ -319,23 +328,48 @@ function SignupForm() {
 
         {/* Batch Selection for Student */}
         {role === 'student' && (
-          <div className="space-y-1.5">
-            <Label htmlFor="batch" className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
               <Layers className="h-3.5 w-3.5 text-emerald-600" />
-              Target Coaching Batch
+              Target Coaching Batches (Select all that apply)
             </Label>
-            <select
-              id="batch"
-              value={batchName}
-              onChange={(e) => setBatchName(e.target.value)}
-              className="w-full h-11 rounded-2xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-            >
-              {batchOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+            <div className="max-h-48 overflow-y-auto space-y-2 p-3 rounded-2xl border border-slate-200 bg-slate-50/50">
+              {availableBatches.length === 0 ? (
+                <div className="text-xs text-slate-500 text-center py-2">Loading batches...</div>
+              ) : (
+                availableBatches.map((batch) => {
+                  const isChecked = selectedBatches.includes(batch.code);
+                  return (
+                    <label
+                      key={batch.id}
+                      className={`flex items-center gap-3 p-2 rounded-xl border cursor-pointer transition-colors ${
+                        isChecked ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200 hover:border-emerald-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedBatches([...selectedBatches, batch.code]);
+                          } else {
+                            setSelectedBatches(selectedBatches.filter(b => b !== batch.code));
+                          }
+                        }}
+                        className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-slate-800">{batch.code}</span>
+                        <span className="text-[10px] text-slate-500 truncate max-w-[200px]">{batch.title}</span>
+                      </div>
+                    </label>
+                  );
+                })
+              )}
+            </div>
+            {selectedBatches.length === 0 && (
+              <p className="text-[10px] text-amber-600 font-medium">Please select at least one batch.</p>
+            )}
           </div>
         )}
 
