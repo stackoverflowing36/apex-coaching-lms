@@ -28,7 +28,10 @@ import {
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { getSubmissionById, gradeSubmission, uploadCheckedCopy } from '@/lib/supabase/queries';
-import { HandwrittenAnnotationCanvas } from '@/components/grading/HandwrittenAnnotationCanvas';
+import {
+  HandwrittenAnnotationCanvas,
+  HandwrittenAnnotationCanvasHandle,
+} from '@/components/grading/HandwrittenAnnotationCanvas';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,6 +55,7 @@ export default function SplitScreenGradingPage() {
   const submissionId = params?.submissionId as string;
   const supabase = createClient();
 
+  const canvasHandleRef = useRef<HandwrittenAnnotationCanvasHandle | null>(null);
   const [submission, setSubmission] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -97,7 +101,7 @@ export default function SplitScreenGradingPage() {
     setFeedback((prev) => (prev ? `${prev}\n${tag}` : tag));
   };
 
-  // Submit Grade
+  // Submit Grade & Return Evaluated Copy
   const handleSubmitGrade = async (e: React.FormEvent) => {
     e.preventDefault();
     if (marks === '') {
@@ -114,11 +118,36 @@ export default function SplitScreenGradingPage() {
 
       let checkedCopyPublicUrl = submission?.checked_copy_url || null;
 
+      // Extract the latest canvas blob directly from the canvas ref
+      let blobToUpload = pendingBlob;
+      if (canvasHandleRef.current) {
+        try {
+          const freshBlob = await canvasHandleRef.current.getExportBlob();
+          if (freshBlob) {
+            blobToUpload = freshBlob;
+          }
+        } catch (bErr) {
+          console.warn('Failed to extract fresh blob from canvas:', bErr);
+        }
+      }
+
       // If an annotated canvas copy is ready to upload
-      if (pendingBlob) {
-        toast.loading('Uploading checked copy with annotations...', { id: 'upload-copy' });
-        checkedCopyPublicUrl = await uploadCheckedCopy(supabase, submissionId, pendingBlob);
-        toast.dismiss('upload-copy');
+      if (blobToUpload) {
+        toast.loading('Saving & uploading checked copy with annotations...', { id: 'upload-copy' });
+        try {
+          checkedCopyPublicUrl = await uploadCheckedCopy(
+            supabase,
+            submissionId,
+            blobToUpload,
+            submission?.student_id,
+            submission?.assignment_id
+          );
+          toast.dismiss('upload-copy');
+        } catch (storageErr: any) {
+          toast.dismiss('upload-copy');
+          console.warn('Storage upload error for checked copy:', storageErr);
+          toast.warning('Could not store annotated image file in cloud bucket, but saving your marks and feedback...');
+        }
       }
 
       await gradeSubmission(supabase, submissionId, {
@@ -128,15 +157,16 @@ export default function SplitScreenGradingPage() {
         checked_copy_url: checkedCopyPublicUrl,
       });
 
-      toast.success('Grade & checked copy sent to student!', {
+      toast.success('Grade & evaluation returned to student!', {
         description: `Score: ${marks}/${maxMarks} (${Math.round((Number(marks) / maxMarks) * 100)}%)`,
       });
 
       // Reload to ensure state is synchronized
-      loadSubmission();
+      await loadSubmission();
     } catch (err: any) {
       toast.dismiss('upload-copy');
-      toast.error('Failed to save grade', { description: err.message });
+      console.error('Grade submit error:', err);
+      toast.error('Failed to save grade', { description: err.message || 'Please check your inputs' });
     } finally {
       setIsSubmitting(false);
     }
@@ -310,6 +340,7 @@ export default function SplitScreenGradingPage() {
           <div className="flex-1 overflow-hidden p-2 bg-slate-100">
             {activeViewerTab === 'canvas' ? (
               <HandwrittenAnnotationCanvas
+                ref={canvasHandleRef}
                 imageUrl={fileUrl}
                 isPdf={isPdf}
                 checkedCopyUrl={submission.checked_copy_url}

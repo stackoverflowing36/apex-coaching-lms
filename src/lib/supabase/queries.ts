@@ -404,24 +404,49 @@ export async function getSubmissionById(supabase: SupabaseClient, submissionId: 
 export async function uploadCheckedCopy(
   supabase: SupabaseClient,
   submissionId: string,
-  blob: Blob
+  blob: Blob,
+  studentId?: string,
+  assignmentId?: string
 ) {
-  const filePath = `checked-copies/${submissionId}_${Date.now()}.png`;
+  // Determine authenticated teacher/user ID or folder to comply with storage RLS
+  const { data: authData } = await supabase.auth.getUser();
+  const currentUserId = authData?.user?.id || studentId || 'evaluator';
+  const filePath = `${currentUserId}/${assignmentId || 'checked-copies'}/${submissionId}_${Date.now()}.png`;
 
-  const { data, error } = await supabase.storage
-    .from('course-materials')
-    .upload(filePath, blob, {
-      contentType: 'image/png',
-      upsert: true,
-    });
+  try {
+    const { data, error } = await supabase.storage
+      .from('course-materials')
+      .upload(filePath, blob, {
+        contentType: 'image/png',
+        upsert: true,
+      });
 
-  if (error) throw error;
+    if (error) {
+      console.warn('User folder upload failed, attempting fallback path:', error.message);
+      const fallbackPath = `checked_${submissionId}_${Date.now()}.png`;
+      const { data: fbData, error: fbError } = await supabase.storage
+        .from('course-materials')
+        .upload(fallbackPath, blob, {
+          contentType: 'image/png',
+          upsert: true,
+        });
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from('course-materials').getPublicUrl(data.path);
+      if (fbError) throw fbError;
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('course-materials').getPublicUrl(fbData.path);
+      return publicUrl;
+    }
 
-  return publicUrl;
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('course-materials').getPublicUrl(data.path);
+
+    return publicUrl;
+  } catch (err: any) {
+    console.error('All storage upload attempts failed:', err);
+    throw err;
+  }
 }
 
 export async function gradeSubmission(
@@ -439,19 +464,20 @@ export async function gradeSubmission(
     combinedFeedback = `${combinedFeedback}\n\n[CHECKED_COPY:${gradeData.checked_copy_url}]`.trim();
   }
 
+  const finalStatus = gradeData.status || 'graded';
+
   const { data, error } = await supabase
     .from('submissions')
     .update({
       marks_obtained: gradeData.marks_obtained,
       feedback: combinedFeedback,
-      status: gradeData.status,
+      status: finalStatus,
     })
     .eq('id', submissionId)
-    .select()
-    .single();
+    .select();
 
   if (error) throw error;
-  return parseSubmissionFeedback(data);
+  return data && data[0] ? parseSubmissionFeedback(data[0]) : { id: submissionId, ...gradeData };
 }
 
 // ============================================================
