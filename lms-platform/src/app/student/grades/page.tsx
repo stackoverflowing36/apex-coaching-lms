@@ -101,6 +101,7 @@ export default function GradesPage() {
     return 'text-red-600';
   }
 
+  /** Resolves a stored course-material path to a browser-accessible URL. */
   function resolveFileUrl(url?: string | null) {
     if (!url) return '';
     if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) return url;
