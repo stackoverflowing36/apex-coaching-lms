@@ -472,7 +472,7 @@ export default function CourseBuilderDetailPage() {
                 No Lectures in this Batch
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Click "Add Lecture Module" above to create your first class video entry.
+                Click &quot;Add Lecture Module&quot; above to create your first class video entry.
               </p>
             </div>
           ) : (
@@ -558,7 +558,7 @@ export default function CourseBuilderDetailPage() {
                 Upload Syllabus PDFs &amp; Formula Handouts
               </h2>
               <p className="text-xs text-slate-500">
-                Uploaded files are stored in the secure Supabase storage bucket "course-materials" and made available to all enrolled batch students.
+                Uploaded files are stored in the secure Supabase storage bucket &quot;course-materials&quot; and made available to all enrolled batch students.
               </p>
             </div>
 

@@ -27,6 +27,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# one-off push/helper scripts (may contain tokens)
+push*.js
+scripts/push*.js
+
 # vercel
 .vercel
 
