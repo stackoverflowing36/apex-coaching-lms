@@ -258,6 +258,7 @@ export function parseSubmissionFeedback(raw: any) {
     ...raw,
     feedback: feedbackText,
     checked_copy_url: checkedCopyUrl || raw.checked_copy_url || null,
+    checkedCopyUrl: checkedCopyUrl || raw.checked_copy_url || null,
   };
 }
 

@@ -93,6 +93,7 @@ export interface Submission {
   feedback?: string;
   status: 'submitted' | 'graded' | 'needs_resubmission' | 'pending';
   checkedCopyUrl?: string | null;
+  checked_copy_url?: string | null;
 }
 
 export interface Announcement {
