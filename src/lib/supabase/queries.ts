@@ -234,7 +234,7 @@ export async function deleteAssignment(supabase: SupabaseClient, assignmentId: s
 // Submission & Grading Queries
 // ============================================================
 
-// Helper to extract checked_copy_url and clean feedback from raw string
+/** Normalizes submission feedback and resolves stored file paths to public URLs. */
 export function parseSubmissionFeedback(raw: any) {
   if (!raw) return raw;
   let feedbackText = raw.feedback || '';
@@ -628,7 +628,7 @@ export interface QuizAttemptRecord {
   created_at?: string;
 }
 
-// Local storage helper for resilient fallback
+/** Reads locally persisted attempts when the quiz-attempts table is unavailable. */
 function getLocalQuizAttempts(quizId: string, studentId: string): QuizAttemptRecord[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -639,6 +639,7 @@ function getLocalQuizAttempts(quizId: string, studentId: string): QuizAttemptRec
   }
 }
 
+/** Persists a quiz attempt locally as a resilient database fallback. */
 function saveLocalQuizAttempt(attempt: QuizAttemptRecord) {
   if (typeof window === 'undefined') return;
   try {
@@ -649,6 +650,7 @@ function saveLocalQuizAttempt(attempt: QuizAttemptRecord) {
   } catch {}
 }
 
+/** Returns one student's attempts for a quiz in attempt order. */
 export async function getQuizAttempts(
   supabase: SupabaseClient,
   quizId: string,
@@ -675,6 +677,7 @@ export async function getQuizAttempts(
   }
 }
 
+/** Returns all database-backed quiz attempts recorded for a student. */
 export async function getStudentQuizAttempts(
   supabase: SupabaseClient,
   studentId: string
@@ -696,6 +699,7 @@ export async function getStudentQuizAttempts(
   }
 }
 
+/** Persists a quiz attempt while preserving the first score as the official score. */
 export async function submitQuizAttempt(
   supabase: SupabaseClient,
   payload: {

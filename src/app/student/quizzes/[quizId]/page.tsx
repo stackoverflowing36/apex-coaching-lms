@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 
 export const dynamic = 'force-dynamic';
 
+/** Renders a quiz, restores prior attempts, and manages quiz submission. */
 export default function StudentQuizPage() {
   const params = useParams();
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function StudentQuizPage() {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
+    /** Loads the quiz questions and the student's previous attempts. */
     async function loadQuiz() {
       if (!quizId) return;
       try {
@@ -72,6 +74,7 @@ export default function StudentQuizPage() {
     loadQuiz();
   }, [quizId, user?.id, supabase]);
 
+  /** Records an answer choice while the current attempt is active. */
   const handleSelectOption = (questionId: string, optionIndex: number) => {
     if (isSubmitted) return;
     setSelectedOptions((prev) => ({
@@ -84,6 +87,7 @@ export default function StudentQuizPage() {
     quiz?.total_marks ||
     questions.reduce((sum: number, q: any) => sum + (q.marks || 1), 0);
 
+  /** Scores and persists the current quiz attempt after confirmation. */
   const handleSubmit = async () => {
     if (!confirm('Are you sure you want to submit your quiz?')) return;
 

@@ -63,6 +63,7 @@ interface HandwrittenAnnotationCanvasProps {
   readOnly?: boolean;
 }
 
+/** Provides an interactive canvas for annotating and exporting submitted work. */
 export const HandwrittenAnnotationCanvas = forwardRef<
   HandwrittenAnnotationCanvasHandle,
   HandwrittenAnnotationCanvasProps
@@ -119,7 +120,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
   const quickMarks = ['+1', '+2', '+5', '-1', '-½', '10/10'];
 
-  // Redraw Canvas
+  /** Redraws the source image and every annotation at the canvas resolution. */
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -228,7 +229,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     });
   }, [strokes]);
 
-  // Export Canvas Helper
+  /** Exports the annotated canvas, with an overlay fallback for tainted images. */
   const getCanvasBlob = useCallback((): Promise<Blob | null> => {
     return new Promise((resolve) => {
       const canvas = canvasRef.current;
@@ -433,7 +434,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     toast.info('All annotations cleared');
   };
 
-  // Pointer Down Handler
+  /** Starts drawing or places the annotation selected by the active tool. */
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (readOnly) return;
 
@@ -615,6 +616,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     });
   };
 
+  /** Finishes the current pointer stroke and releases pointer capture. */
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isDrawing) {
       setIsDrawing(false);
@@ -626,7 +628,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     } catch {}
   };
 
-  // Native Double-Click Guarantee
+  /** Converts a nearby smart-check tick into a cross on native double-click. */
   const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (readOnly || activeTool !== 'smart_check') return;
     const coords = getCanvasCoords(e);

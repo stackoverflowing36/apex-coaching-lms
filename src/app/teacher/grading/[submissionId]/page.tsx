@@ -49,6 +49,7 @@ const feedbackQuickTags = [
 
 export const dynamic = 'force-dynamic';
 
+/** Renders the teacher's split-screen grading and annotation workspace. */
 export default function SplitScreenGradingPage() {
   const params = useParams();
   const router = useRouter();

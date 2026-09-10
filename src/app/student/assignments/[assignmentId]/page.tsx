@@ -43,6 +43,7 @@ const ACCEPTED_TYPES = [
 const ACCEPTED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+/** Renders assignment details and manages the student's submission workflow. */
 export default function AssignmentDetailPage() {
   const params = useParams();
   const assignmentId = params.assignmentId as string;

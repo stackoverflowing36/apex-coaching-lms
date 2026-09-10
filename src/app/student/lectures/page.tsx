@@ -32,6 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const dynamic = 'force-dynamic';
 
+/** Renders lectures, course materials, and quizzes available to the student. */
 export default function LecturesPage() {
   const supabase = createClient();
   const user = useUser();
@@ -45,6 +46,7 @@ export default function LecturesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /** Loads the student's learning resources and recorded quiz attempts. */
     async function load() {
       try {
         const studentId = user?.id || 'demo-student';

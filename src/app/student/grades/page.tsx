@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const dynamic = 'force-dynamic';
 
+/** Renders the student's graded and pending assignment submissions. */
 export default function GradesPage() {
   const { user } = useAuthUser();
   const supabase = createClient();
@@ -101,6 +102,7 @@ export default function GradesPage() {
     return 'text-red-600';
   }
 
+  /** Resolves a stored course-material path to a browser-accessible URL. */
   function resolveFileUrl(url?: string | null) {
     if (!url) return '';
     if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) return url;
