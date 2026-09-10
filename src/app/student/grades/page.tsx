@@ -28,7 +28,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const dynamic = 'force-dynamic';
 
-/** Renders the student's graded and pending assignment submissions. */
 export default function GradesPage() {
   const { user } = useAuthUser();
   const supabase = createClient();
