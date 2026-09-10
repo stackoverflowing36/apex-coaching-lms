@@ -316,9 +316,13 @@ export default function LecturesPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredQuizzes.map((quiz) => {
-                // Find student's attempts for this quiz
+                // Find student's attempts for this quiz (records are sorted descending by completed_at)
                 const attemptsForQuiz = studentAttempts.filter((a) => a.quiz_id === quiz.id);
-                const firstAttempt = attemptsForQuiz.length > 0 ? attemptsForQuiz[0] : null;
+                const firstAttempt =
+                  attemptsForQuiz.length > 0
+                    ? attemptsForQuiz.find((a) => a.attempt_number === 1) ||
+                      attemptsForQuiz[attemptsForQuiz.length - 1]
+                    : null;
 
                 return (
                   <Link key={quiz.id} href={`/student/quizzes/${quiz.id}`}>

@@ -314,6 +314,32 @@ export async function createSubmission(
     file_type: string;
   }
 ) {
+  // Check if an existing submission exists (e.g. records with status needs_resubmission)
+  const { data: existing } = await supabase
+    .from('submissions')
+    .select('id, status')
+    .eq('assignment_id', submission.assignment_id)
+    .eq('student_id', submission.student_id)
+    .maybeSingle();
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('submissions')
+      .update({
+        file_url: submission.file_url,
+        file_name: submission.file_name,
+        file_type: submission.file_type,
+        status: 'submitted',
+        submitted_at: new Date().toISOString(),
+      })
+      .eq('id', existing.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return parseSubmissionFeedback(data);
+  }
+
   const { data, error } = await supabase
     .from('submissions')
     .insert(submission)
@@ -639,14 +665,25 @@ function getLocalQuizAttempts(quizId: string, studentId: string): QuizAttemptRec
   }
 }
 
-function saveLocalQuizAttempt(attempt: QuizAttemptRecord) {
-  if (typeof window === 'undefined') return;
+function saveLocalQuizAttempt(attempt: QuizAttemptRecord): boolean {
+  if (typeof window === 'undefined') return false;
   try {
     const key = `lms_quiz_attempts_${attempt.quiz_id}_${attempt.student_id}`;
     const existing = getLocalQuizAttempts(attempt.quiz_id, attempt.student_id);
-    const updated = [...existing, attempt];
+    const exists = existing.some(
+      (a) => (a.id && a.id === attempt.id) || a.attempt_number === attempt.attempt_number
+    );
+    const updated = exists
+      ? existing.map((a) =>
+          (a.id && a.id === attempt.id) || a.attempt_number === attempt.attempt_number ? attempt : a
+        )
+      : [...existing, attempt];
     localStorage.setItem(key, JSON.stringify(updated));
-  } catch {}
+    return true;
+  } catch (err) {
+    console.error('Failed to save local quiz attempt:', err);
+    return false;
+  }
 }
 
 export async function getQuizAttempts(
@@ -654,6 +691,7 @@ export async function getQuizAttempts(
   quizId: string,
   studentId: string
 ): Promise<QuizAttemptRecord[]> {
+  const localAttempts = getLocalQuizAttempts(quizId, studentId);
   try {
     const { data, error } = await supabase
       .from('quiz_attempts')
@@ -663,15 +701,35 @@ export async function getQuizAttempts(
       .order('attempt_number', { ascending: true });
 
     if (error) {
-      console.warn('Supabase getQuizAttempts error, checking local fallback:', error.message);
-      return getLocalQuizAttempts(quizId, studentId);
+      console.warn('Supabase getQuizAttempts error, returning local attempts:', error.message);
+      return localAttempts;
     }
-    if (data && data.length > 0) {
-      return data;
+
+    const dbAttempts = data || [];
+    if (localAttempts.length === 0) {
+      return dbAttempts;
     }
-    return getLocalQuizAttempts(quizId, studentId);
-  } catch {
-    return getLocalQuizAttempts(quizId, studentId);
+
+    // Merge and deduplicate database and local attempts
+    const attemptsMap = new Map<string | number, QuizAttemptRecord>();
+    dbAttempts.forEach((att) => {
+      const key = att.id || att.attempt_number;
+      attemptsMap.set(key, att);
+    });
+
+    localAttempts.forEach((att) => {
+      const key = att.id || att.attempt_number;
+      if (!attemptsMap.has(key)) {
+        attemptsMap.set(key, att);
+      }
+    });
+
+    const merged = Array.from(attemptsMap.values());
+    merged.sort((a, b) => (a.attempt_number || 0) - (b.attempt_number || 0));
+    return merged;
+  } catch (err) {
+    console.warn('Exception in getQuizAttempts, returning local attempts:', err);
+    return localAttempts;
   }
 }
 
@@ -742,8 +800,13 @@ export async function submitQuizAttempt(
       .single();
 
     if (error) {
-      console.warn('Supabase quiz_attempts insert failed, persisting to local storage fallback:', error.message);
-      saveLocalQuizAttempt(newAttempt);
+      console.warn('Supabase quiz_attempts insert failed, attempting local storage fallback:', error.message);
+      const savedLocally = saveLocalQuizAttempt(newAttempt);
+      if (!savedLocally) {
+        throw new Error(
+          `Failed to persist quiz attempt: database error (${error.message}) and local storage failed.`
+        );
+      }
       return {
         attempt: newAttempt,
         officialScore,
@@ -759,9 +822,14 @@ export async function submitQuizAttempt(
       firstAttemptScore,
       isFirstAttempt,
     };
-  } catch (err) {
-    console.warn('Network / DB exception in submitQuizAttempt, using local storage fallback:', err);
-    saveLocalQuizAttempt(newAttempt);
+  } catch (err: any) {
+    console.warn('Network / DB exception in submitQuizAttempt, attempting local storage fallback:', err);
+    const savedLocally = saveLocalQuizAttempt(newAttempt);
+    if (!savedLocally) {
+      throw new Error(
+        `Failed to persist quiz attempt: ${err?.message || 'persistence failed on both database and local storage'}`
+      );
+    }
     return {
       attempt: newAttempt,
       officialScore,
