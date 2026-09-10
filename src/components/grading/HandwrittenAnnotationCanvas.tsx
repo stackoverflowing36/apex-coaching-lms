@@ -119,6 +119,90 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
   const quickMarks = ['+1', '+2', '+5', '-1', '-½', '10/10'];
 
+  // Render single annotation stroke on any 2D canvas context
+  const renderAnnotationStroke = (
+    ctx: CanvasRenderingContext2D,
+    stroke: AnnotationStroke,
+    canvasScale: number
+  ) => {
+    ctx.save();
+
+    if (stroke.isHighlighter) {
+      ctx.globalAlpha = 0.35;
+    }
+
+    if (stroke.type === 'freehand' && stroke.points && stroke.points.length > 0) {
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.size * canvasScale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      for (let i = 1; i < stroke.points.length; i++) {
+        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+      }
+      ctx.stroke();
+    } else if (stroke.type === 'tick' && stroke.x !== undefined && stroke.y !== undefined) {
+      // Render Green Tick Mark
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const size = Math.max(24, 26 * (stroke.size / 3)) * canvasScale;
+      ctx.beginPath();
+      ctx.moveTo(stroke.x - size * 0.42, stroke.y);
+      ctx.lineTo(stroke.x - size * 0.1, stroke.y + size * 0.38);
+      ctx.lineTo(stroke.x + size * 0.55, stroke.y - size * 0.48);
+      ctx.stroke();
+    } else if (stroke.type === 'cross' && stroke.x !== undefined && stroke.y !== undefined) {
+      // Render Red Cross Mark
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const size = Math.max(20, 22 * (stroke.size / 3)) * canvasScale;
+      ctx.beginPath();
+      ctx.moveTo(stroke.x - size * 0.45, stroke.y - size * 0.45);
+      ctx.lineTo(stroke.x + size * 0.45, stroke.y + size * 0.45);
+      ctx.moveTo(stroke.x + size * 0.45, stroke.y - size * 0.45);
+      ctx.lineTo(stroke.x - size * 0.45, stroke.y + size * 0.45);
+      ctx.stroke();
+    } else if (stroke.type === 'mark' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
+      // Render Score / Mark Badge Circle
+      const radius = Math.max(18, stroke.size * 5.5) * canvasScale;
+      ctx.beginPath();
+      ctx.arc(stroke.x, stroke.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle =
+        stroke.color === '#ef4444'
+          ? 'rgba(239, 68, 68, 0.16)'
+          : stroke.color === '#10b981'
+          ? 'rgba(16, 185, 129, 0.16)'
+          : 'rgba(37, 99, 235, 0.16)';
+      ctx.fill();
+
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = Math.max(2, stroke.size / 2) * canvasScale;
+      ctx.stroke();
+
+      ctx.font = `bold ${Math.max(12, stroke.size * 3.8) * canvasScale}px Inter, sans-serif`;
+      ctx.fillStyle = stroke.color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(stroke.text, stroke.x, stroke.y);
+    } else if (stroke.type === 'text' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
+      // Render Handwritten Remark
+      ctx.font = `bold ${Math.max(14, stroke.size * 4.5) * canvasScale}px Inter, sans-serif`;
+      ctx.fillStyle = stroke.color;
+      ctx.textBaseline = 'top';
+      ctx.fillText(stroke.text, stroke.x, stroke.y);
+    }
+
+    ctx.restore();
+  };
+
   // Redraw Canvas
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -149,82 +233,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
     // Render all vectorized strokes
     strokes.forEach((stroke) => {
-      ctx.save();
-
-      if (stroke.isHighlighter) {
-        ctx.globalAlpha = 0.35;
-      }
-
-      if (stroke.type === 'freehand' && stroke.points && stroke.points.length > 0) {
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = stroke.size * canvasScale;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        ctx.beginPath();
-        ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-        for (let i = 1; i < stroke.points.length; i++) {
-          ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-        }
-        ctx.stroke();
-      } else if (stroke.type === 'tick' && stroke.x !== undefined && stroke.y !== undefined) {
-        // Render Green Tick Mark
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        const size = Math.max(24, 26 * (stroke.size / 3)) * canvasScale;
-        ctx.beginPath();
-        ctx.moveTo(stroke.x - size * 0.42, stroke.y);
-        ctx.lineTo(stroke.x - size * 0.1, stroke.y + size * 0.38);
-        ctx.lineTo(stroke.x + size * 0.55, stroke.y - size * 0.48);
-        ctx.stroke();
-      } else if (stroke.type === 'cross' && stroke.x !== undefined && stroke.y !== undefined) {
-        // Render Red Cross Mark
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        const size = Math.max(20, 22 * (stroke.size / 3)) * canvasScale;
-        ctx.beginPath();
-        ctx.moveTo(stroke.x - size * 0.45, stroke.y - size * 0.45);
-        ctx.lineTo(stroke.x + size * 0.45, stroke.y + size * 0.45);
-        ctx.moveTo(stroke.x + size * 0.45, stroke.y - size * 0.45);
-        ctx.lineTo(stroke.x - size * 0.45, stroke.y + size * 0.45);
-        ctx.stroke();
-      } else if (stroke.type === 'mark' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
-        // Render Score / Mark Badge Circle
-        const radius = Math.max(18, stroke.size * 5.5) * canvasScale;
-        ctx.beginPath();
-        ctx.arc(stroke.x, stroke.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle =
-          stroke.color === '#ef4444'
-            ? 'rgba(239, 68, 68, 0.16)'
-            : stroke.color === '#10b981'
-            ? 'rgba(16, 185, 129, 0.16)'
-            : 'rgba(37, 99, 235, 0.16)';
-        ctx.fill();
-
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = Math.max(2, stroke.size / 2) * canvasScale;
-        ctx.stroke();
-
-        ctx.font = `bold ${Math.max(12, stroke.size * 3.8) * canvasScale}px Inter, sans-serif`;
-        ctx.fillStyle = stroke.color;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(stroke.text, stroke.x, stroke.y);
-      } else if (stroke.type === 'text' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
-        // Render Handwritten Remark
-        ctx.font = `bold ${Math.max(14, stroke.size * 4.5) * canvasScale}px Inter, sans-serif`;
-        ctx.fillStyle = stroke.color;
-        ctx.textBaseline = 'top';
-        ctx.fillText(stroke.text, stroke.x, stroke.y);
-      }
-
-      ctx.restore();
+      renderAnnotationStroke(ctx, stroke, canvasScale);
     });
   }, [strokes]);
 
@@ -252,43 +261,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
           if (oCtx) {
             const canvasScale = Math.max(1, canvas.width / 800);
             strokes.forEach((stroke) => {
-              oCtx.save();
-              if (stroke.type === 'tick' && stroke.x !== undefined && stroke.y !== undefined) {
-                oCtx.strokeStyle = stroke.color;
-                oCtx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
-                oCtx.lineCap = 'round';
-                oCtx.lineJoin = 'round';
-                const size = Math.max(24, 26 * (stroke.size / 3)) * canvasScale;
-                oCtx.beginPath();
-                oCtx.moveTo(stroke.x - size * 0.42, stroke.y);
-                oCtx.lineTo(stroke.x - size * 0.1, stroke.y + size * 0.38);
-                oCtx.lineTo(stroke.x + size * 0.55, stroke.y - size * 0.48);
-                oCtx.stroke();
-              } else if (stroke.type === 'cross' && stroke.x !== undefined && stroke.y !== undefined) {
-                oCtx.strokeStyle = stroke.color;
-                oCtx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
-                oCtx.lineCap = 'round';
-                oCtx.lineJoin = 'round';
-                const size = Math.max(20, 22 * (stroke.size / 3)) * canvasScale;
-                oCtx.beginPath();
-                oCtx.moveTo(stroke.x - size * 0.45, stroke.y - size * 0.45);
-                oCtx.lineTo(stroke.x + size * 0.45, stroke.y + size * 0.45);
-                oCtx.moveTo(stroke.x + size * 0.45, stroke.y - size * 0.45);
-                oCtx.lineTo(stroke.x - size * 0.45, stroke.y + size * 0.45);
-                oCtx.stroke();
-              } else if (stroke.type === 'freehand' && stroke.points && stroke.points.length > 0) {
-                oCtx.strokeStyle = stroke.color;
-                oCtx.lineWidth = stroke.size * canvasScale;
-                oCtx.lineCap = 'round';
-                oCtx.lineJoin = 'round';
-                oCtx.beginPath();
-                oCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
-                for (let i = 1; i < stroke.points.length; i++) {
-                  oCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
-                }
-                oCtx.stroke();
-              }
-              oCtx.restore();
+              renderAnnotationStroke(oCtx, stroke, canvasScale);
             });
             overlayCanvas.toBlob((b) => resolve(b), 'image/png');
             return;
