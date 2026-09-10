@@ -32,7 +32,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const dynamic = 'force-dynamic';
 
-/** Renders lectures, course materials, and quizzes available to the student. */
 export default function LecturesPage() {
   const supabase = createClient();
   const user = useUser();
@@ -46,7 +45,6 @@ export default function LecturesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    /** Loads the student's learning resources and recorded quiz attempts. */
     async function load() {
       try {
         const studentId = user?.id || 'demo-student';
@@ -318,9 +316,13 @@ export default function LecturesPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredQuizzes.map((quiz) => {
-                // Find student's attempts for this quiz
+                // Find student's attempts for this quiz (records are sorted descending by completed_at)
                 const attemptsForQuiz = studentAttempts.filter((a) => a.quiz_id === quiz.id);
-                const firstAttempt = attemptsForQuiz.length > 0 ? attemptsForQuiz[0] : null;
+                const firstAttempt =
+                  attemptsForQuiz.length > 0
+                    ? attemptsForQuiz.find((a) => a.attempt_number === 1) ||
+                      attemptsForQuiz[attemptsForQuiz.length - 1]
+                    : null;
 
                 return (
                   <Link key={quiz.id} href={`/student/quizzes/${quiz.id}`}>

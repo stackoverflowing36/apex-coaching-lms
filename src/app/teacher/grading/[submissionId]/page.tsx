@@ -49,7 +49,6 @@ const feedbackQuickTags = [
 
 export const dynamic = 'force-dynamic';
 
-/** Renders the teacher's split-screen grading and annotation workspace. */
 export default function SplitScreenGradingPage() {
   const params = useParams();
   const router = useRouter();
@@ -214,10 +213,10 @@ export default function SplitScreenGradingPage() {
     
   const hasCheckedCopy = !!submission.checked_copy_url;
   const isPdf =
-    !hasCheckedCopy &&
-    (submission.file_name?.toLowerCase().endsWith('.pdf') ||
-      submission.file_type?.includes('pdf') ||
-      fileUrl?.toLowerCase().includes('.pdf'));
+    submission.file_name?.toLowerCase().endsWith('.pdf') ||
+    submission.file_type?.includes('pdf') ||
+    fileUrl?.toLowerCase().includes('.pdf');
+  const canvasIsPdf = !hasCheckedCopy && isPdf;
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
@@ -345,7 +344,7 @@ export default function SplitScreenGradingPage() {
               <HandwrittenAnnotationCanvas
                 ref={canvasHandleRef}
                 imageUrl={fileUrl}
-                isPdf={isPdf}
+                isPdf={canvasIsPdf}
                 checkedCopyUrl={submission.checked_copy_url}
                 onExportBlob={(blob) => setPendingBlob(blob)}
               />

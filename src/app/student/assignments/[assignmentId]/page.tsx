@@ -43,7 +43,6 @@ const ACCEPTED_TYPES = [
 const ACCEPTED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-/** Renders assignment details and manages the student's submission workflow. */
 export default function AssignmentDetailPage() {
   const params = useParams();
   const assignmentId = params.assignmentId as string;
@@ -215,7 +214,8 @@ export default function AssignmentDetailPage() {
   }
 
   const isPastDue = new Date(assignment.due_date) < new Date();
-  const hasSubmitted = !!submission;
+  const isNeedsResubmit = submission?.status === 'needs_resubmission';
+  const hasSubmitted = !!submission && !isNeedsResubmit;
 
   // Parse attachment from description
   let parsedDescription = assignment.description || 'No additional instructions provided.';
@@ -415,68 +415,127 @@ export default function AssignmentDetailPage() {
                 </div>
 
                 {/* Teacher's Checked Copy (with Ticks and Corrections) */}
-                {submission.checked_copy_url && (
-                  <div className="rounded-2xl border-2 border-orange-200 bg-orange-50/40 p-5 space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-orange-600 text-white border-0 text-xs font-bold px-2.5 py-0.5">
-                            Checked Copy Available
-                          </Badge>
-                          <span className="text-xs font-bold text-orange-950">
-                            Evaluated with Teacher Corrections &amp; Ticks
-                          </span>
+                {(() => {
+                  const rawCheckedCopy = submission.checked_copy_url || submission.checkedCopyUrl;
+                  const checkedCopyUrl = rawCheckedCopy
+                    ? (rawCheckedCopy.startsWith('http')
+                        ? rawCheckedCopy
+                        : supabase.storage.from('course-materials').getPublicUrl(rawCheckedCopy).data.publicUrl)
+                    : null;
+
+                  if (!checkedCopyUrl) return null;
+
+                  return (
+                    <div className="rounded-2xl border-2 border-orange-200 bg-orange-50/40 p-5 space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-orange-600 text-white border-0 text-xs font-bold px-2.5 py-0.5">
+                              Checked Copy Available
+                            </Badge>
+                            <span className="text-xs font-bold text-orange-950">
+                              Evaluated with Teacher Corrections &amp; Ticks
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1">
+                            The teacher has marked your handwritten derivations with ticks, crosses, and remarks.
+                          </p>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">
-                          The teacher has marked your handwritten derivations with ticks, crosses, and remarks.
-                        </p>
+
+                        <a
+                          href={checkedCopyUrl}
+                          download
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition-all shrink-0"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          Download Checked Copy
+                        </a>
                       </div>
 
-                      <a
-                        href={
-                          submission.checked_copy_url?.startsWith('http')
-                            ? submission.checked_copy_url
-                            : supabase.storage.from('course-materials').getPublicUrl(submission.checked_copy_url).data.publicUrl
-                        }
-                        download
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md shadow-orange-600/20 transition-all shrink-0"
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                        Download Checked Copy
-                      </a>
+                      <div className="rounded-xl overflow-hidden border border-orange-200/80 bg-white shadow-md max-h-96 overflow-y-auto">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={checkedCopyUrl}
+                          alt="Teacher evaluated and checked answer copy"
+                          className="w-full object-contain"
+                        />
+                      </div>
                     </div>
-
-                    <div className="rounded-xl overflow-hidden border border-orange-200/80 bg-white shadow-md max-h-96 overflow-y-auto">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={
-                          submission.checked_copy_url?.startsWith('http')
-                            ? submission.checked_copy_url
-                            : supabase.storage.from('course-materials').getPublicUrl(submission.checked_copy_url).data.publicUrl
-                        }
-                        alt="Teacher evaluated and checked answer copy"
-                        className="w-full object-contain"
-                      />
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             ) : (
               /* Upload Area for Scanned Handwritten Work */
               <div>
+                {isNeedsResubmit && submission && (
+                  <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
+                    <div className="flex items-center gap-2.5">
+                      <AlertCircle className="h-5 w-5 text-rose-600 shrink-0" />
+                      <div>
+                        <h3 className="text-sm font-bold text-rose-950">
+                          Revisions Requested by Instructor
+                        </h3>
+                        <p className="text-xs text-rose-700">
+                          Your teacher requested revisions on your previous submission. Please review the feedback and submit an updated copy.
+                        </p>
+                      </div>
+                    </div>
+
+                    {submission.feedback && (
+                      <div className="p-3 bg-white/90 rounded-xl border border-rose-100 text-xs text-slate-700">
+                        <p className="font-semibold text-rose-900 mb-1 flex items-center gap-1.5">
+                          <Award className="h-3.5 w-3.5 text-rose-600" />
+                          Teacher Feedback:
+                        </p>
+                        <p className="whitespace-pre-line leading-relaxed">{submission.feedback}</p>
+                      </div>
+                    )}
+
+                    {(() => {
+                      const rawChecked = submission.checked_copy_url || submission.checkedCopyUrl;
+                      const checkedUrl = rawChecked
+                        ? (rawChecked.startsWith('http')
+                            ? rawChecked
+                            : supabase.storage.from('course-materials').getPublicUrl(rawChecked).data.publicUrl)
+                        : null;
+                      if (!checkedUrl) return null;
+                      return (
+                        <a
+                          href={checkedUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition-all"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          View Checked Copy (Teacher Corrections)
+                        </a>
+                      );
+                    })()}
+                  </div>
+                )}
+
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div>
                     <h2 className="font-display text-lg font-bold text-slate-900">
-                      Upload Scanned Assignment
+                      {isNeedsResubmit ? 'Upload Revised Assignment' : 'Upload Scanned Assignment'}
                     </h2>
                     <p className="text-xs text-slate-500">
-                      Upload clear photos or PDF scans of your handwritten work for faculty review
+                      {isNeedsResubmit
+                        ? 'Upload clear photos or PDF scans of your updated handwritten solutions'
+                        : 'Upload clear photos or PDF scans of your handwritten work for faculty review'}
                     </p>
                   </div>
-                  <Badge variant="outline" className="text-[10px] font-bold border-emerald-200 text-emerald-700 bg-emerald-50">
-                    Handwritten / PDF
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] font-bold ${
+                      isNeedsResubmit
+                        ? 'border-rose-200 text-rose-700 bg-rose-50'
+                        : 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                    }`}
+                  >
+                    {isNeedsResubmit ? 'Resubmission' : 'Handwritten / PDF'}
                   </Badge>
                 </div>
 
@@ -567,7 +626,7 @@ export default function AssignmentDetailPage() {
                     className="mt-5 w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-semibold h-12 text-base shadow-xl shadow-orange-600/20"
                   >
                     <Upload className="h-4 w-4 mr-2" />
-                    Submit Handwritten Work for Grading
+                    {isNeedsResubmit ? 'Submit Revision for Re-evaluation' : 'Submit Handwritten Work for Grading'}
                   </Button>
                 )}
 
@@ -599,6 +658,10 @@ export default function AssignmentDetailPage() {
                 {hasSubmitted ? (
                   <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
                     Submitted
+                  </Badge>
+                ) : isNeedsResubmit ? (
+                  <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-xs">
+                    Revisions Requested
                   </Badge>
                 ) : isPastDue ? (
                   <Badge className="bg-red-50 text-red-600 border-red-200 text-xs">

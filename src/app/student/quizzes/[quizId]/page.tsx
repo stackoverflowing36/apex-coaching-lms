@@ -17,7 +17,6 @@ import { Badge } from '@/components/ui/badge';
 
 export const dynamic = 'force-dynamic';
 
-/** Renders a quiz, restores prior attempts, and manages quiz submission. */
 export default function StudentQuizPage() {
   const params = useParams();
   const router = useRouter();
@@ -42,7 +41,6 @@ export default function StudentQuizPage() {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
-    /** Loads the quiz questions and the student's previous attempts. */
     async function loadQuiz() {
       if (!quizId) return;
       try {
@@ -51,18 +49,19 @@ export default function StudentQuizPage() {
         setQuiz(data);
         setQuestions(data?.quiz_questions || []);
 
-        // Load student's past attempts if user id is available
-        const studentId = user?.id || 'demo-student';
-        const pastAttempts = await getQuizAttempts(supabase, quizId, studentId);
-        setAttempts(pastAttempts);
+        // Load student's past attempts once authenticated user ID is available
+        if (user?.id) {
+          const pastAttempts = await getQuizAttempts(supabase, quizId, user.id);
+          setAttempts(pastAttempts);
 
-        if (pastAttempts.length > 0) {
-          // 1st attempt score is always the official recorded score
-          const firstScore = pastAttempts[0].score;
-          setOfficialScore(firstScore);
-          setLatestAttemptScore(pastAttempts[pastAttempts.length - 1].score);
-          setScore(firstScore);
-          setIsSubmitted(true);
+          if (pastAttempts.length > 0) {
+            // 1st attempt score is always the official recorded score
+            const firstScore = pastAttempts[0].score;
+            setOfficialScore(firstScore);
+            setLatestAttemptScore(pastAttempts[pastAttempts.length - 1].score);
+            setScore(firstScore);
+            setIsSubmitted(true);
+          }
         }
       } catch (err: any) {
         console.error('Error loading quiz:', err);
@@ -74,7 +73,6 @@ export default function StudentQuizPage() {
     loadQuiz();
   }, [quizId, user?.id, supabase]);
 
-  /** Records an answer choice while the current attempt is active. */
   const handleSelectOption = (questionId: string, optionIndex: number) => {
     if (isSubmitted) return;
     setSelectedOptions((prev) => ({
@@ -87,9 +85,15 @@ export default function StudentQuizPage() {
     quiz?.total_marks ||
     questions.reduce((sum: number, q: any) => sum + (q.marks || 1), 0);
 
-  /** Scores and persists the current quiz attempt after confirmation. */
   const handleSubmit = async () => {
     if (!confirm('Are you sure you want to submit your quiz?')) return;
+
+    if (!user?.id) {
+      toast.error('Authentication required', {
+        description: 'Please sign in to submit your quiz attempt.',
+      });
+      return;
+    }
 
     let calculatedScore = 0;
     questions.forEach((q) => {
@@ -100,7 +104,7 @@ export default function StudentQuizPage() {
 
     try {
       setIsSubmittingAttempt(true);
-      const studentId = user?.id || 'demo-student';
+      const studentId = user.id;
       const allowReattempt = quiz?.description?.includes('[REATTEMPT_ALLOWED]') ?? false;
 
       const result = await submitQuizAttempt(supabase, {
@@ -130,10 +134,8 @@ export default function StudentQuizPage() {
     } catch (err: any) {
       console.error('Failed to save quiz attempt:', err);
       toast.error('Failed to save quiz score', {
-        description: err.message || 'Please check your connection',
+        description: err.message || 'Please check your connection and try again.',
       });
-      setScore(calculatedScore);
-      setIsSubmitted(true);
     } finally {
       setIsSubmittingAttempt(false);
     }
