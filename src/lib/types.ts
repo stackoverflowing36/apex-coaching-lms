@@ -91,7 +91,8 @@ export interface Submission {
   fileName?: string;
   score?: number;
   feedback?: string;
-  status: 'submitted' | 'graded';
+  status: 'submitted' | 'graded' | 'needs_resubmission' | 'pending';
+  checkedCopyUrl?: string | null;
 }
 
 export interface Announcement {
