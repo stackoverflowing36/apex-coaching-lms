@@ -15,9 +15,17 @@ import {
   Download,
   ExternalLink,
   Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { getLectures, getCourses, getCourseMaterials, getQuizzes } from '@/lib/supabase/queries';
+import {
+  getLectures,
+  getCourses,
+  getCourseMaterials,
+  getQuizzes,
+  getStudentQuizAttempts,
+} from '@/lib/supabase/queries';
+import { useUser } from '@/app/student/layout';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,10 +34,12 @@ export const dynamic = 'force-dynamic';
 
 export default function LecturesPage() {
   const supabase = createClient();
+  const user = useUser();
   const [lectures, setLectures] = useState<any[]>([]);
   const [materials, setMaterials] = useState<any[]>([]);
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
+  const [studentAttempts, setStudentAttempts] = useState<any[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -37,16 +47,19 @@ export default function LecturesPage() {
   useEffect(() => {
     async function load() {
       try {
-        const [lectureData, courseData, materialsData, quizzesData] = await Promise.all([
+        const studentId = user?.id || 'demo-student';
+        const [lectureData, courseData, materialsData, quizzesData, attemptsData] = await Promise.all([
           getLectures(supabase),
           getCourses(supabase),
           getCourseMaterials(supabase),
           getQuizzes(supabase),
+          getStudentQuizAttempts(supabase, studentId),
         ]);
         setLectures(lectureData);
         setCourses(courseData);
         setMaterials(materialsData);
         setQuizzes(quizzesData);
+        setStudentAttempts(attemptsData || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -54,7 +67,7 @@ export default function LecturesPage() {
       }
     }
     load();
-  }, [supabase]);
+  }, [supabase, user?.id]);
 
   const filteredLectures = lectures.filter((l) => {
     const matchesCourse = selectedCourse ? l.course_id === selectedCourse : true;
@@ -302,37 +315,50 @@ export default function LecturesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredQuizzes.map((quiz) => (
-                <Link key={quiz.id} href={`/student/quizzes/${quiz.id}`}>
-                  <div
-                    className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 hover:border-emerald-200 transition-all flex flex-col justify-between space-y-4 h-full cursor-pointer hover:shadow-2xl"
-                  >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Badge className="bg-emerald-50 text-emerald-700 font-bold text-xs">
-                        {quiz.courses?.code}
-                      </Badge>
-                      <span className="text-xs font-bold text-slate-500 flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5 text-orange-600" />
-                        {quiz.time_limit_minutes || 30} mins
-                      </span>
+              {filteredQuizzes.map((quiz) => {
+                // Find student's attempts for this quiz
+                const attemptsForQuiz = studentAttempts.filter((a) => a.quiz_id === quiz.id);
+                const firstAttempt = attemptsForQuiz.length > 0 ? attemptsForQuiz[0] : null;
+
+                return (
+                  <Link key={quiz.id} href={`/student/quizzes/${quiz.id}`}>
+                    <div
+                      className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 hover:border-emerald-200 transition-all flex flex-col justify-between space-y-4 h-full cursor-pointer hover:shadow-2xl"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Badge className="bg-emerald-50 text-emerald-700 font-bold text-xs">
+                            {quiz.courses?.code}
+                          </Badge>
+                          <span className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5 text-orange-600" />
+                            {quiz.time_limit_minutes || 30} mins
+                          </span>
+                        </div>
+
+                        <h4 className="font-bold text-sm text-slate-900">{quiz.title}</h4>
+                        <p className="text-xs text-slate-500 line-clamp-2">{quiz.description}</p>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-slate-700">
+                          {quiz.questions_count} Questions • {quiz.total_marks} Marks
+                        </span>
+                        {firstAttempt ? (
+                          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 font-bold text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                            <span>Score: {firstAttempt.score}/{quiz.total_marks}</span>
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-slate-900 text-white font-bold text-[10px] px-2.5 py-1 rounded-full">
+                            Active Test
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-
-                    <h4 className="font-bold text-sm text-slate-900">{quiz.title}</h4>
-                    <p className="text-xs text-slate-500 line-clamp-2">{quiz.description}</p>
-                  </div>
-
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-slate-700">
-                      {quiz.questions_count} Questions • {quiz.total_marks} Marks
-                    </span>
-                    <Badge className="bg-slate-900 text-white font-bold text-[10px] px-2.5 py-1 rounded-full">
-                      Active Test
-                    </Badge>
-                  </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </TabsContent>

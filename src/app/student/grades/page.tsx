@@ -101,6 +101,13 @@ export default function GradesPage() {
     return 'text-red-600';
   }
 
+  function resolveFileUrl(url?: string | null) {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) return url;
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gnoaegjqazibdchorpuo.supabase.co';
+    return `${baseUrl}/storage/v1/object/public/course-materials/${url}`;
+  }
+
   function getScoreBg(marks: number, maxMarks: number) {
     const pct = (marks / maxMarks) * 100;
     if (pct >= 80) return 'bg-emerald-50 border-emerald-200';
@@ -318,7 +325,7 @@ export default function GradesPage() {
                               </div>
                               {s.file_url && (
                                 <a
-                                  href={s.file_url}
+                                  href={resolveFileUrl(s.file_url)}
                                   target="_blank"
                                   rel="noreferrer"
                                   className="text-xs font-bold text-emerald-600 hover:underline flex-shrink-0"
@@ -407,7 +414,7 @@ export default function GradesPage() {
                               </div>
 
                               <a
-                                href={s.checked_copy_url || s.checkedCopyUrl}
+                                href={resolveFileUrl(s.checked_copy_url || s.checkedCopyUrl)}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-sm transition-all shrink-0"

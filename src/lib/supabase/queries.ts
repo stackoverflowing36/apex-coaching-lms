@@ -254,11 +254,27 @@ export function parseSubmissionFeedback(raw: any) {
     }
   }
 
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gnoaegjqazibdchorpuo.supabase.co';
+
+  // Ensure file_url has a fully qualified URL to avoid 404s when clicked
+  let resolvedFileUrl = raw.file_url || '';
+  if (resolvedFileUrl && !resolvedFileUrl.startsWith('http') && !resolvedFileUrl.startsWith('data:')) {
+    resolvedFileUrl = `${supabaseUrl}/storage/v1/object/public/course-materials/${resolvedFileUrl}`;
+  }
+
+  // Ensure checked_copy_url has a fully qualified URL
+  let resolvedCheckedUrl = checkedCopyUrl || raw.checked_copy_url || raw.checkedCopyUrl || null;
+  if (resolvedCheckedUrl && !resolvedCheckedUrl.startsWith('http') && !resolvedCheckedUrl.startsWith('data:')) {
+    resolvedCheckedUrl = `${supabaseUrl}/storage/v1/object/public/course-materials/${resolvedCheckedUrl}`;
+  }
+
   return {
     ...raw,
+    file_url: resolvedFileUrl || raw.file_url,
     feedback: feedbackText,
-    checked_copy_url: checkedCopyUrl || raw.checked_copy_url || null,
-    checkedCopyUrl: checkedCopyUrl || raw.checked_copy_url || null,
+    checked_copy_url: resolvedCheckedUrl,
+    checkedCopyUrl: resolvedCheckedUrl,
   };
 }
 
@@ -598,6 +614,161 @@ export async function deleteQuiz(supabase: SupabaseClient, quizId: string) {
   const { error } = await supabase.from('quizzes').delete().eq('id', quizId);
   if (error) throw error;
   return true;
+}
+
+export interface QuizAttemptRecord {
+  id?: string;
+  quiz_id: string;
+  student_id: string;
+  score: number;
+  total_marks: number;
+  answers: Record<string, number>;
+  attempt_number: number;
+  completed_at?: string;
+  created_at?: string;
+}
+
+// Local storage helper for resilient fallback
+function getLocalQuizAttempts(quizId: string, studentId: string): QuizAttemptRecord[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(`lms_quiz_attempts_${quizId}_${studentId}`);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalQuizAttempt(attempt: QuizAttemptRecord) {
+  if (typeof window === 'undefined') return;
+  try {
+    const key = `lms_quiz_attempts_${attempt.quiz_id}_${attempt.student_id}`;
+    const existing = getLocalQuizAttempts(attempt.quiz_id, attempt.student_id);
+    const updated = [...existing, attempt];
+    localStorage.setItem(key, JSON.stringify(updated));
+  } catch {}
+}
+
+export async function getQuizAttempts(
+  supabase: SupabaseClient,
+  quizId: string,
+  studentId: string
+): Promise<QuizAttemptRecord[]> {
+  try {
+    const { data, error } = await supabase
+      .from('quiz_attempts')
+      .select('*')
+      .eq('quiz_id', quizId)
+      .eq('student_id', studentId)
+      .order('attempt_number', { ascending: true });
+
+    if (error) {
+      console.warn('Supabase getQuizAttempts error, checking local fallback:', error.message);
+      return getLocalQuizAttempts(quizId, studentId);
+    }
+    if (data && data.length > 0) {
+      return data;
+    }
+    return getLocalQuizAttempts(quizId, studentId);
+  } catch {
+    return getLocalQuizAttempts(quizId, studentId);
+  }
+}
+
+export async function getStudentQuizAttempts(
+  supabase: SupabaseClient,
+  studentId: string
+): Promise<QuizAttemptRecord[]> {
+  try {
+    const { data, error } = await supabase
+      .from('quiz_attempts')
+      .select('*')
+      .eq('student_id', studentId)
+      .order('completed_at', { ascending: false });
+
+    if (error) {
+      console.warn('Supabase getStudentQuizAttempts error:', error.message);
+      return [];
+    }
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function submitQuizAttempt(
+  supabase: SupabaseClient,
+  payload: {
+    quiz_id: string;
+    student_id: string;
+    score: number;
+    total_marks: number;
+    answers: Record<string, number>;
+    allow_reattempt?: boolean;
+  }
+): Promise<{
+  attempt: QuizAttemptRecord;
+  officialScore: number;
+  firstAttemptScore: number;
+  isFirstAttempt: boolean;
+}> {
+  const { quiz_id, student_id, score, total_marks, answers } = payload;
+
+  // 1. Fetch prior attempts to determine attempt order
+  const existingAttempts = await getQuizAttempts(supabase, quiz_id, student_id);
+  const isFirstAttempt = existingAttempts.length === 0;
+  const nextAttemptNumber = isFirstAttempt ? 1 : existingAttempts.length + 1;
+
+  // Rule: Save the score of the 1st attempt for multiple attempts option selected!
+  // The first attempt's score is the permanent official score.
+  const firstAttemptScore = isFirstAttempt ? score : existingAttempts[0].score;
+  const officialScore = firstAttemptScore;
+
+  const newAttempt: QuizAttemptRecord = {
+    quiz_id,
+    student_id,
+    score,
+    total_marks,
+    answers,
+    attempt_number: nextAttemptNumber,
+    completed_at: new Date().toISOString(),
+  };
+
+  try {
+    const { data, error } = await supabase
+      .from('quiz_attempts')
+      .insert(newAttempt)
+      .select()
+      .single();
+
+    if (error) {
+      console.warn('Supabase quiz_attempts insert failed, persisting to local storage fallback:', error.message);
+      saveLocalQuizAttempt(newAttempt);
+      return {
+        attempt: newAttempt,
+        officialScore,
+        firstAttemptScore,
+        isFirstAttempt,
+      };
+    }
+
+    saveLocalQuizAttempt(data);
+    return {
+      attempt: data,
+      officialScore,
+      firstAttemptScore,
+      isFirstAttempt,
+    };
+  } catch (err) {
+    console.warn('Network / DB exception in submitQuizAttempt, using local storage fallback:', err);
+    saveLocalQuizAttempt(newAttempt);
+    return {
+      attempt: newAttempt,
+      officialScore,
+      firstAttemptScore,
+      isFirstAttempt,
+    };
+  }
 }
 
 // ============================================================
