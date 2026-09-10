@@ -161,6 +161,11 @@ export default function SplitScreenGradingPage() {
         description: `Score: ${marks}/${maxMarks} (${Math.round((Number(marks) / maxMarks) * 100)}%)`,
       });
 
+      // Clear locally-saved strokes now that they've been exported and uploaded
+      try {
+        localStorage.removeItem(`annotation_strokes_v2_${submissionId}`);
+      } catch {}
+
       // Reload to ensure state is synchronized
       await loadSubmission();
     } catch (err: any) {
@@ -346,6 +351,7 @@ export default function SplitScreenGradingPage() {
                 imageUrl={fileUrl}
                 isPdf={canvasIsPdf}
                 checkedCopyUrl={submission.checked_copy_url}
+                persistenceKey={submissionId}
                 onExportBlob={(blob) => setPendingBlob(blob)}
               />
             ) : isPdf ? (
