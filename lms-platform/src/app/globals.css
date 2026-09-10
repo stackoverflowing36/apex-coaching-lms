@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   SHADCN/UI CSS Variables — EduFlow Theme
+   Mapped to the emerald/orange design language
+   ============================================================ */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Primary = Emerald */
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary = Subtle slate */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Destructive = Orange/Red for CTAs */
+    --destructive: 24 95% 53%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 160 84% 39%;
+
+    --radius: 1rem;
+  }
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+}
+
+/* ============================================================
+   Component Utilities
+   ============================================================ */
+
+@layer utilities {
+  /* Floating card base */
+  .card-float {
+    @apply rounded-2xl bg-white p-6 shadow-card transition-all duration-300 hover:shadow-card-hover;
+  }
+
+  /* Pill button */
+  .btn-pill {
+    @apply inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-200;
+  }
+
+  /* Primary CTA (orange/red) */
+  .btn-primary {
+    @apply btn-pill bg-orange-600 text-white hover:bg-orange-700 active:scale-[0.98];
+  }
+
+  /* Outlined button */
+  .btn-outline {
+    @apply btn-pill border-2 border-slate-200 bg-white text-slate-700 hover:border-emerald-500 hover:text-emerald-600 active:scale-[0.98];
+  }
+
+  /* Emerald accent button */
+  .btn-emerald {
+    @apply btn-pill bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.98];
+  }
+
+  /* Text gradient effect */
+  .text-gradient-emerald {
+    @apply bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent;
+  }
+
+  /* Headline styling */
+  .headline-hero {
+    @apply font-display text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 md:text-6xl lg:text-7xl;
+  }
+
+  /* Section heading */
+  .headline-section {
+    @apply font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl;
+  }
+
+  /* Focus ring matching design system */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2;
+  }
+
+  /* Glass effect for overlays */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl;
+  }
+
+  /* Subtle hover lift */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+}
+
+/* ============================================================
+   Sonner Toast Overrides (floating card style)
+   ============================================================ */
+
+[data-sonner-toaster] [data-sonner-toast] {
+  --normal-bg: white;
+  --normal-text: #0f172a;
+  --normal-border: #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
