@@ -101,8 +101,10 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   // Click tracking for Single Click = Tick, Double Click = Cross
   const lastClickRef = useRef<{
     time: number;
-    x: number;
-    y: number;
+    clientX: number;
+    clientY: number;
+    canvasX: number;
+    canvasY: number;
     strokeId: string;
   } | null>(null);
   const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -142,6 +144,9 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
+    // Dynamic resolution scaling so strokes/marks look bold and proportional on high-res camera scans
+    const canvasScale = Math.max(1, canvas.width / 800);
+
     // Render all vectorized strokes
     strokes.forEach((stroke) => {
       ctx.save();
@@ -152,7 +157,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
       if (stroke.type === 'freehand' && stroke.points && stroke.points.length > 0) {
         ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = stroke.size;
+        ctx.lineWidth = stroke.size * canvasScale;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -165,11 +170,11 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       } else if (stroke.type === 'tick' && stroke.x !== undefined && stroke.y !== undefined) {
         // Render Green Tick Mark
         ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = Math.max(2.5, stroke.size * 1.2);
+        ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
-        const size = Math.max(20, 22 * (stroke.size / 3));
+        const size = Math.max(24, 26 * (stroke.size / 3)) * canvasScale;
         ctx.beginPath();
         ctx.moveTo(stroke.x - size * 0.42, stroke.y);
         ctx.lineTo(stroke.x - size * 0.1, stroke.y + size * 0.38);
@@ -178,10 +183,11 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       } else if (stroke.type === 'cross' && stroke.x !== undefined && stroke.y !== undefined) {
         // Render Red Cross Mark
         ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = Math.max(2.5, stroke.size * 1.2);
+        ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
         ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
 
-        const size = Math.max(16, 18 * (stroke.size / 3));
+        const size = Math.max(20, 22 * (stroke.size / 3)) * canvasScale;
         ctx.beginPath();
         ctx.moveTo(stroke.x - size * 0.45, stroke.y - size * 0.45);
         ctx.lineTo(stroke.x + size * 0.45, stroke.y + size * 0.45);
@@ -190,7 +196,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         ctx.stroke();
       } else if (stroke.type === 'mark' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
         // Render Score / Mark Badge Circle
-        const radius = Math.max(18, stroke.size * 5.5);
+        const radius = Math.max(18, stroke.size * 5.5) * canvasScale;
         ctx.beginPath();
         ctx.arc(stroke.x, stroke.y, radius, 0, Math.PI * 2);
         ctx.fillStyle =
@@ -202,17 +208,17 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         ctx.fill();
 
         ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = Math.max(1.8, stroke.size / 2);
+        ctx.lineWidth = Math.max(2, stroke.size / 2) * canvasScale;
         ctx.stroke();
 
-        ctx.font = `bold ${Math.max(12, stroke.size * 3.8)}px Inter, sans-serif`;
+        ctx.font = `bold ${Math.max(12, stroke.size * 3.8) * canvasScale}px Inter, sans-serif`;
         ctx.fillStyle = stroke.color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(stroke.text, stroke.x, stroke.y);
       } else if (stroke.type === 'text' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
         // Render Handwritten Remark
-        ctx.font = `bold ${Math.max(14, stroke.size * 4.5)}px Inter, sans-serif`;
+        ctx.font = `bold ${Math.max(14, stroke.size * 4.5) * canvasScale}px Inter, sans-serif`;
         ctx.fillStyle = stroke.color;
         ctx.textBaseline = 'top';
         ctx.fillText(stroke.text, stroke.x, stroke.y);
@@ -244,16 +250,42 @@ export const HandwrittenAnnotationCanvas = forwardRef<
           overlayCanvas.height = canvas.height;
           const oCtx = overlayCanvas.getContext('2d');
           if (oCtx) {
+            const canvasScale = Math.max(1, canvas.width / 800);
             strokes.forEach((stroke) => {
-              // Draw strokes on clean canvas
               oCtx.save();
-              if (stroke.type === 'tick' && stroke.x && stroke.y) {
+              if (stroke.type === 'tick' && stroke.x !== undefined && stroke.y !== undefined) {
                 oCtx.strokeStyle = stroke.color;
-                oCtx.lineWidth = Math.max(2.5, stroke.size * 1.2);
+                oCtx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
+                oCtx.lineCap = 'round';
+                oCtx.lineJoin = 'round';
+                const size = Math.max(24, 26 * (stroke.size / 3)) * canvasScale;
                 oCtx.beginPath();
-                oCtx.moveTo(stroke.x - 8, stroke.y);
-                oCtx.lineTo(stroke.x - 2, stroke.y + 7);
-                oCtx.lineTo(stroke.x + 10, stroke.y - 9);
+                oCtx.moveTo(stroke.x - size * 0.42, stroke.y);
+                oCtx.lineTo(stroke.x - size * 0.1, stroke.y + size * 0.38);
+                oCtx.lineTo(stroke.x + size * 0.55, stroke.y - size * 0.48);
+                oCtx.stroke();
+              } else if (stroke.type === 'cross' && stroke.x !== undefined && stroke.y !== undefined) {
+                oCtx.strokeStyle = stroke.color;
+                oCtx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
+                oCtx.lineCap = 'round';
+                oCtx.lineJoin = 'round';
+                const size = Math.max(20, 22 * (stroke.size / 3)) * canvasScale;
+                oCtx.beginPath();
+                oCtx.moveTo(stroke.x - size * 0.45, stroke.y - size * 0.45);
+                oCtx.lineTo(stroke.x + size * 0.45, stroke.y + size * 0.45);
+                oCtx.moveTo(stroke.x + size * 0.45, stroke.y - size * 0.45);
+                oCtx.lineTo(stroke.x - size * 0.45, stroke.y + size * 0.45);
+                oCtx.stroke();
+              } else if (stroke.type === 'freehand' && stroke.points && stroke.points.length > 0) {
+                oCtx.strokeStyle = stroke.color;
+                oCtx.lineWidth = stroke.size * canvasScale;
+                oCtx.lineCap = 'round';
+                oCtx.lineJoin = 'round';
+                oCtx.beginPath();
+                oCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                for (let i = 1; i < stroke.points.length; i++) {
+                  oCtx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                }
                 oCtx.stroke();
               }
               oCtx.restore();
@@ -404,7 +436,14 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   // Pointer Down Handler
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (readOnly) return;
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+
+    // Only capture pointer for continuous freehand drawing tools so clicks aren't swallowed
+    if (activeTool === 'pen' || activeTool === 'highlighter') {
+      try {
+        (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      } catch {}
+    }
+
     const coords = getCanvasCoords(e);
     if (!coords) return;
 
@@ -412,12 +451,12 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     if (activeTool === 'smart_check') {
       const now = Date.now();
       const last = lastClickRef.current;
+      const screenDist = last
+        ? Math.hypot(e.clientX - last.clientX, e.clientY - last.clientY)
+        : Infinity;
 
-      // Check if double-click within 320ms and within 40px radius
-      const isDoubleClick =
-        last &&
-        now - last.time < 320 &&
-        Math.hypot(coords.x - last.x, coords.y - last.y) < 45;
+      // Check double-click in screen coordinates (within 450ms and 35px radius)
+      const isDoubleClick = last && now - last.time < 450 && screenDist < 35;
 
       if (isDoubleClick) {
         if (clickTimerRef.current) {
@@ -458,14 +497,16 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       setStrokes((prev) => [...prev, tickStroke]);
       lastClickRef.current = {
         time: now,
-        x: coords.x,
-        y: coords.y,
+        clientX: e.clientX,
+        clientY: e.clientY,
+        canvasX: coords.x,
+        canvasY: coords.y,
         strokeId: tickStroke.id,
       };
 
       clickTimerRef.current = setTimeout(() => {
         lastClickRef.current = null;
-      }, 320);
+      }, 450);
       return;
     }
 
@@ -577,10 +618,38 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isDrawing) {
       setIsDrawing(false);
-      try {
-        (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
-      } catch {}
     }
+    try {
+      if ((e.target as HTMLElement).hasPointerCapture?.(e.pointerId)) {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      }
+    } catch {}
+  };
+
+  // Native Double-Click Guarantee
+  const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (readOnly || activeTool !== 'smart_check') return;
+    const coords = getCanvasCoords(e);
+    if (!coords) return;
+
+    setStrokes((prev) => {
+      if (prev.length === 0) return prev;
+      const lastStroke = prev[prev.length - 1];
+      if (lastStroke && lastStroke.type === 'tick' && lastStroke.x !== undefined && lastStroke.y !== undefined) {
+        const dist = Math.hypot(lastStroke.x - coords.x, lastStroke.y - coords.y);
+        const canvasScale = Math.max(1, (canvasRef.current?.width || 800) / 800);
+        if (dist < 80 * canvasScale) {
+          const cross: AnnotationStroke = {
+            ...lastStroke,
+            id: Math.random().toString(),
+            type: 'cross',
+            color: '#ef4444',
+          };
+          return [...prev.slice(0, -1), cross];
+        }
+      }
+      return prev;
+    });
   };
 
   const handleAddText = () => {
@@ -910,6 +979,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerUp}
+              onDoubleClick={handleDoubleClick}
               className="max-w-none block bg-white touch-none"
             />
 

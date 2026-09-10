@@ -211,10 +211,12 @@ export default function SplitScreenGradingPage() {
     ? rawFileUrl 
     : supabase.storage.from('course-materials').getPublicUrl(rawFileUrl).data.publicUrl;
     
+  const hasCheckedCopy = !!submission.checked_copy_url;
   const isPdf =
-    submission.file_name?.toLowerCase().endsWith('.pdf') ||
-    submission.file_type?.includes('pdf') ||
-    fileUrl?.toLowerCase().includes('.pdf');
+    !hasCheckedCopy &&
+    (submission.file_name?.toLowerCase().endsWith('.pdf') ||
+      submission.file_type?.includes('pdf') ||
+      fileUrl?.toLowerCase().includes('.pdf'));
 
   return (
     <div className="space-y-5 animate-in fade-in duration-300">

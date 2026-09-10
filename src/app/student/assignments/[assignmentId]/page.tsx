@@ -432,7 +432,11 @@ export default function AssignmentDetailPage() {
                       </div>
 
                       <a
-                        href={submission.checked_copy_url}
+                        href={
+                          submission.checked_copy_url?.startsWith('http')
+                            ? submission.checked_copy_url
+                            : supabase.storage.from('course-materials').getPublicUrl(submission.checked_copy_url).data.publicUrl
+                        }
                         download
                         target="_blank"
                         rel="noreferrer"
@@ -446,7 +450,11 @@ export default function AssignmentDetailPage() {
                     <div className="rounded-xl overflow-hidden border border-orange-200/80 bg-white shadow-md max-h-96 overflow-y-auto">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={submission.checked_copy_url}
+                        src={
+                          submission.checked_copy_url?.startsWith('http')
+                            ? submission.checked_copy_url
+                            : supabase.storage.from('course-materials').getPublicUrl(submission.checked_copy_url).data.publicUrl
+                        }
                         alt="Teacher evaluated and checked answer copy"
                         className="w-full object-contain"
                       />
