@@ -24,7 +24,8 @@ import {
   Eraser,
   Award,
   MousePointerClick,
-  Maximize2,
+  Eye,
+  ArrowLeft,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -61,7 +62,11 @@ interface HandwrittenAnnotationCanvasProps {
   onExportBlob?: (blob: Blob) => void;
   checkedCopyUrl?: string | null;
   readOnly?: boolean;
+  /** Unique key used to persist strokes in localStorage (e.g. submissionId) */
+  persistenceKey?: string;
 }
+
+const STORAGE_PREFIX = 'annotation_strokes_v2_';
 
 export const HandwrittenAnnotationCanvas = forwardRef<
   HandwrittenAnnotationCanvasHandle,
@@ -73,6 +78,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     onExportBlob,
     checkedCopyUrl,
     readOnly = false,
+    persistenceKey,
   },
   ref
 ) {
@@ -88,6 +94,9 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   const [zoom, setZoom] = useState<number>(1);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+
+  // View mode: 'annotate' = live canvas, 'returned' = show checkedCopyUrl directly
+  const [viewMode, setViewMode] = useState<'annotate' | 'returned'>('annotate');
 
   // History State for Undo / Redo
   const [strokes, setStrokes] = useState<AnnotationStroke[]>([]);
@@ -118,6 +127,45 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   ];
 
   const quickMarks = ['+1', '+2', '+5', '-1', '-½', '10/10'];
+
+  // ─── localStorage Persistence ───────────────────────────────────────────
+  const storageKey = persistenceKey ? `${STORAGE_PREFIX}${persistenceKey}` : null;
+
+  /** Load strokes from localStorage on initial mount */
+  useEffect(() => {
+    if (!storageKey || readOnly) return;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) {
+        const parsed: AnnotationStroke[] = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setStrokes(parsed);
+          toast.info(`Restored ${parsed.length} annotation${parsed.length !== 1 ? 's' : ''} from last session`, {
+            duration: 2500,
+          });
+        }
+      }
+    } catch {
+      // Corrupt data — ignore silently
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
+  /** Save strokes to localStorage whenever they change */
+  useEffect(() => {
+    if (!storageKey || readOnly) return;
+    try {
+      if (strokes.length > 0) {
+        localStorage.setItem(storageKey, JSON.stringify(strokes));
+      } else {
+        localStorage.removeItem(storageKey);
+      }
+    } catch {
+      // Storage quota exceeded — ignore
+    }
+  }, [strokes, storageKey, readOnly]);
+
+  // ─── Canvas Rendering ──────────────────────────────────────────────────
 
   // Render single annotation stroke on any 2D canvas context
   const renderAnnotationStroke = (
@@ -301,7 +349,8 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     }
 
     let isMounted = true;
-    const targetUrl = checkedCopyUrl || imageUrl;
+    // Always load the original student submission for annotation
+    const targetUrl = imageUrl;
     if (!targetUrl) return;
 
     const setupImage = async () => {
@@ -353,7 +402,9 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     return () => {
       isMounted = false;
     };
-  }, [imageUrl, checkedCopyUrl, isPdf, redrawCanvas]);
+  // Only re-run when imageUrl or isPdf changes, NOT on checkedCopyUrl changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageUrl, isPdf]);
 
   useEffect(() => {
     redrawCanvas();
@@ -403,6 +454,10 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     if (strokes.length === 0) return;
     saveHistory();
     setStrokes([]);
+    // Also clear localStorage
+    if (storageKey) {
+      try { localStorage.removeItem(storageKey); } catch {}
+    }
     toast.info('All annotations cleared');
   };
 
@@ -664,375 +719,450 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
   return (
     <div className="flex flex-col h-full bg-slate-900 text-slate-100 rounded-2xl overflow-hidden relative shadow-2xl">
-      {/* Top Digital Correction Toolbar */}
-      {!readOnly && !isPdf && (
-        <div className="p-2.5 bg-slate-900/95 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 select-none z-20">
-          {/* Main Primary Tools */}
-          <div className="flex items-center gap-1 bg-slate-800/95 p-1 rounded-xl border border-slate-700/80 shadow-inner">
-            {/* Smart Check (1-Click Tick, 2-Click Cross) */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('smart_check')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'smart_check'
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md ring-2 ring-emerald-400/50'
-                  : 'text-emerald-300 hover:text-white hover:bg-slate-700'
-              }`}
-              title="Smart Check: Single click for Green Tick (✓), Double click for Red Cross (✗)"
-            >
-              <MousePointerClick className="h-4 w-4" />
-              <span>Smart Check (✓ / ✗)</span>
-            </button>
 
-            {/* Freehand Pen */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('pen')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'pen'
-                  ? 'bg-orange-600 text-white shadow-md'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-700'
-              }`}
-              title="Freehand Correction Pen"
-            >
-              <Pen className="h-3.5 w-3.5" />
-              <span>Pen</span>
-            </button>
-
-            {/* Explicit Tick */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('tick')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'tick'
-                  ? 'bg-emerald-600 text-white shadow-md'
-                  : 'text-emerald-400 hover:text-white hover:bg-slate-700'
-              }`}
-              title="Stamp Green Tick (✓)"
-            >
-              <Check className="h-3.5 w-3.5 stroke-[3]" />
-              <span className="hidden sm:inline">Tick</span>
-            </button>
-
-            {/* Explicit Cross */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('cross')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'cross'
-                  ? 'bg-red-600 text-white shadow-md'
-                  : 'text-red-400 hover:text-white hover:bg-slate-700'
-              }`}
-              title="Stamp Red Cross (✗)"
-            >
-              <X className="h-3.5 w-3.5 stroke-[3]" />
-              <span className="hidden sm:inline">Cross</span>
-            </button>
-
-            {/* Marks Stamp */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('mark')}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'mark'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-blue-300 hover:text-white hover:bg-slate-700'
-              }`}
-              title="Stamp Score Marks (+1, +2, -1)"
-            >
-              <Award className="h-3.5 w-3.5" />
-              <span>Mark ({selectedMark})</span>
-            </button>
-
-            {/* Highlighter */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('highlighter')}
-              className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'highlighter'
-                  ? 'bg-yellow-500 text-slate-900 shadow-md'
-                  : 'text-yellow-400 hover:text-yellow-300 hover:bg-slate-700'
-              }`}
-              title="Highlighter"
-            >
-              <Highlighter className="h-3.5 w-3.5" />
-            </button>
-
-            {/* Text Note */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('text')}
-              className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'text'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-700'
-              }`}
-              title="Type Written Note / Remark"
-            >
-              <Type className="h-3.5 w-3.5" />
-            </button>
-
-            {/* Eraser */}
-            <button
-              type="button"
-              onClick={() => setActiveTool('eraser')}
-              className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTool === 'eraser'
-                  ? 'bg-rose-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700'
-              }`}
-              title="Click on any mark or ink to erase"
-            >
-              <Eraser className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {/* Quick Mark Pill Selector (visible when mark tool active) */}
-          {activeTool === 'mark' && (
-            <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700">
-              {quickMarks.map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setSelectedMark(m)}
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                    selectedMark === m
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Colors & Brush Size */}
-          <div className="flex items-center gap-2">
-            {/* Color Swatches */}
-            <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-full border border-slate-700">
-              {colors.map((c) => (
-                <button
-                  key={c.value}
-                  type="button"
-                  onClick={() => setActiveColor(c.value)}
-                  className={`w-5 h-5 rounded-full ${c.bg} transition-all flex items-center justify-center ${
-                    activeColor === c.value
-                      ? 'ring-2 ring-white ring-offset-1 ring-offset-slate-900 scale-110'
-                      : 'opacity-70 hover:opacity-100'
-                  }`}
-                  title={c.label}
-                />
-              ))}
-            </div>
-
-            {/* Stroke Thickness */}
-            <div className="flex items-center gap-0.5 bg-slate-800/90 p-1 rounded-lg border border-slate-700 text-xs">
-              {[2, 4, 7].map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setBrushSize(s)}
-                  className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${
-                    brushSize === s
-                      ? 'bg-slate-600 text-white'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {s === 2 ? 'Fine' : s === 4 ? 'Med' : 'Thick'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Actions: Undo / Redo / Clear / Zoom / Download */}
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={handleUndo}
-              disabled={undoStack.length === 0}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-25"
-              title="Undo (Ctrl+Z)"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleRedo}
-              disabled={redoStack.length === 0}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-25"
-              title="Redo (Ctrl+Y)"
-            >
-              <RotateCw className="h-4 w-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleClear}
-              disabled={strokes.length === 0}
-              className="p-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-slate-800 disabled:opacity-25"
-              title="Clear all markings"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-
-            <div className="h-4 w-[1px] bg-slate-700 mx-1" />
-
-            <button
-              type="button"
-              onClick={() => setZoom((z) => Math.max(0.6, z - 0.15))}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
-              title="Zoom out"
-            >
-              <ZoomOut className="h-4 w-4" />
-            </button>
-            <span className="text-[11px] font-mono font-bold text-slate-400 w-8 text-center">
-              {Math.round(zoom * 100)}%
-            </span>
-            <button
-              type="button"
-              onClick={() => setZoom((z) => Math.min(2.2, z + 0.15))}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
-              title="Zoom in"
-            >
-              <ZoomIn className="h-4 w-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleDownloadLocalCopy}
-              className="ml-1 p-1 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-slate-800"
-              title="Save / Download evaluated copy as PNG"
-            >
-              <Download className="h-4 w-4" />
-            </button>
-          </div>
+      {/* ── View Mode Tabs (Annotate / View Returned Copy) ── */}
+      {checkedCopyUrl && (
+        <div className="flex items-center gap-1 px-3 pt-2 bg-slate-900 border-b border-slate-800/60">
+          <button
+            type="button"
+            onClick={() => setViewMode('annotate')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-lg text-xs font-bold transition-all ${
+              viewMode === 'annotate'
+                ? 'bg-slate-800 text-orange-400 border-b-2 border-orange-500'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <MousePointerClick className="h-3.5 w-3.5" />
+            Annotate (Correction Pad)
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('returned')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t-lg text-xs font-bold transition-all ${
+              viewMode === 'returned'
+                ? 'bg-emerald-900/40 text-emerald-400 border-b-2 border-emerald-500'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            View Returned Copy
+          </button>
         </div>
       )}
 
-      {/* Main Drawing Viewport */}
-      <div
-        ref={containerRef}
-        className="flex-1 overflow-auto bg-slate-950/90 relative flex items-center justify-center p-4"
-        style={{
-          cursor:
-            activeTool === 'smart_check'
-              ? 'cell'
-              : activeTool === 'pen'
-              ? 'crosshair'
-              : activeTool === 'tick' || activeTool === 'cross' || activeTool === 'mark'
-              ? 'cell'
-              : activeTool === 'eraser'
-              ? 'not-allowed'
-              : 'default',
-        }}
-      >
-        {isPdf ? (
-          <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center space-y-3 bg-slate-100 relative rounded-xl overflow-hidden">
-            <div className="bg-blue-50/95 border border-blue-200 text-blue-800 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm">
-              📄 Multi-page PDF Submission. To evaluate, please review in the viewer below and submit marks in the right console.
+      {/* ── Returned Checked Copy Viewer ── */}
+      {viewMode === 'returned' && checkedCopyUrl ? (
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-950/90">
+          <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <span className="text-xs font-bold text-emerald-300">Previously Returned Checked Copy</span>
             </div>
-            <iframe
-              src={`${imageUrl}#toolbar=1`}
-              className="w-full h-full rounded-xl border border-slate-300 bg-white"
-              title="Student PDF Document"
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setViewMode('annotate')}
+                className="flex items-center gap-1 text-xs text-slate-400 hover:text-white px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back to Annotation
+              </button>
+              <a
+                href={checkedCopyUrl}
+                download
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors font-semibold"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download
+              </a>
+            </div>
+          </div>
+          <div className="flex-1 overflow-auto flex items-start justify-center p-4 bg-slate-950/90">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={checkedCopyUrl}
+              alt="Previously returned teacher-annotated copy"
+              className="max-w-full object-contain rounded-xl shadow-2xl border border-slate-700"
             />
           </div>
-        ) : (
-          <div
-            className="transition-transform origin-center duration-150 relative shadow-2xl rounded-xl overflow-hidden border border-slate-700/60 bg-white"
-            style={{ transform: `scale(${zoom})` }}
-          >
-            <canvas
-              ref={canvasRef}
-              width={800}
-              height={1100}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerUp}
-              onDoubleClick={handleDoubleClick}
-              className="max-w-none block bg-white touch-none"
-            />
+        </div>
+      ) : (
+        <>
+          {/* Top Digital Correction Toolbar */}
+          {!readOnly && !isPdf && (
+            <div className="p-2.5 bg-slate-900/95 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 select-none z-20">
+              {/* Main Primary Tools */}
+              <div className="flex items-center gap-1 bg-slate-800/95 p-1 rounded-xl border border-slate-700/80 shadow-inner">
+                {/* Smart Check (1-Click Tick, 2-Click Cross) */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('smart_check')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'smart_check'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md ring-2 ring-emerald-400/50'
+                      : 'text-emerald-300 hover:text-white hover:bg-slate-700'
+                  }`}
+                  title="Smart Check: Single click for Green Tick (✓), Double click for Red Cross (✗)"
+                >
+                  <MousePointerClick className="h-4 w-4" />
+                  <span>Smart Check (✓ / ✗)</span>
+                </button>
 
-            {/* Floating Text Input Box when typing teacher remark */}
-            {textInputPos && (
-              <div
-                className="absolute z-30 flex items-center gap-1.5 bg-slate-900/95 p-2 rounded-xl border border-slate-700 shadow-2xl"
-                style={{
-                  left:
-                    (textInputPos.x / (canvasRef.current?.width || 1)) * 100 + '%',
-                  top:
-                    (textInputPos.y / (canvasRef.current?.height || 1)) * 100 + '%',
-                }}
-              >
-                <input
-                  type="text"
-                  autoFocus
-                  value={textInputValue}
-                  onChange={(e) => setTextInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddText();
-                    if (e.key === 'Escape') setTextInputPos(null);
-                  }}
-                  placeholder="Type teacher correction / note..."
-                  className="px-2.5 py-1 text-xs rounded-lg bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-1 focus:ring-orange-500 w-52"
+                {/* Freehand Pen */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('pen')}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'pen'
+                      ? 'bg-orange-600 text-white shadow-md'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                  }`}
+                  title="Freehand Correction Pen"
+                >
+                  <Pen className="h-3.5 w-3.5" />
+                  <span>Pen</span>
+                </button>
+
+                {/* Explicit Tick */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('tick')}
+                  className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'tick'
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'text-emerald-400 hover:text-white hover:bg-slate-700'
+                  }`}
+                  title="Stamp Green Tick (✓)"
+                >
+                  <Check className="h-3.5 w-3.5 stroke-[3]" />
+                  <span className="hidden sm:inline">Tick</span>
+                </button>
+
+                {/* Explicit Cross */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('cross')}
+                  className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'cross'
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'text-red-400 hover:text-white hover:bg-slate-700'
+                  }`}
+                  title="Stamp Red Cross (✗)"
+                >
+                  <X className="h-3.5 w-3.5 stroke-[3]" />
+                  <span className="hidden sm:inline">Cross</span>
+                </button>
+
+                {/* Marks Stamp */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('mark')}
+                  className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'mark'
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'text-blue-300 hover:text-white hover:bg-slate-700'
+                  }`}
+                  title="Stamp Score Marks (+1, +2, -1)"
+                >
+                  <Award className="h-3.5 w-3.5" />
+                  <span>Mark ({selectedMark})</span>
+                </button>
+
+                {/* Highlighter */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('highlighter')}
+                  className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'highlighter'
+                      ? 'bg-yellow-500 text-slate-900 shadow-md'
+                      : 'text-yellow-400 hover:text-yellow-300 hover:bg-slate-700'
+                  }`}
+                  title="Highlighter"
+                >
+                  <Highlighter className="h-3.5 w-3.5" />
+                </button>
+
+                {/* Text Note */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('text')}
+                  className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'text'
+                      ? 'bg-purple-600 text-white shadow-md'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                  }`}
+                  title="Type Written Note / Remark"
+                >
+                  <Type className="h-3.5 w-3.5" />
+                </button>
+
+                {/* Eraser */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('eraser')}
+                  className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeTool === 'eraser'
+                      ? 'bg-rose-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                  }`}
+                  title="Click on any mark or ink to erase"
+                >
+                  <Eraser className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* Quick Mark Pill Selector (visible when mark tool active) */}
+              {activeTool === 'mark' && (
+                <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700">
+                  {quickMarks.map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setSelectedMark(m)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                        selectedMark === m
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Colors & Brush Size */}
+              <div className="flex items-center gap-2">
+                {/* Color Swatches */}
+                <div className="flex items-center gap-1 bg-slate-800/90 p-1 rounded-full border border-slate-700">
+                  {colors.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setActiveColor(c.value)}
+                      className={`w-5 h-5 rounded-full ${c.bg} transition-all flex items-center justify-center ${
+                        activeColor === c.value
+                          ? 'ring-2 ring-white ring-offset-1 ring-offset-slate-900 scale-110'
+                          : 'opacity-70 hover:opacity-100'
+                      }`}
+                      title={c.label}
+                    />
+                  ))}
+                </div>
+
+                {/* Stroke Thickness */}
+                <div className="flex items-center gap-0.5 bg-slate-800/90 p-1 rounded-lg border border-slate-700 text-xs">
+                  {[2, 4, 7].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setBrushSize(s)}
+                      className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${
+                        brushSize === s
+                          ? 'bg-slate-600 text-white'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {s === 2 ? 'Fine' : s === 4 ? 'Med' : 'Thick'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions: Undo / Redo / Clear / Zoom / Download */}
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleUndo}
+                  disabled={undoStack.length === 0}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-25"
+                  title="Undo (Ctrl+Z)"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRedo}
+                  disabled={redoStack.length === 0}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-25"
+                  title="Redo (Ctrl+Y)"
+                >
+                  <RotateCw className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  disabled={strokes.length === 0}
+                  className="p-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-slate-800 disabled:opacity-25"
+                  title="Clear all markings"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+
+                <div className="h-4 w-[1px] bg-slate-700 mx-1" />
+
+                <button
+                  type="button"
+                  onClick={() => setZoom((z) => Math.max(0.6, z - 0.15))}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                  title="Zoom out"
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </button>
+                <span className="text-[11px] font-mono font-bold text-slate-400 w-8 text-center">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setZoom((z) => Math.min(2.2, z + 0.15))}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                  title="Zoom in"
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadLocalCopy}
+                  className="ml-1 p-1 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-slate-800"
+                  title="Save / Download evaluated copy as PNG"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Main Drawing Viewport */}
+          <div
+            ref={containerRef}
+            className="flex-1 overflow-auto bg-slate-950/90 relative flex items-center justify-center p-4"
+            style={{
+              cursor:
+                activeTool === 'smart_check'
+                  ? 'cell'
+                  : activeTool === 'pen'
+                  ? 'crosshair'
+                  : activeTool === 'tick' || activeTool === 'cross' || activeTool === 'mark'
+                  ? 'cell'
+                  : activeTool === 'eraser'
+                  ? 'not-allowed'
+                  : 'default',
+            }}
+          >
+            {isPdf ? (
+              <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center space-y-3 bg-slate-100 relative rounded-xl overflow-hidden">
+                <div className="bg-blue-50/95 border border-blue-200 text-blue-800 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm">
+                  📄 Multi-page PDF Submission. To evaluate, please review in the viewer below and submit marks in the right console.
+                </div>
+                <iframe
+                  src={`${imageUrl}#toolbar=1`}
+                  className="w-full h-full rounded-xl border border-slate-300 bg-white"
+                  title="Student PDF Document"
                 />
-                <button
-                  type="button"
-                  onClick={handleAddText}
-                  className="px-2.5 py-1 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs"
-                >
-                  Add
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTextInputPos(null)}
-                  className="p-1 text-slate-400 hover:text-white"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
+              </div>
+            ) : (
+              <div
+                className="transition-transform origin-center duration-150 relative shadow-2xl rounded-xl overflow-hidden border border-slate-700/60 bg-white"
+                style={{ transform: `scale(${zoom})` }}
+              >
+                <canvas
+                  ref={canvasRef}
+                  width={800}
+                  height={1100}
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerCancel={handlePointerUp}
+                  onDoubleClick={handleDoubleClick}
+                  className="max-w-none block bg-white touch-none"
+                />
+
+                {/* Floating Text Input Box when typing teacher remark */}
+                {textInputPos && (
+                  <div
+                    className="absolute z-30 flex items-center gap-1.5 bg-slate-900/95 p-2 rounded-xl border border-slate-700 shadow-2xl"
+                    style={{
+                      left:
+                        (textInputPos.x / (canvasRef.current?.width || 1)) * 100 + '%',
+                      top:
+                        (textInputPos.y / (canvasRef.current?.height || 1)) * 100 + '%',
+                    }}
+                  >
+                    <input
+                      type="text"
+                      autoFocus
+                      value={textInputValue}
+                      onChange={(e) => setTextInputValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleAddText();
+                        if (e.key === 'Escape') setTextInputPos(null);
+                      }}
+                      placeholder="Type teacher correction / note..."
+                      className="px-2.5 py-1 text-xs rounded-lg bg-slate-800 text-white border border-slate-600 focus:outline-none focus:ring-1 focus:ring-orange-500 w-52"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddText}
+                      className="px-2.5 py-1 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTextInputPos(null)}
+                      className="p-1 text-slate-400 hover:text-white"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-      </div>
 
-      {/* Bottom Status Bar */}
-      <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 font-semibold text-slate-300">
-            {activeTool === 'smart_check' && (
-              <>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Smart Check Mode:{' '}
-                <strong className="text-emerald-400">Single click = ✓ Tick</strong> ·{' '}
-                <strong className="text-red-400">Double click = ✗ Cross</strong>
-              </>
+          {/* Bottom Status Bar */}
+          <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 font-semibold text-slate-300">
+                {activeTool === 'smart_check' && (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Smart Check Mode:{' '}
+                    <strong className="text-emerald-400">Single click = ✓ Tick</strong> ·{' '}
+                    <strong className="text-red-400">Double click = ✗ Cross</strong>
+                  </>
+                )}
+                {activeTool === 'pen' && 'Freehand Pen Mode (Drag to draw ink)'}
+                {activeTool === 'tick' && 'Tick Stamp Mode (Click to stamp ✓)'}
+                {activeTool === 'cross' && 'Cross Stamp Mode (Click to stamp ✗)'}
+                {activeTool === 'mark' && `Score Stamp Mode (Click to stamp ${selectedMark})`}
+                {activeTool === 'eraser' && 'Eraser Mode (Click on markings to erase)'}
+              </span>
+              <span className="text-slate-500">|</span>
+              <span>{strokes.length} annotations drawn</span>
+              {strokes.length > 0 && storageKey && (
+                <span className="text-emerald-500/70 font-semibold">· Auto-saved locally</span>
+              )}
+            </div>
+
+            {checkedCopyUrl && (
+              <button
+                type="button"
+                onClick={() => setViewMode('returned')}
+                className="flex items-center gap-1 text-emerald-400 hover:underline font-semibold"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>View Returned Copy</span>
+              </button>
             )}
-            {activeTool === 'pen' && 'Freehand Pen Mode (Drag to draw ink)'}
-            {activeTool === 'tick' && 'Tick Stamp Mode (Click to stamp ✓)'}
-            {activeTool === 'cross' && 'Cross Stamp Mode (Click to stamp ✗)'}
-            {activeTool === 'mark' && `Score Stamp Mode (Click to stamp ${selectedMark})`}
-            {activeTool === 'eraser' && 'Eraser Mode (Click on markings to erase)'}
-          </span>
-          <span className="text-slate-500">|</span>
-          <span>{strokes.length} annotations drawn</span>
-        </div>
-
-        {checkedCopyUrl && (
-          <a
-            href={checkedCopyUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1 text-emerald-400 hover:underline font-semibold"
-          >
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            <span>Checked Copy Available</span>
-          </a>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 });
