@@ -444,6 +444,36 @@ export async function getSubmissionById(supabase: SupabaseClient, submissionId: 
   return parseSubmissionFeedback(data);
 }
 
+export async function getAssignmentSubmissions(supabase: SupabaseClient, assignmentId: string) {
+  const { data, error } = await supabase
+    .from('submissions')
+    .select(
+      `
+        id,
+        assignment_id,
+        student_id,
+        file_url,
+        file_name,
+        file_type,
+        marks_obtained,
+        feedback,
+        status,
+        submitted_at,
+        users:student_id (
+          id,
+          full_name,
+          email,
+          avatar_url
+        )
+      `
+    )
+    .eq('assignment_id', assignmentId)
+    .order('submitted_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []).map(parseSubmissionFeedback);
+}
+
 export async function uploadCheckedCopy(
   supabase: SupabaseClient,
   submissionId: string,
