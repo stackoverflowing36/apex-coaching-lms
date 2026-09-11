@@ -27,6 +27,7 @@ import {
   getSubmissionForAssignment,
   createSubmission,
   uploadSubmissionFile,
+  createNotification,
 } from '@/lib/supabase/queries';
 import { useAuthUser } from '@/hooks/useAuthUser';
 import { Badge } from '@/components/ui/badge';
@@ -150,6 +151,24 @@ export default function AssignmentDetailPage() {
       setUploadProgress(100);
       setSubmission(newSubmission);
       setSelectedFile(null);
+
+      // Notify faculty in real-time
+      try {
+        await createNotification(supabase, {
+          type: 'submission_created',
+          title: 'New Assignment Submission',
+          message: `${user.full_name || 'A student'} submitted for "${assignment.title}"`,
+          data: {
+            assignment_id: assignment.id,
+            assignment_title: assignment.title,
+            student_id: user.id,
+            submission_id: newSubmission.id,
+          },
+        });
+      } catch (notifErr) {
+        console.warn('Failed to notify faculty of submission:', notifErr);
+      }
+
       toast.success('Assignment submitted!', {
         description: 'Your file has been uploaded successfully.',
       });

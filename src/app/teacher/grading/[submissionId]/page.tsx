@@ -59,7 +59,7 @@ export default function SplitScreenGradingPage() {
   const [submission, setSubmission] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeViewerTab, setActiveViewerTab] = useState<'canvas' | 'original'>('canvas');
+  const [activeViewerTab, setActiveViewerTab] = useState<'canvas' | 'checked_copy' | 'original'>('canvas');
 
   // Form State
   const [marks, setMarks] = useState<number | ''>('');
@@ -161,13 +161,19 @@ export default function SplitScreenGradingPage() {
         description: `Score: ${marks}/${maxMarks} (${Math.round((Number(marks) / maxMarks) * 100)}%)`,
       });
 
-      // Clear locally-saved strokes now that they've been exported and uploaded
+      // Clear locally-saved strokes draft now that they've been exported and uploaded
+      if (canvasHandleRef.current) {
+        try { canvasHandleRef.current.clearSavedDraft(); } catch {}
+      }
       try {
         localStorage.removeItem(`annotation_strokes_v2_${submissionId}`);
       } catch {}
 
       // Reload to ensure state is synchronized
       await loadSubmission();
+      if (checkedCopyPublicUrl) {
+        setActiveViewerTab('checked_copy');
+      }
     } catch (err: any) {
       toast.dismiss('upload-copy');
       console.error('Grade submit error:', err);
@@ -293,24 +299,44 @@ export default function SplitScreenGradingPage() {
           
           {/* Viewer Mode Selector Header */}
           <div className="p-3 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 bg-white p-1 rounded-full border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-1.5 bg-white p-1 rounded-full border border-slate-200 shadow-sm overflow-x-auto max-w-[80%]">
               <button
                 type="button"
                 onClick={() => setActiveViewerTab('canvas')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${
                   activeViewerTab === 'canvas'
                     ? 'bg-orange-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <PenTool className="h-3.5 w-3.5" />
-                <span>Correction Pad (Pen &amp; Ticks)</span>
+                <span>Correction Pad</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveViewerTab('checked_copy')}
+                disabled={!submission?.checked_copy_url}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${
+                  activeViewerTab === 'checked_copy'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : submission?.checked_copy_url
+                    ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                    : 'text-slate-300 opacity-40 cursor-not-allowed'
+                }`}
+                title={submission?.checked_copy_url ? 'View evaluated checked copy' : 'No checked copy saved yet'}
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>Evaluated Copy</span>
+                {submission?.checked_copy_url && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                )}
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveViewerTab('original')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${
                   activeViewerTab === 'original'
                     ? 'bg-orange-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
@@ -328,12 +354,12 @@ export default function SplitScreenGradingPage() {
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-orange-600 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm"
               >
-                <span>Raw File</span>
+                <span>Raw</span>
                 <ExternalLink className="h-3 w-3" />
               </a>
 
               <a
-                href={submission.checked_copy_url || fileUrl}
+                href={submission?.checked_copy_url || fileUrl}
                 download
                 className="p-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors"
                 title="Download file"
@@ -354,6 +380,33 @@ export default function SplitScreenGradingPage() {
                 persistenceKey={submissionId}
                 onExportBlob={(blob) => setPendingBlob(blob)}
               />
+            ) : activeViewerTab === 'checked_copy' ? (
+              <div className="w-full h-full flex flex-col overflow-hidden bg-slate-950 rounded-2xl">
+                <div className="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs text-slate-300">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                    <span className="font-bold text-emerald-300">Evaluated Copy with Handwritten Corrections</span>
+                  </div>
+                  <a
+                    href={submission.checked_copy_url}
+                    download
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Download Copy
+                  </a>
+                </div>
+                <div className="flex-1 overflow-auto flex items-start justify-center p-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={submission.checked_copy_url}
+                    alt="Evaluated checked copy"
+                    className="max-w-full object-contain rounded-xl shadow-2xl border border-slate-700"
+                  />
+                </div>
+              </div>
             ) : isPdf ? (
               <iframe
                 src={`${fileUrl}#toolbar=1`}

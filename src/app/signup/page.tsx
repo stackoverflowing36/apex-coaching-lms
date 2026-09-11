@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
-import { getCourses } from '@/lib/supabase/queries';
+import { getCourses, createNotification } from '@/lib/supabase/queries';
 import { BackgroundGrid } from '@/components/layout/BackgroundGrid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -173,14 +173,40 @@ function SignupForm() {
       }
 
       if (data?.user) {
+        const assignedBatch =
+          role === 'student'
+            ? selectedBatches.length > 0
+              ? selectedBatches.join(', ')
+              : 'Standard Batch'
+            : 'Faculty Staff';
+
         if (data.session) {
           await supabase.from('users').upsert({
             id: data.user.id,
             email: email.trim(),
             full_name: fullName.trim(),
             role: role,
-            batch_name: role === 'student' ? selectedBatches.join(', ') : 'Faculty Staff',
+            batch_name: assignedBatch,
           });
+        }
+
+        // Notify faculty of new student enrolment
+        if (role === 'student') {
+          try {
+            await createNotification(supabase, {
+              type: 'student_signup',
+              title: 'New Student Enrolled',
+              message: `${fullName.trim() || 'A new student'} joined batch: ${assignedBatch}`,
+              data: {
+                student_id: data.user.id,
+                student_name: fullName.trim(),
+                student_email: email.trim(),
+                batch_name: assignedBatch,
+              },
+            });
+          } catch (notifErr) {
+            console.warn('Failed to notify faculty of student signup:', notifErr);
+          }
         }
 
         toast.success('Registration successful!', {
