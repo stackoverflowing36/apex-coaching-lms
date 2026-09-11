@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
-import { getSubmissionById, gradeSubmission, uploadCheckedCopy } from '@/lib/supabase/queries';
+import { getSubmissionById, gradeSubmission, uploadCheckedCopy, createNotification } from '@/lib/supabase/queries';
 import {
   HandwrittenAnnotationCanvas,
   HandwrittenAnnotationCanvasHandle,
@@ -156,6 +156,22 @@ export default function SplitScreenGradingPage() {
         status: status,
         checked_copy_url: checkedCopyPublicUrl,
       });
+
+      // Fire grading_completed notification
+      try {
+        await createNotification(supabase, {
+          type: 'grading_completed',
+          title: 'Assignment Graded',
+          message: `The submission by ${submission?.users?.full_name || 'Student'} for "${submission?.assignments?.title || 'an assignment'}" has been graded.`,
+          data: {
+            submission_id: submissionId,
+            student_id: submission?.student_id,
+            assignment_id: submission?.assignment_id,
+          }
+        });
+      } catch (notifErr) {
+        console.warn('Failed to fire grading notification:', notifErr);
+      }
 
       toast.success('Grade & evaluation returned to student!', {
         description: `Score: ${marks}/${maxMarks} (${Math.round((Number(marks) / maxMarks) * 100)}%)`,

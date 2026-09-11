@@ -36,6 +36,7 @@ import {
   getAssignments,
   createAssignment,
   deleteAssignment,
+  createNotification,
 } from '@/lib/supabase/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -315,13 +316,28 @@ export default function CourseBuilderDetailPage() {
         }
       }
 
-      await createAssignment(supabase, {
+      const newAssignment = await createAssignment(supabase, {
         course_id: courseId,
         title: assignmentTitle.trim(),
         description: finalDescription,
         due_date: parsedDueDate,
         max_marks: safeMarks,
       });
+
+      // Fire assignment_created notification
+      try {
+        await createNotification(supabase, {
+          type: 'assignment_created',
+          title: 'New Assignment Published',
+          message: `A new assignment "${assignmentTitle.trim()}" has been published in ${course?.title || 'a batch'}.`,
+          data: {
+            assignment_id: newAssignment.id,
+            course_id: courseId,
+          }
+        });
+      } catch (notifErr) {
+        console.warn('Failed to fire assignment notification:', notifErr);
+      }
 
       toast.success('Assignment created successfully!');
       setAssignmentTitle('');
@@ -1101,6 +1117,13 @@ export default function CourseBuilderDetailPage() {
                   </div>
 
                   <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
+                    <Link
+                      href={`/teacher/assignments/${assignment.id}`}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-slate-500 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      View Details
+                    </Link>
                     <button
                       onClick={() => handleDeleteAssignment(assignment.id)}
                       className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
