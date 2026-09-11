@@ -230,8 +230,8 @@ export default function CourseBuilderDetailPage() {
   // Handle Create Assignment
   const handleCreateAssignment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!assignmentTitle.trim() || !assignmentDueDate) {
-      toast.error('Please fill required fields');
+    if (!assignmentTitle.trim()) {
+      toast.error('Please enter an assignment title');
       return;
     }
 
@@ -239,35 +239,57 @@ export default function CourseBuilderDetailPage() {
       setIsCreatingAssignment(true);
       let finalDescription = assignmentDescription.trim();
 
+      // Safe date parsing with 7-day fallback if malformed
+      let parsedDueDate: string;
+      try {
+        if (!assignmentDueDate) throw new Error('Due date required');
+        const d = new Date(assignmentDueDate);
+        if (isNaN(d.getTime())) throw new Error('Invalid date');
+        parsedDueDate = d.toISOString();
+      } catch {
+        const fallback = new Date();
+        fallback.setDate(fallback.getDate() + 7);
+        parsedDueDate = fallback.toISOString();
+      }
+
+      const safeMarks = Number(assignmentMaxMarks) > 0 ? Number(assignmentMaxMarks) : 100;
+
+      // Handle optional file attachment upload
       if (assignmentFile) {
-        const sanitizedFileName = assignmentFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const filePath = `assignments/${courseId}/${Date.now()}_${sanitizedFileName}`;
+        try {
+          const sanitizedFileName = assignmentFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+          const filePath = `assignments/${courseId}/${Date.now()}_${sanitizedFileName}`;
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('course-materials')
-          .upload(filePath, assignmentFile, {
-            cacheControl: '3600',
-            upsert: true,
-          });
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('course-materials')
+            .upload(filePath, assignmentFile, {
+              cacheControl: '3600',
+              upsert: true,
+            });
 
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('course-materials')
-          .getPublicUrl(uploadData.path);
-
-        finalDescription += `\n\n[ATTACHMENT:${publicUrl}]`;
+          if (uploadError) {
+            console.warn('Assignment attachment upload warning:', uploadError.message);
+            toast.warning('Attachment upload issue, continuing with assignment creation...');
+          } else if (uploadData?.path) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('course-materials')
+              .getPublicUrl(uploadData.path);
+            finalDescription += `\n\n[ATTACHMENT:${publicUrl}]`;
+          }
+        } catch (uploadErr: any) {
+          console.warn('Attachment upload failed:', uploadErr);
+        }
       }
 
       await createAssignment(supabase, {
         course_id: courseId,
         title: assignmentTitle.trim(),
         description: finalDescription,
-        due_date: new Date(assignmentDueDate).toISOString(),
-        max_marks: assignmentMaxMarks,
+        due_date: parsedDueDate,
+        max_marks: safeMarks,
       });
 
-      toast.success('Assignment created!');
+      toast.success('Assignment created successfully!');
       setAssignmentTitle('');
       setAssignmentDescription('');
       setAssignmentDueDate('');
@@ -276,7 +298,10 @@ export default function CourseBuilderDetailPage() {
       setIsAssignmentDialogOpen(false);
       loadData();
     } catch (err: any) {
-      toast.error('Failed to create assignment', { description: err.message });
+      console.error('Assignment create error:', err);
+      toast.error('Failed to create assignment', {
+        description: err.message || 'Please check your inputs and permissions',
+      });
     } finally {
       setIsCreatingAssignment(false);
     }

@@ -23,6 +23,7 @@ import { createClient } from '@/lib/supabase/client';
 import { getCurrentUser } from '@/lib/supabase/queries';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { FacultyNotificationBell } from '@/components/notifications/FacultyNotificationBell';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -173,6 +174,9 @@ export default function TeacherLayout({
                     <ExternalLink className="h-3 w-3 text-slate-400" />
                   </Button>
                 </Link>
+
+                {/* Real-time Faculty Notification Bell */}
+                <FacultyNotificationBell />
 
                 {/* User Dropdown */}
                 <DropdownMenu>

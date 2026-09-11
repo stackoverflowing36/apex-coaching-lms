@@ -24,13 +24,34 @@ export async function GET(request: Request) {
 
       if (!profile) {
         const role = user.user_metadata?.role || 'student';
+        const studentName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Student';
         await supabase.from('users').insert({
           id: user.id,
           email: user.email,
-          full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Student',
+          full_name: studentName,
           role: role,
           avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
         });
+
+        if (role === 'student') {
+          try {
+            await supabase.from('notifications').insert({
+              type: 'student_signup',
+              title: 'New Student Registered (Google)',
+              message: `${studentName} registered via Google and joined the student portal`,
+              data: {
+                student_id: user.id,
+                student_name: studentName,
+                student_email: user.email,
+              },
+              is_read: false,
+              created_at: new Date().toISOString(),
+            });
+          } catch (notifErr) {
+            console.warn('OAuth notification failed:', notifErr);
+          }
+        }
+
         if (next === '/dashboard' || next === '/') {
           next = role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
         }

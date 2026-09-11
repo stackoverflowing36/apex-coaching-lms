@@ -344,18 +344,31 @@ export default function TeacherGradingHubPage() {
 
                       {/* Action Button Column */}
                       <td className="py-4 px-6 text-right">
-                        <Link href={`/teacher/grading/${sub.id}`}>
-                          <Button
-                            size="sm"
-                            className={`rounded-full font-bold text-xs h-8 px-4 shadow-sm transition-all ${
-                              isGraded
-                                ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                                : 'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-600/20'
-                            }`}
-                          >
-                            {isGraded ? 'Review & Edit' : 'Grade Paper'}
-                          </Button>
-                        </Link>
+                        <div className="flex items-center justify-end gap-2">
+                          {(sub.checked_copy_url || sub.checkedCopyUrl) && (
+                            <a
+                              href={sub.checked_copy_url || sub.checkedCopyUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-1.5 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                              title="View Returned Checked Copy"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          <Link href={`/teacher/grading/${sub.id}`}>
+                            <Button
+                              size="sm"
+                              className={`rounded-full font-bold text-xs h-8 px-4 shadow-sm transition-all ${
+                                isGraded
+                                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                  : 'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-600/20'
+                              }`}
+                            >
+                              {isGraded ? 'Review & Edit' : 'Grade Paper'}
+                            </Button>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );

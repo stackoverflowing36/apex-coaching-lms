@@ -1144,3 +1144,86 @@ export async function getDashboardStats(supabase: SupabaseClient, studentId: str
     gradedCount: gradedSubmissions.length,
   };
 }
+
+// ============================================================
+// Notification Queries (Faculty alerts for signups & batch joins)
+// ============================================================
+
+export interface NotificationItem {
+  id: string;
+  user_id?: string | null;
+  type: 'student_signup' | 'batch_enrolled' | 'submission_created' | string;
+  title: string;
+  message: string;
+  data?: any;
+  is_read: boolean;
+  created_at: string;
+}
+
+export async function getNotifications(supabase: SupabaseClient, limit = 20): Promise<NotificationItem[]> {
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.warn('Could not fetch notifications:', error.message);
+      return [];
+    }
+    return (data ?? []) as NotificationItem[];
+  } catch (err) {
+    console.warn('Notification fetch error:', err);
+    return [];
+  }
+}
+
+export async function createNotification(
+  supabase: SupabaseClient,
+  notification: {
+    type: string;
+    title: string;
+    message: string;
+    data?: any;
+    user_id?: string | null;
+  }
+): Promise<NotificationItem | null> {
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert({
+        ...notification,
+        is_read: false,
+        created_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.warn('Failed to insert notification:', error.message);
+      return null;
+    }
+    return data as NotificationItem;
+  } catch (err) {
+    console.warn('Notification insert error:', err);
+    return null;
+  }
+}
+
+export async function markNotificationsAsRead(supabase: SupabaseClient, ids?: string[]) {
+  try {
+    let query = supabase.from('notifications').update({ is_read: true });
+    if (ids && ids.length > 0) {
+      query = query.in('id', ids);
+    } else {
+      query = query.eq('is_read', false);
+    }
+    const { error } = await query;
+    if (error) console.warn('Failed to mark notifications as read:', error.message);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
