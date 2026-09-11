@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import {
   getAssignmentById,
-  getAssignmentSubmissions,
+  fetchAssignmentSubmissions,
 } from '@/lib/supabase/queries';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -39,12 +39,10 @@ export default function TeacherAssignmentDetailsPage() {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
-      const [assignmentData, submissionsData] = await Promise.all([
-        getAssignmentById(supabase, assignmentId),
-        getAssignmentSubmissions(supabase, assignmentId),
-      ]);
+      const assignmentData = await getAssignmentById(supabase, assignmentId);
+      const subs = await fetchAssignmentSubmissions(supabase, assignmentId);
       setAssignment(assignmentData);
-      setSubmissions(submissionsData);
+      setSubmissions(subs);
     } catch (err: any) {
       toast.error('Failed to load assignment details', { description: err.message });
       router.push('/teacher/dashboard');

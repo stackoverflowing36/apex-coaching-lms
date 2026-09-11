@@ -444,7 +444,7 @@ export async function getSubmissionById(supabase: SupabaseClient, submissionId: 
   return parseSubmissionFeedback(data);
 }
 
-export async function getAssignmentSubmissions(supabase: SupabaseClient, assignmentId: string) {
+export async function fetchAssignmentSubmissions(supabase: SupabaseClient, assignmentId: string) {
   const { data, error } = await supabase
     .from('submissions')
     .select(
