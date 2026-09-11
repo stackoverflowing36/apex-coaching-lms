@@ -20,6 +20,7 @@ import {
   Eye,
   AlertCircle,
   Clock,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
@@ -85,6 +86,39 @@ export default function CourseBuilderDetailPage() {
   const [assignmentFile, setAssignmentFile] = useState<File | null>(null);
   const assignmentFileInputRef = useRef<HTMLInputElement>(null);
   const [isCreatingAssignment, setIsCreatingAssignment] = useState(false);
+  const [isAssignmentDragging, setIsAssignmentDragging] = useState(false);
+  const [isTabDragging, setIsTabDragging] = useState(false);
+
+  const handleAssignmentFileDrop = useCallback((file: File) => {
+    const validExtensions = ['.pdf', '.png', '.jpg', '.jpeg', '.docx', '.doc'];
+    const lowerName = file.name.toLowerCase();
+    const isValid = validExtensions.some((ext) => lowerName.endsWith(ext));
+    if (!isValid) {
+      toast.error('Unsupported file format', {
+        description: 'Please upload a PDF document or JPG/PNG scan image.',
+      });
+      return false;
+    }
+    if (file.size > 30 * 1024 * 1024) {
+      toast.error('File too large', {
+        description: 'Maximum file size allowed is 30 MB.',
+      });
+      return false;
+    }
+    setAssignmentFile(file);
+    setAssignmentTitle((prevTitle) => {
+      if (!prevTitle.trim()) {
+        return file.name
+          .replace(/\.[^/.]+$/, '')
+          .replace(/[_-]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+      return prevTitle;
+    });
+    toast.success(`Attached question paper: ${file.name}`);
+    return true;
+  }, []);
 
   const loadData = useCallback(async () => {
     if (!courseId) return;
@@ -820,34 +854,115 @@ export default function CourseBuilderDetailPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-700">
-                      Attachment (PDF/Image)
-                    </Label>
-                    <div className="flex items-center gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => assignmentFileInputRef.current?.click()}
-                        className="rounded-full text-xs h-9"
-                      >
-                        <UploadCloud className="h-4 w-4 mr-2" />
-                        Choose File
-                      </Button>
-                      <span className="text-xs text-slate-500 truncate max-w-[200px]">
-                        {assignmentFile ? assignmentFile.name : 'No file selected'}
+                    <Label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                      <span>Question Paper / Attachment (PDF or Image)</span>
+                      <span className="text-[10px] font-medium text-slate-400">
+                        Drag &amp; drop supported
                       </span>
-                    </div>
-                    <input
-                      ref={assignmentFileInputRef}
-                      type="file"
-                      accept=".pdf,.png,.jpg,.jpeg"
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setAssignmentFile(e.target.files[0]);
+                    </Label>
+
+                    {/* Drag and Drop Zone */}
+                    <div
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsAssignmentDragging(true);
+                      }}
+                      onDragEnter={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsAssignmentDragging(true);
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsAssignmentDragging(false);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsAssignmentDragging(false);
+                        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                          handleAssignmentFileDrop(e.dataTransfer.files[0]);
                         }
                       }}
-                    />
+                      onClick={() => assignmentFileInputRef.current?.click()}
+                      className={`relative border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all duration-200 ${
+                        isAssignmentDragging
+                          ? 'border-orange-500 bg-orange-50/90 scale-[1.01] shadow-md shadow-orange-500/10'
+                          : assignmentFile
+                          ? 'border-emerald-300 bg-emerald-50/30'
+                          : 'border-slate-200 bg-slate-50/60 hover:border-orange-300 hover:bg-orange-50/25'
+                      }`}
+                    >
+                      <input
+                        ref={assignmentFileInputRef}
+                        type="file"
+                        accept=".pdf,.png,.jpg,.jpeg,.docx"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            handleAssignmentFileDrop(e.target.files[0]);
+                          }
+                        }}
+                      />
+
+                      {assignmentFile ? (
+                        <div className="flex items-center justify-between gap-3 text-left">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                              <FileCheck className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-slate-900 truncate">
+                                {assignmentFile.name}
+                              </p>
+                              <p className="text-[10px] text-slate-500 font-medium">
+                                {(assignmentFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to attach
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                              Attached
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setAssignmentFile(null);
+                                if (assignmentFileInputRef.current) {
+                                  assignmentFileInputRef.current.value = '';
+                                }
+                              }}
+                              className="p-1 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                              title="Remove attachment"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5 py-2">
+                          <UploadCloud
+                            className={`h-8 w-8 mx-auto transition-colors ${
+                              isAssignmentDragging
+                                ? 'text-orange-600 animate-bounce'
+                                : 'text-slate-400'
+                            }`}
+                          />
+                          <p className="text-xs font-bold text-slate-800">
+                            {isAssignmentDragging
+                              ? 'Drop file here to attach'
+                              : 'Drag & drop assignment question paper here'}
+                          </p>
+                          <p className="text-[10px] text-slate-400">
+                            Supports PDF, DOCX, PNG, JPG (up to 30MB) or click to browse
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <Button
@@ -867,6 +982,77 @@ export default function CourseBuilderDetailPage() {
                 </form>
               </DialogContent>
             </Dialog>
+          </div>
+
+          {/* Quick Drag & Drop Zone to Create Assignment */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsTabDragging(true);
+            }}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsTabDragging(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsTabDragging(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsTabDragging(false);
+              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                const ok = handleAssignmentFileDrop(e.dataTransfer.files[0]);
+                if (ok) {
+                  setIsAssignmentDialogOpen(true);
+                }
+              }
+            }}
+            onClick={() => setIsAssignmentDialogOpen(true)}
+            className={`border-2 border-dashed rounded-3xl p-5 sm:p-6 text-center cursor-pointer transition-all duration-200 ${
+              isTabDragging
+                ? 'border-orange-500 bg-orange-50/90 scale-[1.01] shadow-xl shadow-orange-500/15'
+                : 'border-slate-200/90 bg-white hover:border-orange-300 hover:bg-orange-50/20 shadow-sm'
+            }`}
+          >
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 text-left">
+                <div
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform shrink-0 ${
+                    isTabDragging
+                      ? 'bg-orange-600 text-white scale-110 shadow-lg shadow-orange-600/30'
+                      : 'bg-orange-100 text-orange-600'
+                  }`}
+                >
+                  <UploadCloud className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="font-heading font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2">
+                    {isTabDragging ? 'Release to Create Assignment!' : 'Drag & Drop Question Paper (PDF / Image)'}
+                    <span className="hidden sm:inline-block text-[10px] font-bold text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full">
+                      Drag &amp; Drop
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Drop a question paper PDF or scanned worksheet here to automatically open the assignment creator
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-full border-orange-200 text-orange-700 hover:bg-orange-50 text-xs font-bold h-9 px-3.5"
+                >
+                  <UploadCloud className="h-3.5 w-3.5 mr-1.5" />
+                  Drop or Browse
+                </Button>
+              </div>
+            </div>
           </div>
 
           {assignments.length === 0 ? (
