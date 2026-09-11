@@ -147,19 +147,19 @@ export default function StudentLayout({
 
               {/* Right Section */}
               <div className="flex items-center gap-3">
-                {/* Teacher View Toggle */}
-                {user?.role === 'teacher' && (
-                  <Link href="/teacher/dashboard">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="hidden sm:flex items-center gap-2 rounded-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 h-9"
-                    >
-                      <ArrowRightLeft className="h-3.5 w-3.5" />
-                      Switch to Faculty View
-                    </Button>
-                  </Link>
-                )}
+                {/* Faculty Portal Switcher (Always accessible) */}
+                <Link href="/teacher/dashboard">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1.5 rounded-full border-orange-200 text-orange-700 bg-orange-50/70 hover:bg-orange-100 hover:border-orange-300 h-8 text-xs font-bold shadow-sm transition-all"
+                    title="Switch to Faculty Console"
+                  >
+                    <ArrowRightLeft className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Faculty Console</span>
+                    <span className="sm:hidden">Faculty</span>
+                  </Button>
+                </Link>
 
                 {/* Notifications (placeholder) */}
                 <button className="relative p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
@@ -190,6 +190,16 @@ export default function StudentLayout({
                       <p className="text-sm font-semibold text-slate-900">{user?.full_name}</p>
                       <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                     </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/teacher/dashboard"
+                        className="rounded-lg text-orange-700 focus:bg-orange-50 cursor-pointer flex items-center gap-2 px-3 py-2 text-xs font-bold"
+                      >
+                        <ArrowRightLeft className="h-4 w-4 text-orange-600" />
+                        Switch to Faculty Console
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
@@ -236,6 +246,16 @@ export default function StudentLayout({
                     </Link>
                   );
                 })}
+                <div className="pt-2 border-t border-slate-100">
+                  <Link
+                    href="/teacher/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-orange-700 bg-orange-50 hover:bg-orange-100 transition-all border border-orange-200"
+                  >
+                    <ArrowRightLeft className="h-5 w-5" />
+                    Switch to Faculty Console
+                  </Link>
+                </div>
               </div>
             </div>
           )}
