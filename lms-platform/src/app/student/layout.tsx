@@ -148,18 +148,19 @@ export default function StudentLayout({
               {/* Right Section */}
               <div className="flex items-center gap-3">
                 {/* Faculty Portal Switcher (Always accessible) */}
-                <Link href="/teacher/dashboard">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-1.5 rounded-full border-orange-200 text-orange-700 bg-orange-50/70 hover:bg-orange-100 hover:border-orange-300 h-8 text-xs font-bold shadow-sm transition-all"
-                    title="Switch to Faculty Console"
-                  >
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1.5 rounded-full border-orange-200 text-orange-700 bg-orange-50/70 hover:bg-orange-100 hover:border-orange-300 h-8 text-xs font-bold shadow-sm transition-all"
+                  title="Switch to Faculty Console"
+                >
+                  <Link href="/teacher/dashboard">
                     <ArrowRightLeft className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Faculty Console</span>
                     <span className="sm:hidden">Faculty</span>
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
 
                 {/* Notifications (placeholder) */}
                 <button className="relative p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">

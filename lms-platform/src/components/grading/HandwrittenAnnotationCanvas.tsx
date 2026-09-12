@@ -518,7 +518,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     if (activeTool === 'smart_check') {
       saveHistory();
       const canvasScale = Math.max(1, (canvasRef.current?.width || 800) / 800);
-      const hitRadius = 55 * canvasScale;
+      const hitRadius = 120 * canvasScale; // Increased hit radius for easier toggling
 
       // Check if clicked near an existing tick or cross
       const existingIndex = strokes.findIndex(
