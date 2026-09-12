@@ -25,6 +25,7 @@ import {
   createQuizWithQuestions,
   deleteQuiz,
   getQuizWithQuestions,
+  createNotification,
 } from '@/lib/supabase/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -207,7 +208,7 @@ export default function TeacherQuizEnginePage() {
       const finalDescription = (quizDescription.trim() + (allowReattempt ? ' \n[REATTEMPT_ALLOWED]' : '')).trim();
       
       setIsSubmitting(true);
-      await createQuizWithQuestions(
+      const newQuiz = await createQuizWithQuestions(
         supabase,
         {
           course_id: selectedCourseId,
@@ -217,6 +218,22 @@ export default function TeacherQuizEnginePage() {
         },
         questions
       );
+
+      // Fire quiz_created notification
+      try {
+        const course = courses.find(c => c.id === selectedCourseId);
+        await createNotification(supabase, {
+          type: 'quiz_created',
+          title: 'New Quiz Published',
+          message: `A new quiz "${quizTitle.trim()}" has been published in ${course?.title || 'a batch'}.`,
+          data: {
+            quiz_id: newQuiz.id,
+            course_id: selectedCourseId,
+          }
+        });
+      } catch (notifErr) {
+        console.warn('Failed to fire quiz notification:', notifErr);
+      }
 
       toast.success('MCQ Quiz published successfully!');
       setIsCreateOpen(false);

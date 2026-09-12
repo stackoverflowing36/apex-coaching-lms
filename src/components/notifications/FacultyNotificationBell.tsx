@@ -129,15 +129,29 @@ export function FacultyNotificationBell() {
           </div>
         );
       case 'submission_created':
+      case 'assignment_created':
         return (
           <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
             <FileCheck className="h-4 w-4" />
           </div>
         );
-      default:
+      case 'grading_completed':
+        return (
+          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <FileCheck className="h-4 w-4" />
+          </div>
+        );
+      case 'quiz_created':
+      case 'quiz_attempted':
         return (
           <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
             <Sparkles className="h-4 w-4" />
+          </div>
+        );
+      default:
+        return (
+          <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+            <Bell className="h-4 w-4" />
           </div>
         );
     }
@@ -205,12 +219,18 @@ export function FacultyNotificationBell() {
             </div>
           ) : (
             notifications.map((item) => {
-              const targetHref =
-                item.type === 'submission_created' && item.data?.submission_id
-                  ? `/teacher/grading/${item.data.submission_id}`
-                  : item.type === 'student_signup'
-                  ? '/teacher/attendance'
-                  : null;
+              let targetHref = null;
+              if (item.type === 'submission_created' && item.data?.submission_id) {
+                targetHref = `/teacher/grading/${item.data.submission_id}`;
+              } else if (item.type === 'assignment_created' && item.data?.assignment_id) {
+                targetHref = `/teacher/assignments/${item.data.assignment_id}`;
+              } else if (item.type === 'grading_completed' && item.data?.submission_id) {
+                targetHref = `/teacher/grading/${item.data.submission_id}`;
+              } else if (item.type === 'quiz_created' || item.type === 'quiz_attempted') {
+                targetHref = '/teacher/quizzes';
+              } else if (item.type === 'student_signup' || item.type === 'batch_enrolled') {
+                targetHref = '/teacher/attendance';
+              }
 
               const content = (
                 <div

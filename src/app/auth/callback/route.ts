@@ -53,7 +53,7 @@ export async function GET(request: Request) {
         }
 
         if (next === '/dashboard' || next === '/') {
-          next = role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
+          next = role === 'teacher' ? '/teacher/dashboard' : '/onboarding';
         }
       } else if (next === '/dashboard' || next === '/') {
         next = profile.role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';

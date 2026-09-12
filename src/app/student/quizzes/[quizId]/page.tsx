@@ -10,6 +10,7 @@ import {
   getQuizAttempts,
   submitQuizAttempt,
   QuizAttemptRecord,
+  createNotification,
 } from '@/lib/supabase/queries';
 import { useUser } from '@/app/student/layout';
 import { Button } from '@/components/ui/button';
@@ -130,6 +131,23 @@ export default function StudentQuizPage() {
         toast.success('Practice attempt finished!', {
           description: `Score: ${calculatedScore} / ${totalQuizMarks}. Official score remains ${result.firstAttemptScore} / ${totalQuizMarks} (1st attempt).`,
         });
+      }
+
+      // Fire quiz_attempted notification
+      try {
+        await createNotification(supabase, {
+          type: 'quiz_attempted',
+          title: 'Quiz Attempt Submitted',
+          message: `${user?.full_name || 'A student'} attempted the quiz "${quiz?.title}" and scored ${calculatedScore}/${totalQuizMarks}.`,
+          data: {
+            quiz_id: quizId,
+            student_id: studentId,
+            score: calculatedScore,
+            total_marks: totalQuizMarks,
+          }
+        });
+      } catch (notifErr) {
+        console.warn('Failed to fire quiz attempt notification:', notifErr);
       }
     } catch (err: any) {
       console.error('Failed to save quiz attempt:', err);
