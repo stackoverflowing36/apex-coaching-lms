@@ -11,7 +11,6 @@ import {
   LogOut,
   ChevronDown,
   GraduationCap,
-  Bell,
   Menu,
   X,
   ArrowRightLeft,
@@ -27,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { StudentNotificationBell } from '@/components/notifications/StudentNotificationBell';
 
 interface UserProfile {
   id: string;
@@ -162,13 +162,8 @@ export default function StudentLayout({
                   </Link>
                 </Button>
 
-                {/* Notifications (placeholder) */}
-                <button className="relative p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white">
-                    3
-                  </span>
-                </button>
+                {/* Notifications */}
+                <StudentNotificationBell studentId={user?.id} />
 
                 {/* User Dropdown */}
                 <DropdownMenu>

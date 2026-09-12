@@ -21,6 +21,10 @@ import {
   AlertCircle,
   Clock,
   X,
+  Upload,
+  HardDrive,
+  Link2,
+  CheckCircle2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
@@ -37,6 +41,7 @@ import {
   createAssignment,
   deleteAssignment,
   createNotification,
+  uploadLectureVideo,
 } from '@/lib/supabase/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,9 +73,43 @@ export default function CourseBuilderDetailPage() {
   // New Lecture Dialog State
   const [isLectureDialogOpen, setIsLectureDialogOpen] = useState(false);
   const [lectureTitle, setLectureTitle] = useState('');
+  const [lectureVideoSource, setLectureVideoSource] = useState<'upload' | 'gdrive' | 'url'>('upload');
   const [lectureVideoUrl, setLectureVideoUrl] = useState('');
+  const [lectureGDriveUrl, setLectureGDriveUrl] = useState('');
+  const [lectureVideoFile, setLectureVideoFile] = useState<File | null>(null);
   const [lectureNotesUrl, setLectureNotesUrl] = useState('');
   const [isAddingLecture, setIsAddingLecture] = useState(false);
+  const lectureFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLectureFileSelect = (file: File) => {
+    const validExts = ['.mp4', '.webm', '.mov', '.mkv', '.ogg', '.avi', '.m4v'];
+    const lower = file.name.toLowerCase();
+    const isValid = validExts.some((ext) => lower.endsWith(ext)) || file.type.startsWith('video/');
+    if (!isValid) {
+      toast.error('Unsupported video format', {
+        description: 'Please upload an MP4, WebM, MOV, or MKV video file.',
+      });
+      return;
+    }
+    if (file.size > 500 * 1024 * 1024) {
+      toast.error('File too large', {
+        description: 'Maximum video upload size is 500 MB. For larger videos, use Google Drive or YouTube.',
+      });
+      return;
+    }
+    setLectureVideoFile(file);
+    setLectureTitle((prev) => {
+      if (!prev.trim()) {
+        return file.name
+          .replace(/\.[^/.]+$/, '')
+          .replace(/[_-]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+      return prev;
+    });
+    toast.success(`Selected video: ${file.name}`);
+  };
 
   // Upload Material State
   const [isUploading, setIsUploading] = useState(false);
@@ -155,20 +194,72 @@ export default function CourseBuilderDetailPage() {
       return;
     }
 
+    let finalVideoUrl = '';
+
+    if (lectureVideoSource === 'upload') {
+      if (!lectureVideoFile) {
+        toast.error('Please choose a video file from your device');
+        return;
+      }
+      try {
+        setIsAddingLecture(true);
+        toast.info('Uploading lecture video to cloud storage... Please keep this page open.');
+        const { publicUrl } = await uploadLectureVideo(supabase, courseId, lectureVideoFile);
+        finalVideoUrl = publicUrl;
+      } catch (upErr: any) {
+        toast.error('Video upload failed', {
+          description: upErr.message || 'Storage error while saving video',
+        });
+        setIsAddingLecture(false);
+        return;
+      }
+    } else if (lectureVideoSource === 'gdrive') {
+      if (!lectureGDriveUrl.trim()) {
+        toast.error('Please enter Google Drive video share link');
+        return;
+      }
+      const rawUrl = lectureGDriveUrl.trim();
+      const driveMatch = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (driveMatch && driveMatch[1]) {
+        finalVideoUrl = `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+      } else {
+        finalVideoUrl = rawUrl;
+      }
+    } else {
+      if (!lectureVideoUrl.trim()) {
+        toast.error('Please enter video URL');
+        return;
+      }
+      finalVideoUrl = lectureVideoUrl.trim();
+    }
+
     try {
       setIsAddingLecture(true);
       const newOrderIndex = lectures.length + 1;
       await createLecture(supabase, {
         course_id: courseId,
         title: lectureTitle.trim(),
-        video_url: lectureVideoUrl.trim() || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        video_url: finalVideoUrl,
         notes_url: lectureNotesUrl.trim() || undefined,
         order_index: newOrderIndex,
       });
 
-      toast.success('Lecture module added!');
+      // Send notification to students
+      try {
+        await createNotification(supabase, {
+          type: 'lecture_created',
+          title: `New Lecture: ${lectureTitle.trim()}`,
+          message: `A new video lecture has been added to ${course?.code || 'your course'}.`,
+        });
+      } catch {
+        // notification non-blocking
+      }
+
+      toast.success('Lecture module added successfully!');
       setLectureTitle('');
       setLectureVideoUrl('');
+      setLectureGDriveUrl('');
+      setLectureVideoFile(null);
       setLectureNotesUrl('');
       setIsLectureDialogOpen(false);
       loadData();
@@ -467,17 +558,17 @@ export default function CourseBuilderDetailPage() {
                   Add Lecture Module
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-md">
+              <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-lg">
                 <DialogHeader className="space-y-1 text-left">
                   <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
                     Add Lecture to {course?.code}
                   </DialogTitle>
                   <p className="text-xs text-slate-500">
-                    Provide the video URL (YouTube, Vimeo, MP4) and notes link.
+                    Add video content from your device, Google Drive, or streaming links.
                   </p>
                 </DialogHeader>
 
-                <form onSubmit={handleAddLecture} className="space-y-4 pt-3">
+                <form onSubmit={handleAddLecture} className="space-y-4 pt-2">
                   <div className="space-y-1.5">
                     <Label htmlFor="lecTitle" className="text-xs font-bold text-slate-700">
                       Lecture Title
@@ -492,20 +583,142 @@ export default function CourseBuilderDetailPage() {
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="vidUrl" className="text-xs font-bold text-slate-700">
-                      Video Stream URL
+                  {/* Video Source Selector */}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold text-slate-700">
+                      Video Source
                     </Label>
-                    <Input
-                      id="vidUrl"
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      value={lectureVideoUrl}
-                      onChange={(e) => setLectureVideoUrl(e.target.value)}
-                      className="rounded-2xl h-11 text-xs"
-                    />
-                    <p className="text-[10px] text-slate-400">
-                      Leave empty to use test institute stream.
-                    </p>
+                    <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setLectureVideoSource('upload')}
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${
+                          lectureVideoSource === 'upload'
+                            ? 'bg-white text-orange-700 shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <Upload className="h-3.5 w-3.5" />
+                        <span>Local Device</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLectureVideoSource('gdrive')}
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${
+                          lectureVideoSource === 'gdrive'
+                            ? 'bg-white text-orange-700 shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <HardDrive className="h-3.5 w-3.5" />
+                        <span>Google Drive</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLectureVideoSource('url')}
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all ${
+                          lectureVideoSource === 'url'
+                            ? 'bg-white text-orange-700 shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <Link2 className="h-3.5 w-3.5" />
+                        <span>Web URL</span>
+                      </button>
+                    </div>
+
+                    {/* Tab 1: Local Device File Upload */}
+                    {lectureVideoSource === 'upload' && (
+                      <div className="space-y-2 pt-1">
+                        <input
+                          ref={lectureFileInputRef}
+                          type="file"
+                          accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleLectureFileSelect(file);
+                          }}
+                        />
+                        {lectureVideoFile ? (
+                          <div className="flex items-center justify-between p-3 bg-orange-50/50 border border-orange-200 rounded-2xl">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
+                                <Video className="h-4 w-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-slate-800 truncate">
+                                  {lectureVideoFile.name}
+                                </p>
+                                <p className="text-[10px] text-slate-500">
+                                  {(lectureVideoFile.size / (1024 * 1024)).toFixed(1)} MB • Ready to upload
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setLectureVideoFile(null);
+                                if (lectureFileInputRef.current) lectureFileInputRef.current.value = '';
+                              }}
+                              className="text-slate-400 hover:text-red-600 h-8 w-8 p-0 rounded-full"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => lectureFileInputRef.current?.click()}
+                            className="border-2 border-dashed border-slate-200 hover:border-orange-400 bg-slate-50/50 hover:bg-orange-50/20 rounded-2xl p-5 text-center cursor-pointer transition-all"
+                          >
+                            <Upload className="h-7 w-7 text-orange-500 mx-auto mb-1.5" />
+                            <p className="text-xs font-bold text-slate-700">
+                              Click to choose video from your device
+                            </p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              MP4, WebM, MOV, or MKV (up to 500 MB)
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tab 2: Google Drive */}
+                    {lectureVideoSource === 'gdrive' && (
+                      <div className="space-y-2 pt-1">
+                        <Input
+                          placeholder="https://drive.google.com/file/d/.../view?usp=sharing"
+                          value={lectureGDriveUrl}
+                          onChange={(e) => setLectureGDriveUrl(e.target.value)}
+                          className="rounded-2xl h-11 text-xs"
+                          required={lectureVideoSource === 'gdrive'}
+                        />
+                        <div className="rounded-xl bg-blue-50 border border-blue-100 p-2.5 text-[11px] text-blue-700 leading-relaxed">
+                          <p className="font-bold flex items-center gap-1 mb-0.5">
+                            <HardDrive className="h-3 w-3 shrink-0" /> Google Drive Link Sharing
+                          </p>
+                          Ensure file permission in Google Drive is set to <strong>&ldquo;Anyone with the link can view&rdquo;</strong>. The URL is automatically converted to an embeddable player for students.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tab 3: Web URL / YouTube / Vimeo */}
+                    {lectureVideoSource === 'url' && (
+                      <div className="space-y-2 pt-1">
+                        <Input
+                          placeholder="https://www.youtube.com/watch?v=... or Vimeo / direct MP4 link"
+                          value={lectureVideoUrl}
+                          onChange={(e) => setLectureVideoUrl(e.target.value)}
+                          className="rounded-2xl h-11 text-xs"
+                          required={lectureVideoSource === 'url'}
+                        />
+                        <p className="text-[10px] text-slate-400">
+                          Supports YouTube, Vimeo, Loom, or direct .mp4 streaming links.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -529,7 +742,7 @@ export default function CourseBuilderDetailPage() {
                     {isAddingLecture ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Saving Lecture...
+                        {lectureVideoSource === 'upload' ? 'Uploading Video & Saving...' : 'Saving Lecture...'}
                       </span>
                     ) : (
                       'Save & Publish Lecture'

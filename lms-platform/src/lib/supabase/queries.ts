@@ -1257,3 +1257,102 @@ export async function markNotificationsAsRead(supabase: SupabaseClient, ids?: st
   }
 }
 
+export async function deleteNotification(supabase: SupabaseClient, id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      console.warn('Failed to delete notification:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('Error deleting notification:', err);
+    return false;
+  }
+}
+
+export async function getStudentNotifications(
+  supabase: SupabaseClient,
+  studentId?: string,
+  limit = 25
+): Promise<NotificationItem[]> {
+  try {
+    let query = supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (studentId) {
+      query = query.or(`user_id.eq.${studentId},user_id.is.null`);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.warn('Could not fetch student notifications:', error.message);
+      return [];
+    }
+    return (data ?? []) as NotificationItem[];
+  } catch (err) {
+    console.warn('Student notification fetch error:', err);
+    return [];
+  }
+}
+
+export async function deleteSubmission(
+  supabase: SupabaseClient,
+  submissionId: string,
+  fileUrl?: string
+): Promise<boolean> {
+  // If file exists in storage, attempt cleanup
+  if (fileUrl && !fileUrl.startsWith('data:')) {
+    try {
+      let pathToRemove = fileUrl;
+      if (fileUrl.includes('course-materials/')) {
+        pathToRemove = fileUrl.split('course-materials/')[1];
+      }
+      if (pathToRemove && !pathToRemove.startsWith('http')) {
+        await supabase.storage.from('course-materials').remove([pathToRemove]);
+      }
+    } catch (sErr) {
+      console.warn('Storage file cleanup failed during submission delete:', sErr);
+    }
+  }
+
+  const { error } = await supabase
+    .from('submissions')
+    .delete()
+    .eq('id', submissionId);
+
+  if (error) throw error;
+  return true;
+}
+
+export async function uploadLectureVideo(
+  supabase: SupabaseClient,
+  courseId: string,
+  file: File
+): Promise<{ path: string; publicUrl: string }> {
+  const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const filePath = `${courseId}/lectures/${Date.now()}_${sanitizedFileName}`;
+
+  const { data, error } = await supabase.storage
+    .from('course-materials')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true,
+    });
+
+  if (error) throw error;
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('course-materials').getPublicUrl(data.path);
+
+  return { path: data.path, publicUrl };
+}
+
+

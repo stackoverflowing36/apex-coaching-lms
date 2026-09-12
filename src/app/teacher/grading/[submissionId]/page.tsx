@@ -24,10 +24,17 @@ import {
   Layers,
   Check,
   X,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
-import { getSubmissionById, gradeSubmission, uploadCheckedCopy, createNotification } from '@/lib/supabase/queries';
+import {
+  getSubmissionById,
+  gradeSubmission,
+  uploadCheckedCopy,
+  createNotification,
+  deleteSubmission,
+} from '@/lib/supabase/queries';
 import {
   HandwrittenAnnotationCanvas,
   HandwrittenAnnotationCanvasHandle,
@@ -38,6 +45,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const feedbackQuickTags = [
   'Outstanding step-by-step derivations! 🌟',
@@ -66,6 +79,84 @@ export default function SplitScreenGradingPage() {
   const [feedback, setFeedback] = useState<string>('');
   const [status, setStatus] = useState<'graded' | 'needs_resubmission'>('graded');
   const [pendingBlob, setPendingBlob] = useState<Blob | null>(null);
+
+  // Deletion & Standalone Save State
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isSavingAnnotations, setIsSavingAnnotations] = useState(false);
+
+  const handleDeleteSubmission = async () => {
+    if (!submissionId) return;
+    try {
+      setIsDeleting(true);
+      await deleteSubmission(supabase, submissionId, submission?.file_url);
+      toast.success('Student submission deleted successfully');
+      setIsDeleteDialogOpen(false);
+      router.push('/teacher/grading');
+    } catch (err: any) {
+      console.error('Delete error:', err);
+      toast.error('Failed to delete submission', { description: err.message });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleSaveAnnotationsOnly = async () => {
+    if (!canvasHandleRef.current) return;
+    try {
+      setIsSavingAnnotations(true);
+      toast.loading('Saving handwritten annotations & checked copy...', { id: 'save-anno' });
+
+      let blobToUpload: Blob | null = null;
+      try {
+        blobToUpload = await canvasHandleRef.current.getExportBlob();
+      } catch (e) {
+        console.warn('Failed to extract blob:', e);
+      }
+
+      if (!blobToUpload) {
+        toast.dismiss('save-anno');
+        toast.error('No annotations found or unable to capture canvas');
+        return;
+      }
+
+      let checkedUrl: string | null = null;
+      try {
+        checkedUrl = await uploadCheckedCopy(
+          supabase,
+          submissionId,
+          blobToUpload,
+          submission?.student_id,
+          submission?.assignment_id
+        );
+      } catch (upErr: any) {
+        console.warn('Storage upload error:', upErr);
+        toast.dismiss('save-anno');
+        toast.error('Cloud storage upload failed', { description: upErr.message });
+        return;
+      }
+
+      if (checkedUrl) {
+        await gradeSubmission(supabase, submissionId, {
+          marks_obtained: marks === '' ? null : Number(marks),
+          feedback: feedback.trim(),
+          status: status,
+          checked_copy_url: checkedUrl,
+        });
+
+        toast.dismiss('save-anno');
+        toast.success('Checked copy with annotations saved successfully!');
+        await loadSubmission();
+        setActiveViewerTab('checked_copy');
+      }
+    } catch (err: any) {
+      toast.dismiss('save-anno');
+      toast.error('Failed to save annotations', { description: err.message });
+    } finally {
+      setIsSavingAnnotations(false);
+    }
+  };
+
 
   const loadSubmission = useCallback(async () => {
     if (!submissionId) return;
@@ -282,7 +373,7 @@ export default function SplitScreenGradingPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-xs">
+        <div className="flex items-center gap-3 text-xs">
           <div className="text-right hidden sm:block">
             <div className="font-bold text-slate-800">
               Max Marks: {maxMarks}
@@ -301,9 +392,65 @@ export default function SplitScreenGradingPage() {
           >
             {submission.status === 'graded' ? 'Graded' : 'Pending Evaluation'}
           </Badge>
+
+          {/* Faculty Delete Submission Action */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className="rounded-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 h-8 px-3 text-xs font-bold flex items-center gap-1.5 transition-colors"
+            title="Delete this student submission"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Delete Submission</span>
+          </Button>
         </div>
 
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="rounded-3xl p-6 max-w-sm">
+          <DialogHeader className="space-y-2 text-left">
+            <DialogTitle className="font-heading font-extrabold text-lg text-slate-900 flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Delete Submission?
+            </DialogTitle>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Are you sure you want to permanently delete this submission by{' '}
+              <strong className="text-slate-800">{studentName}</strong>? All marks, feedback remarks, and checked copies will be deleted. This action cannot be undone.
+            </p>
+          </DialogHeader>
+          <div className="flex items-center justify-end gap-2 pt-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+              className="rounded-full text-xs font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteSubmission}
+              disabled={isDeleting}
+              className="rounded-full text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-600/20"
+            >
+              {isDeleting ? (
+                <span className="flex items-center gap-1.5">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Deleting...
+                </span>
+              ) : (
+                'Delete Submission'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* ============================================================
           SPLIT SCREEN INTERFACE: 60% Left Viewer + 40% Right Grading
@@ -395,6 +542,8 @@ export default function SplitScreenGradingPage() {
                 checkedCopyUrl={submission.checked_copy_url}
                 persistenceKey={submissionId}
                 onExportBlob={(blob) => setPendingBlob(blob)}
+                onSaveAnnotations={handleSaveAnnotationsOnly}
+                isSavingAnnotations={isSavingAnnotations}
               />
             ) : activeViewerTab === 'checked_copy' ? (
               <div className="w-full h-full flex flex-col overflow-hidden bg-slate-950 rounded-2xl">

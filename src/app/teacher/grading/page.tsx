@@ -16,14 +16,22 @@ import {
   Award,
   ArrowUpDown,
   Sparkles,
+  Trash2,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
-import { getAllSubmissions, getCourses } from '@/lib/supabase/queries';
+import { getAllSubmissions, getCourses, deleteSubmission } from '@/lib/supabase/queries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,6 +45,25 @@ export default function TeacherGradingHubPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'graded'>('all');
   const [courseFilter, setCourseFilter] = useState<string>('all');
+
+  // Deletion State
+  const [submissionToDelete, setSubmissionToDelete] = useState<any | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!submissionToDelete) return;
+    try {
+      setIsDeleting(true);
+      await deleteSubmission(supabase, submissionToDelete.id, submissionToDelete.file_url);
+      toast.success('Submission deleted successfully');
+      setSubmissionToDelete(null);
+      await loadData();
+    } catch (err: any) {
+      toast.error('Failed to delete submission', { description: err.message });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const loadData = useCallback(async () => {
     try {
@@ -368,6 +395,16 @@ export default function TeacherGradingHubPage() {
                               {isGraded ? 'Review & Edit' : 'Grade Paper'}
                             </Button>
                           </Link>
+
+                          {/* Delete Submission Action */}
+                          <button
+                            type="button"
+                            onClick={() => setSubmissionToDelete(sub)}
+                            className="p-1.5 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors"
+                            title="Delete student submission"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -378,6 +415,53 @@ export default function TeacherGradingHubPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Submission Confirmation Modal */}
+      <Dialog open={!!submissionToDelete} onOpenChange={(open) => !open && setSubmissionToDelete(null)}>
+        <DialogContent className="rounded-3xl p-6 max-w-sm">
+          <DialogHeader className="space-y-2 text-left">
+            <DialogTitle className="font-heading font-extrabold text-lg text-slate-900 flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Delete Submission?
+            </DialogTitle>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Are you sure you want to permanently delete the submission by{' '}
+              <strong className="text-slate-800">
+                {submissionToDelete?.users?.full_name || 'this student'}
+              </strong>{' '}
+              for &quot;{submissionToDelete?.assignments?.title || 'Assignment'}&quot;?
+              This action cannot be undone.
+            </p>
+          </DialogHeader>
+          <div className="flex items-center justify-end gap-2 pt-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSubmissionToDelete(null)}
+              disabled={isDeleting}
+              className="rounded-full text-xs font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="rounded-full text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-600/20"
+            >
+              {isDeleting ? (
+                <span className="flex items-center gap-1.5">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Deleting...
+                </span>
+              ) : (
+                'Delete Submission'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

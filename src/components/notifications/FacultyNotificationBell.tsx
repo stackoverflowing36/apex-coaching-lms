@@ -12,12 +12,14 @@ import {
   Info,
   Clock,
   ExternalLink,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import {
   getNotifications,
   markNotificationsAsRead,
+  deleteNotification,
   type NotificationItem,
 } from '@/lib/supabase/queries';
 import {
@@ -103,6 +105,12 @@ export function FacultyNotificationBell() {
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     await markNotificationsAsRead(supabase);
     toast.success('All notifications marked as read');
+  };
+
+  const handleDeleteNotification = async (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    await deleteNotification(supabase, id);
+    toast.success('Notification removed');
   };
 
   const handleItemClick = async (item: NotificationItem) => {
@@ -236,12 +244,12 @@ export function FacultyNotificationBell() {
                 <div
                   key={item.id}
                   onClick={() => handleItemClick(item)}
-                  className={`flex items-start gap-3 p-3 transition-colors cursor-pointer text-left hover:bg-slate-50/80 ${
+                  className={`group relative flex items-start gap-3 p-3 transition-colors cursor-pointer text-left hover:bg-slate-50/80 ${
                     !item.is_read ? 'bg-orange-50/30' : ''
                   }`}
                 >
                   {getItemIcon(item.type)}
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 pr-2">
                     <div className="flex items-center justify-between gap-1">
                       <p
                         className={`text-xs truncate ${
@@ -261,9 +269,23 @@ export function FacultyNotificationBell() {
                       {item.message}
                     </p>
                   </div>
-                  {!item.is_read && (
-                    <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-1.5" />
-                  )}
+                  <div className="flex items-center gap-1.5 shrink-0 self-center">
+                    {!item.is_read && (
+                      <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0" />
+                    )}
+                    <button
+                      type="button"
+                      title="Delete notification"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteNotification(item.id);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded transition-all"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               );
 

@@ -67,23 +67,35 @@ export default function LectureViewerPage() {
     );
   }
 
-  // Convert YouTube watch URLs to embed URLs
+  // Convert YouTube, Vimeo, Google Drive watch/share URLs to embed URLs
   function getEmbedUrl(url: string) {
     if (!url) return '';
+    // Google Drive
+    if (url.includes('drive.google.com')) {
+      const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (driveMatch && driveMatch[1]) {
+        return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+      }
+      return url;
+    }
     // Already an embed URL
-    if (url.includes('/embed/')) return url;
+    if (url.includes('/embed/') || url.includes('/preview')) return url;
     // YouTube watch URL
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
     if (match) return `https://www.youtube.com/embed/${match[1]}`;
     // Vimeo
     const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
     if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-    // Direct MP4 or other
+    // Direct MP4, WebM or storage URL
     return url;
   }
 
   const videoUrl = getEmbedUrl(lecture.video_url || '');
-  const isDirectVideo = videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm');
+  const isGoogleDrive = videoUrl.includes('drive.google.com');
+  const isDirectVideo =
+    !isGoogleDrive &&
+    (/\.(mp4|webm|mov|mkv|ogg)(\?.*)?$/i.test(videoUrl) ||
+      (videoUrl.includes('/course-materials/') && !videoUrl.includes('/preview')));
 
   return (
     <div className="space-y-6 animate-fade-in-up">
