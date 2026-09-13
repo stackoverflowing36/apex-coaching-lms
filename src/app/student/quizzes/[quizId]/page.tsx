@@ -15,6 +15,7 @@ import {
 import { useUser } from '@/app/student/layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { FormattedQuestionText } from '@/components/quiz/FormattedQuestionText';
 
 export const dynamic = 'force-dynamic';
 
@@ -283,9 +284,10 @@ export default function StudentQuizPage() {
               </div>
 
               <div className="space-y-6">
-                <p className="text-lg font-medium text-slate-900">
-                  {currentQuestion.question_text}
-                </p>
+                <FormattedQuestionText
+                  text={currentQuestion.question_text}
+                  textClassName="text-lg font-medium text-slate-900 leading-relaxed"
+                />
 
                 <div className="space-y-3">
                   {currentQuestion.options.map((option: string, idx: number) => {

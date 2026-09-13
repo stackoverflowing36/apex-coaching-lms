@@ -1410,4 +1410,27 @@ export async function uploadLectureVideo(
   return { path: data.path, publicUrl };
 }
 
+export async function uploadQuizAttachment(
+  supabase: SupabaseClient,
+  file: File
+): Promise<{ path: string; publicUrl: string }> {
+  const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const filePath = `quiz-attachments/${Date.now()}_${sanitizedFileName}`;
+
+  const { data, error } = await supabase.storage
+    .from('course-materials')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true,
+    });
+
+  if (error) throw error;
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('course-materials').getPublicUrl(data.path);
+
+  return { path: data.path, publicUrl };
+}
+
 

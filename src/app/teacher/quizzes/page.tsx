@@ -39,6 +39,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { QuestionRichEditor } from '@/components/quiz/QuestionRichEditor';
+import { FormattedQuestionText } from '@/components/quiz/FormattedQuestionText';
 
 export const dynamic = 'force-dynamic';
 
@@ -434,47 +436,16 @@ export default function TeacherQuizEnginePage() {
                       key={qIndex}
                       className="p-4 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-extrabold">
-                            {qIndex + 1}
-                          </span>
-                          <span className="text-xs font-bold text-slate-700">Question #{qIndex + 1}</span>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] font-semibold text-slate-500">Marks:</span>
-                            <Input
-                              type="number"
-                              min="1"
-                              max="20"
-                              value={q.marks}
-                              onChange={(e) => handleMarksChange(qIndex, Number(e.target.value))}
-                              className="w-14 h-7 rounded-lg text-xs text-center"
-                            />
-                          </div>
-
-                          {questions.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveQuestion(qIndex)}
-                              className="p-1 rounded-full text-slate-400 hover:text-red-600"
-                              title="Remove question"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Question Text */}
-                      <Textarea
-                        placeholder="Enter the question problem statement..."
+                      {/* Rich Question Editor with Google Forms-like formatting toolbar & attachments */}
+                      <QuestionRichEditor
                         value={q.question_text}
-                        onChange={(e) => handleQuestionTextChange(qIndex, e.target.value)}
-                        className="rounded-2xl min-h-[60px] text-xs bg-white resize-none"
-                        required
+                        onChange={(text) => handleQuestionTextChange(qIndex, text)}
+                        qIndex={qIndex}
+                        marks={q.marks}
+                        onMarksChange={(marks) => handleMarksChange(qIndex, marks)}
+                        onRemoveQuestion={() => handleRemoveQuestion(qIndex)}
+                        canRemove={questions.length > 1}
+                        supabase={supabase}
                       />
 
                       {/* Options List */}
@@ -712,11 +683,17 @@ export default function TeacherQuizEnginePage() {
             <div className="space-y-4 pt-4">
               {previewQuiz?.quiz_questions?.map((q: any, idx: number) => (
                 <div key={q.id || idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-slate-900">
-                      Q{idx + 1}. {q.question_text}
-                    </span>
-                    <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0 border-0">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1 flex-1">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                        Question #{idx + 1}
+                      </span>
+                      <FormattedQuestionText
+                        text={q.question_text}
+                        textClassName="text-sm font-semibold text-slate-900 leading-relaxed"
+                      />
+                    </div>
+                    <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0 border-0 shrink-0">
                       {q.marks} Mark{q.marks > 1 ? 's' : ''}
                     </Badge>
                   </div>
