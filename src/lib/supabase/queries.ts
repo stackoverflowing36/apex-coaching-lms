@@ -92,6 +92,61 @@ export async function createCourse(
   return data;
 }
 
+export async function deleteCourse(supabase: SupabaseClient, courseId: string): Promise<boolean> {
+  try {
+    // 1. Delete submissions for all assignments in this course
+    const { data: assignments } = await supabase
+      .from('assignments')
+      .select('id')
+      .eq('course_id', courseId);
+
+    if (assignments && assignments.length > 0) {
+      const assignmentIds = assignments.map((a: any) => a.id);
+      await supabase.from('submissions').delete().in('assignment_id', assignmentIds);
+    }
+
+    // 2. Delete assignments
+    await supabase.from('assignments').delete().eq('course_id', courseId);
+
+    // 3. Delete quizzes and their attempts & questions
+    const { data: quizzes } = await supabase
+      .from('quizzes')
+      .select('id')
+      .eq('course_id', courseId);
+
+    if (quizzes && quizzes.length > 0) {
+      const quizIds = quizzes.map((q: any) => q.id);
+      await supabase.from('quiz_attempts').delete().in('quiz_id', quizIds);
+      await supabase.from('quiz_questions').delete().in('quiz_id', quizIds);
+    }
+    await supabase.from('quizzes').delete().eq('course_id', courseId);
+
+    // 4. Delete lectures
+    await supabase.from('lectures').delete().eq('course_id', courseId);
+
+    // 5. Delete course materials
+    await supabase.from('course_materials').delete().eq('course_id', courseId);
+
+    // 6. Delete enrollments
+    await supabase.from('enrollments').delete().eq('course_id', courseId);
+
+    // 7. Delete attendance
+    await supabase.from('attendance').delete().eq('course_id', courseId);
+
+    // 8. Delete announcements
+    await supabase.from('announcements').delete().eq('course_id', courseId);
+
+    // 9. Delete course row
+    const { error } = await supabase.from('courses').delete().eq('id', courseId);
+    if (error) throw error;
+
+    return true;
+  } catch (err) {
+    console.error('Failed to delete course and associated records:', err);
+    throw err;
+  }
+}
+
 // ============================================================
 // Lecture Queries
 // ============================================================

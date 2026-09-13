@@ -14,12 +14,15 @@ import {
   Loader2,
   Calendar,
   Settings2,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import {
   getCourses,
   createCourse,
+  deleteCourse,
   getLectures,
   getCourseMaterials,
 } from '@/lib/supabase/queries';
@@ -59,6 +62,10 @@ export default function TeacherCoursesPage() {
   const [newCode, setNewCode] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Delete Course State
+  const [courseToDelete, setCourseToDelete] = useState<CourseWithCounts | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadCourses = useCallback(async () => {
     try {
@@ -112,6 +119,21 @@ export default function TeacherCoursesPage() {
       toast.error('Could not create batch', { description: err.message });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    if (!courseToDelete) return;
+    try {
+      setIsDeleting(true);
+      await deleteCourse(supabase, courseToDelete.id);
+      toast.success(`Classroom batch "${courseToDelete.title}" deleted successfully`);
+      setCourseToDelete(null);
+      loadCourses();
+    } catch (err: any) {
+      toast.error('Failed to delete classroom batch', { description: err.message });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -235,12 +257,26 @@ export default function TeacherCoursesPage() {
             >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <Badge className="bg-orange-50 text-orange-700 border-orange-200/80 font-bold text-xs px-2.5 py-0.5 rounded-full">
-                    {course.code}
-                  </Badge>
-                  <span className="text-[11px] font-semibold text-slate-400">
-                    {new Date(course.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-orange-50 text-orange-700 border-orange-200/80 font-bold text-xs px-2.5 py-0.5 rounded-full">
+                      {course.code}
+                    </Badge>
+                    <span className="text-[11px] font-semibold text-slate-400">
+                      {new Date(course.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setCourseToDelete(course);
+                    }}
+                    className="p-1.5 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    title="Delete classroom batch"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
 
                 <div>
@@ -285,6 +321,74 @@ export default function TeacherCoursesPage() {
           ))}
         </div>
       )}
+
+      {/* Delete Batch Confirmation Dialog */}
+      <Dialog
+        open={!!courseToDelete}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) setCourseToDelete(null);
+        }}
+      >
+        <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-md">
+          <DialogHeader className="space-y-2 text-left">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mb-1">
+              <AlertTriangle className="h-6 w-6" />
+            </div>
+            <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
+              Delete Classroom Batch?
+            </DialogTitle>
+            <div className="space-y-2 text-xs text-slate-500 leading-relaxed">
+              <p>
+                Are you sure you want to permanently delete{' '}
+                <strong className="text-slate-900 font-bold">{courseToDelete?.title}</strong>{' '}
+                <span className="text-orange-600 font-bold">({courseToDelete?.code})</span>?
+              </p>
+              <div className="rounded-2xl bg-red-50/90 border border-red-200 p-3 text-red-800 text-[11px] space-y-1.5">
+                <p className="font-bold flex items-center gap-1.5 text-red-900">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  <span>Final Confirmation Required</span>
+                </p>
+                <p className="leading-normal">
+                  This will permanently erase all video lectures, PDF syllabi & notes, quizzes, student assignments, submissions, and attendance records associated with this batch.
+                </p>
+                <p className="font-bold text-red-700">
+                  This action is irreversible and cannot be undone.
+                </p>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="flex items-center justify-end gap-2.5 pt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setCourseToDelete(null)}
+              disabled={isDeleting}
+              className="rounded-full text-xs font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteCourse}
+              disabled={isDeleting}
+              className="rounded-full text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/25 px-4 h-9"
+            >
+              {isDeleting ? (
+                <span className="flex items-center gap-1.5">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Deleting Batch...
+                </span>
+              ) : (
+                'Yes, Permanently Delete'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

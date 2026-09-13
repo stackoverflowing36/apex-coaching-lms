@@ -25,11 +25,13 @@ import {
   HardDrive,
   Link2,
   CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import {
   getCourseById,
+  deleteCourse,
   getLectures,
   createLecture,
   deleteLecture,
@@ -69,6 +71,10 @@ export default function CourseBuilderDetailPage() {
   const [materials, setMaterials] = useState<any[]>([]);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Delete Batch State
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeletingCourse, setIsDeletingCourse] = useState(false);
 
   // New Lecture Dialog State
   const [isLectureDialogOpen, setIsLectureDialogOpen] = useState(false);
@@ -279,6 +285,20 @@ export default function CourseBuilderDetailPage() {
       loadData();
     } catch (err: any) {
       toast.error('Failed to remove lecture', { description: err.message });
+    }
+  };
+
+  // Handle Delete Entire Classroom Batch
+  const handleDeleteCourse = async () => {
+    if (!courseId) return;
+    try {
+      setIsDeletingCourse(true);
+      await deleteCourse(supabase, courseId);
+      toast.success(`Classroom batch "${course?.title || 'Batch'}" deleted successfully`);
+      router.push('/teacher/courses');
+    } catch (err: any) {
+      toast.error('Failed to delete classroom batch', { description: err.message });
+      setIsDeletingCourse(false);
     }
   };
 
@@ -506,6 +526,17 @@ export default function CourseBuilderDetailPage() {
               Preview as Student
             </Button>
           </Link>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className="rounded-full border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 text-xs font-semibold h-9 shadow-xs"
+            title="Delete Classroom Batch"
+          >
+            <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+            Delete Batch
+          </Button>
         </div>
       </div>
 
@@ -1351,6 +1382,74 @@ export default function CourseBuilderDetailPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Delete Batch Confirmation Dialog */}
+      <Dialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!open && !isDeletingCourse) setIsDeleteDialogOpen(false);
+        }}
+      >
+        <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-md">
+          <DialogHeader className="space-y-2 text-left">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mb-1">
+              <AlertTriangle className="h-6 w-6" />
+            </div>
+            <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
+              Delete Classroom Batch?
+            </DialogTitle>
+            <div className="space-y-2 text-xs text-slate-500 leading-relaxed">
+              <p>
+                Are you sure you want to permanently delete{' '}
+                <strong className="text-slate-900 font-bold">{course?.title}</strong>{' '}
+                <span className="text-orange-600 font-bold">({course?.code})</span>?
+              </p>
+              <div className="rounded-2xl bg-red-50/90 border border-red-200 p-3 text-red-800 text-[11px] space-y-1.5">
+                <p className="font-bold flex items-center gap-1.5 text-red-900">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  <span>Final Confirmation Required</span>
+                </p>
+                <p className="leading-normal">
+                  This will permanently erase all video lectures, PDF syllabi & notes, quizzes, student assignments, submissions, and attendance records associated with this batch.
+                </p>
+                <p className="font-bold text-red-700">
+                  This action is irreversible and cannot be undone.
+                </p>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="flex items-center justify-end gap-2.5 pt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeletingCourse}
+              className="rounded-full text-xs font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleDeleteCourse}
+              disabled={isDeletingCourse}
+              className="rounded-full text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/25 px-4 h-9"
+            >
+              {isDeletingCourse ? (
+                <span className="flex items-center gap-1.5">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Deleting Batch...
+                </span>
+              ) : (
+                'Yes, Permanently Delete'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
