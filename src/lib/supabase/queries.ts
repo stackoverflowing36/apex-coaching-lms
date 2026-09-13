@@ -148,11 +148,44 @@ export async function deleteCourse(supabase: SupabaseClient, courseId: string): 
 }
 
 // ============================================================
+// Chapter Queries
+// ============================================================
+
+export async function getCourseChapters(supabase: SupabaseClient, courseId: string) {
+  const { data, error } = await supabase
+    .from('course_chapters')
+    .select('*')
+    .eq('course_id', courseId)
+    .order('created_at', { ascending: true });
+
+  // Return empty array instead of throwing if the table doesn't exist yet to prevent crashes
+  if (error) {
+    console.error('getCourseChapters error:', error);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function createCourseChapter(
+  supabase: SupabaseClient,
+  chapter: { course_id: string; title: string }
+) {
+  const { data, error } = await supabase
+    .from('course_chapters')
+    .insert(chapter)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================
 // Lecture Queries
 // ============================================================
 
 export async function getLectures(supabase: SupabaseClient, courseId?: string) {
-  let query = supabase.from('lectures').select('*, courses(title, code)');
+  let query = supabase.from('lectures').select('*, courses(title, code), course_chapters(title)');
 
   if (courseId) {
     query = query.eq('course_id', courseId);
@@ -166,7 +199,7 @@ export async function getLectures(supabase: SupabaseClient, courseId?: string) {
 export async function getLectureById(supabase: SupabaseClient, lectureId: string) {
   const { data, error } = await supabase
     .from('lectures')
-    .select('*, courses(title, code)')
+    .select('*, courses(title, code), course_chapters(title)')
     .eq('id', lectureId)
     .single();
 
@@ -182,6 +215,7 @@ export async function createLecture(
     video_url?: string;
     notes_url?: string;
     order_index?: number;
+    chapter_id?: string | null;
   }
 ) {
   const { data, error } = await supabase
@@ -237,7 +271,7 @@ export async function reorderLectures(
 // ============================================================
 
 export async function getAssignments(supabase: SupabaseClient, courseId?: string) {
-  let query = supabase.from('assignments').select('*, courses(title, code)');
+  let query = supabase.from('assignments').select('*, courses(title, code), course_chapters(title)');
 
   if (courseId) {
     query = query.eq('course_id', courseId);
@@ -251,7 +285,7 @@ export async function getAssignments(supabase: SupabaseClient, courseId?: string
 export async function getAssignmentById(supabase: SupabaseClient, assignmentId: string) {
   const { data, error } = await supabase
     .from('assignments')
-    .select('*, courses(title, code)')
+    .select('*, courses(title, code), course_chapters(title)')
     .eq('id', assignmentId)
     .single();
 
@@ -267,6 +301,7 @@ export async function createAssignment(
     description: string;
     due_date: string;
     max_marks: number;
+    chapter_id?: string | null;
   }
 ) {
   const { data, error } = await supabase
@@ -626,6 +661,9 @@ export async function getQuizzes(supabase: SupabaseClient, courseId?: string) {
         title,
         code
       ),
+      course_chapters (
+        title
+      ),
       quiz_questions (
         id,
         marks
@@ -684,6 +722,7 @@ export async function createQuizWithQuestions(
     title: string;
     description?: string;
     time_limit_minutes?: number;
+    chapter_id?: string | null;
   },
   questions: {
     question_text: string;
@@ -929,7 +968,7 @@ export async function submitQuizAttempt(
 // ============================================================
 
 export async function getCourseMaterials(supabase: SupabaseClient, courseId?: string) {
-  let query = supabase.from('course_materials').select('*, courses(id, title, code)');
+  let query = supabase.from('course_materials').select('*, courses(id, title, code), course_chapters(title)');
 
   if (courseId) {
     query = query.eq('course_id', courseId);
@@ -944,7 +983,8 @@ export async function uploadCourseMaterial(
   supabase: SupabaseClient,
   courseId: string,
   file: File,
-  title: string
+  title: string,
+  chapterId?: string | null
 ) {
   const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
   const filePath = `${courseId}/${Date.now()}_${sanitizedFileName}`;
@@ -971,6 +1011,7 @@ export async function uploadCourseMaterial(
       title: title.trim() || file.name,
       file_url: publicUrl,
       file_type: fileType,
+      chapter_id: chapterId || null,
     })
     .select()
     .single();

@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/dialog';
 import { QuestionRichEditor } from '@/components/quiz/QuestionRichEditor';
 import { FormattedQuestionText } from '@/components/quiz/FormattedQuestionText';
+import { ChapterSelect } from '@/components/chapters/ChapterSelect';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,7 @@ export default function TeacherQuizEnginePage() {
   // Quiz Creator Dialog State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [quizChapterId, setQuizChapterId] = useState<string | null>(null);
   const [quizTitle, setQuizTitle] = useState('');
   const [quizDescription, setQuizDescription] = useState('');
   const [allowReattempt, setAllowReattempt] = useState(false);
@@ -217,6 +219,7 @@ export default function TeacherQuizEnginePage() {
           title: quizTitle.trim(),
           description: finalDescription || undefined,
           time_limit_minutes: Number(timeLimitMinutes) || 30,
+          chapter_id: quizChapterId,
         },
         questions
       );
@@ -241,6 +244,7 @@ export default function TeacherQuizEnginePage() {
       setIsCreateOpen(false);
       setQuizTitle('');
       setQuizDescription('');
+      setQuizChapterId(null);
       setAllowReattempt(false);
       setTimeLimitMinutes(30);
       setQuestions([
@@ -368,18 +372,38 @@ export default function TeacherQuizEnginePage() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="qTitle" className="text-xs font-bold text-slate-700">
-                  Quiz Title
-                </Label>
-                <Input
-                  id="qTitle"
-                  placeholder="e.g. Weekly Speed Mock #4: Electrostatics & Potential"
-                  value={quizTitle}
-                  onChange={(e) => setQuizTitle(e.target.value)}
-                  className="rounded-2xl h-11 text-xs font-medium"
-                  required
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="qTitle" className="text-xs font-bold text-slate-700">
+                    Quiz Title
+                  </Label>
+                  <Input
+                    id="qTitle"
+                    placeholder="e.g. Weekly Speed Mock #4: Electrostatics & Potential"
+                    value={quizTitle}
+                    onChange={(e) => setQuizTitle(e.target.value)}
+                    className="rounded-2xl h-11 text-xs font-medium"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">
+                    Chapter / Module
+                  </Label>
+                  {selectedCourseId ? (
+                    <ChapterSelect
+                      supabase={supabase}
+                      courseId={selectedCourseId}
+                      value={quizChapterId}
+                      onChange={setQuizChapterId}
+                    />
+                  ) : (
+                    <div className="h-11 border border-slate-200 rounded-xl bg-slate-50 flex items-center px-3 text-xs text-slate-400">
+                      Select a batch first...
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-1.5">
@@ -610,8 +634,13 @@ export default function TeacherQuizEnginePage() {
                 </div>
 
                 <div>
-                  <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900">
+                  <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 flex flex-wrap items-center gap-2">
                     {quiz.title}
+                    {quiz.course_chapters?.title && (
+                      <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-[10px] px-1.5 py-0 border-orange-200 shadow-none font-bold">
+                        {quiz.course_chapters.title}
+                      </Badge>
+                    )}
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                     {quiz.description || 'Timed practice assessment with instant answer evaluation.'}

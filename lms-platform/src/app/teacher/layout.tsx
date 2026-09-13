@@ -163,18 +163,20 @@ export default function TeacherLayout({
 
               {/* Right Section */}
               <div className="flex items-center gap-3">
-                {/* Switch to Student Portal */}
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 text-xs font-semibold h-8 gap-1.5 hidden sm:flex"
-                >
-                  <Link href="/student/dashboard">
-                    <span>Student View</span>
-                    <ExternalLink className="h-3 w-3 text-slate-400" />
-                  </Link>
-                </Button>
+                {/* Switch to Student Portal - Only on Dashboard */}
+                {pathname === '/teacher/dashboard' && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 text-xs font-semibold h-8 px-3 gap-1 hidden sm:flex mr-2"
+                  >
+                    <Link href="/student/dashboard">
+                      <span>Student View</span>
+                      <ExternalLink className="h-3 w-3 text-slate-400" />
+                    </Link>
+                  </Button>
+                )}
 
                 {/* Real-time Faculty Notification Bell */}
                 <FacultyNotificationBell />

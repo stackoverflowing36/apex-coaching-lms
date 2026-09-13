@@ -57,6 +57,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ChapterSelect } from '@/components/chapters/ChapterSelect';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,6 +85,7 @@ export default function CourseBuilderDetailPage() {
   const [lectureGDriveUrl, setLectureGDriveUrl] = useState('');
   const [lectureVideoFile, setLectureVideoFile] = useState<File | null>(null);
   const [lectureNotesUrl, setLectureNotesUrl] = useState('');
+  const [lectureChapterId, setLectureChapterId] = useState<string | null>(null);
   const [isAddingLecture, setIsAddingLecture] = useState(false);
   const lectureFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +123,7 @@ export default function CourseBuilderDetailPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [materialTitle, setMaterialTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [materialChapterId, setMaterialChapterId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Add Assignment State
@@ -130,6 +133,7 @@ export default function CourseBuilderDetailPage() {
   const [assignmentDueDate, setAssignmentDueDate] = useState('');
   const [assignmentMaxMarks, setAssignmentMaxMarks] = useState(100);
   const [assignmentFile, setAssignmentFile] = useState<File | null>(null);
+  const [assignmentChapterId, setAssignmentChapterId] = useState<string | null>(null);
   const assignmentFileInputRef = useRef<HTMLInputElement>(null);
   const [isCreatingAssignment, setIsCreatingAssignment] = useState(false);
   const [isAssignmentDragging, setIsAssignmentDragging] = useState(false);
@@ -248,6 +252,7 @@ export default function CourseBuilderDetailPage() {
         video_url: finalVideoUrl,
         notes_url: lectureNotesUrl.trim() || undefined,
         order_index: newOrderIndex,
+        chapter_id: lectureChapterId,
       });
 
       // Send notification to students
@@ -339,7 +344,8 @@ export default function CourseBuilderDetailPage() {
         supabase,
         courseId,
         selectedFile,
-        materialTitle.trim() || selectedFile.name
+        materialTitle.trim() || selectedFile.name,
+        materialChapterId
       );
 
       toast.success('Syllabus PDF / Material uploaded successfully!');
@@ -433,6 +439,7 @@ export default function CourseBuilderDetailPage() {
         description: finalDescription,
         due_date: parsedDueDate,
         max_marks: safeMarks,
+        chapter_id: assignmentChapterId,
       });
 
       // Fire assignment_created notification
@@ -753,6 +760,18 @@ export default function CourseBuilderDetailPage() {
                   </div>
 
                   <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-700">
+                      Chapter / Module
+                    </Label>
+                    <ChapterSelect
+                      supabase={supabase}
+                      courseId={courseId}
+                      value={lectureChapterId}
+                      onChange={setLectureChapterId}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
                     <Label htmlFor="notesUrl" className="text-xs font-bold text-slate-700">
                       Accompanying Handout / Notes URL (Optional)
                     </Label>
@@ -827,8 +846,13 @@ export default function CourseBuilderDetailPage() {
                     </div>
 
                     <div className="space-y-0.5">
-                      <div className="font-heading font-bold text-sm sm:text-base text-slate-900">
+                      <div className="font-heading font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
                         {lecture.title}
+                        {lecture.course_chapters?.title && (
+                          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-[10px] px-1.5 py-0 border-orange-200 shadow-none font-bold">
+                            {lecture.course_chapters.title}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 text-xs text-slate-500">
                         <span className="truncate max-w-[200px] sm:max-w-xs text-slate-400">
@@ -932,7 +956,7 @@ export default function CourseBuilderDetailPage() {
 
               {/* Title Input & Upload CTA */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                <div className="sm:col-span-8 space-y-1.5">
+                <div className="sm:col-span-4 space-y-1.5">
                   <Label htmlFor="matTitle" className="text-xs font-bold text-slate-700">
                     Document Title / Label
                   </Label>
@@ -942,6 +966,18 @@ export default function CourseBuilderDetailPage() {
                     value={materialTitle}
                     onChange={(e) => setMaterialTitle(e.target.value)}
                     className="rounded-2xl h-11 text-xs"
+                  />
+                </div>
+                <div className="sm:col-span-4 space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">
+                    Chapter / Module
+                  </Label>
+                  <ChapterSelect
+                    supabase={supabase}
+                    courseId={courseId}
+                    value={materialChapterId}
+                    onChange={setMaterialChapterId}
+                    className="h-11"
                   />
                 </div>
 
@@ -988,8 +1024,13 @@ export default function CourseBuilderDetailPage() {
                         <FileText className="h-5 w-5" />
                       </div>
                       <div className="space-y-0.5 overflow-hidden">
-                        <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                        <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate flex items-center gap-2">
                           {mat.title}
+                          {mat.course_chapters?.title && (
+                            <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-[10px] px-1.5 py-0 border-orange-200 shadow-none font-bold">
+                              {mat.course_chapters.title}
+                            </Badge>
+                          )}
                         </h4>
                         <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                           {mat.file_type?.toUpperCase() || 'PDF'} • {new Date(mat.uploaded_at).toLocaleDateString()}
@@ -1067,6 +1108,18 @@ export default function CourseBuilderDetailPage() {
                       onChange={(e) => setAssignmentTitle(e.target.value)}
                       className="rounded-2xl h-11 text-xs"
                       required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-700">
+                      Chapter / Module
+                    </Label>
+                    <ChapterSelect
+                      supabase={supabase}
+                      courseId={courseId}
+                      value={assignmentChapterId}
+                      onChange={setAssignmentChapterId}
                     />
                   </div>
 
@@ -1337,8 +1390,13 @@ export default function CourseBuilderDetailPage() {
                       <FileCheck className="h-5 w-5" />
                     </div>
                     <div className="space-y-0.5">
-                      <h4 className="font-heading font-bold text-sm sm:text-base text-slate-900">
+                      <h4 className="font-heading font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
                         {assignment.title}
+                        {assignment.course_chapters?.title && (
+                          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-[10px] px-1.5 py-0 border-orange-200 shadow-none font-bold">
+                            {assignment.course_chapters.title}
+                          </Badge>
+                        )}
                       </h4>
                       <div className="flex items-center gap-3 text-xs text-slate-500">
                         <span className="flex items-center gap-1">
