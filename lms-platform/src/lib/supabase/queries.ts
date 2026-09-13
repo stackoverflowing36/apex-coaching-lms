@@ -185,7 +185,7 @@ export async function createCourseChapter(
 // ============================================================
 
 export async function getLectures(supabase: SupabaseClient, courseId?: string) {
-  let query = supabase.from('lectures').select('*, courses(title, code), course_chapters(title)');
+  let query = supabase.from('lectures').select('*, courses(title, code)');
 
   if (courseId) {
     query = query.eq('course_id', courseId);
@@ -193,17 +193,33 @@ export async function getLectures(supabase: SupabaseClient, courseId?: string) {
 
   const { data, error } = await query.order('order_index', { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  
+  if (!data || data.length === 0) return [];
+  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
+  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
+
+  return data.map((item: any) => ({
+    ...item,
+    course_chapters: item.chapter_id && chaptersMap.has(item.chapter_id) ? { title: chaptersMap.get(item.chapter_id) } : null
+  }));
 }
 
 export async function getLectureById(supabase: SupabaseClient, lectureId: string) {
   const { data, error } = await supabase
     .from('lectures')
-    .select('*, courses(title, code), course_chapters(title)')
+    .select('*, courses(title, code)')
     .eq('id', lectureId)
     .single();
 
   if (error) throw error;
+  
+  if (data?.chapter_id) {
+    const { data: chapterData } = await supabase.from('course_chapters').select('title').eq('id', data.chapter_id).single();
+    if (chapterData) {
+      data.course_chapters = { title: chapterData.title };
+    }
+  }
+  
   return data;
 }
 
@@ -271,7 +287,7 @@ export async function reorderLectures(
 // ============================================================
 
 export async function getAssignments(supabase: SupabaseClient, courseId?: string) {
-  let query = supabase.from('assignments').select('*, courses(title, code), course_chapters(title)');
+  let query = supabase.from('assignments').select('*, courses(title, code)');
 
   if (courseId) {
     query = query.eq('course_id', courseId);
@@ -279,17 +295,33 @@ export async function getAssignments(supabase: SupabaseClient, courseId?: string
 
   const { data, error } = await query.order('due_date', { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  
+  if (!data || data.length === 0) return [];
+  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
+  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
+
+  return data.map((item: any) => ({
+    ...item,
+    course_chapters: item.chapter_id && chaptersMap.has(item.chapter_id) ? { title: chaptersMap.get(item.chapter_id) } : null
+  }));
 }
 
 export async function getAssignmentById(supabase: SupabaseClient, assignmentId: string) {
   const { data, error } = await supabase
     .from('assignments')
-    .select('*, courses(title, code), course_chapters(title)')
+    .select('*, courses(title, code)')
     .eq('id', assignmentId)
     .single();
 
   if (error) throw error;
+
+  if (data?.chapter_id) {
+    const { data: chapterData } = await supabase.from('course_chapters').select('title').eq('id', data.chapter_id).single();
+    if (chapterData) {
+      data.course_chapters = { title: chapterData.title };
+    }
+  }
+
   return data;
 }
 
@@ -656,13 +688,11 @@ export async function getQuizzes(supabase: SupabaseClient, courseId?: string) {
       description,
       time_limit_minutes,
       created_at,
+      chapter_id,
       courses:course_id (
         id,
         title,
         code
-      ),
-      course_chapters (
-        title
       ),
       quiz_questions (
         id,
@@ -678,14 +708,17 @@ export async function getQuizzes(supabase: SupabaseClient, courseId?: string) {
   const { data, error } = await query.order('created_at', { ascending: false });
   if (error) throw error;
 
-  return (
-    data?.map((quiz: any) => ({
-      ...quiz,
-      questions_count: quiz.quiz_questions?.length ?? 0,
-      total_marks:
-        quiz.quiz_questions?.reduce((sum: number, q: any) => sum + (q.marks ?? 1), 0) ?? 0,
-    })) ?? []
-  );
+  if (!data || data.length === 0) return [];
+  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
+  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
+
+  return data.map((quiz: any) => ({
+    ...quiz,
+    course_chapters: quiz.chapter_id && chaptersMap.has(quiz.chapter_id) ? { title: chaptersMap.get(quiz.chapter_id) } : null,
+    questions_count: quiz.quiz_questions?.length ?? 0,
+    total_marks:
+      quiz.quiz_questions?.reduce((sum: number, q: any) => sum + (q.marks ?? 1), 0) ?? 0,
+  }));
 }
 
 export async function getQuizWithQuestions(supabase: SupabaseClient, quizId: string) {
@@ -968,7 +1001,7 @@ export async function submitQuizAttempt(
 // ============================================================
 
 export async function getCourseMaterials(supabase: SupabaseClient, courseId?: string) {
-  let query = supabase.from('course_materials').select('*, courses(id, title, code), course_chapters(title)');
+  let query = supabase.from('course_materials').select('*, courses(id, title, code)');
 
   if (courseId) {
     query = query.eq('course_id', courseId);
@@ -976,7 +1009,15 @@ export async function getCourseMaterials(supabase: SupabaseClient, courseId?: st
 
   const { data, error } = await query.order('uploaded_at', { ascending: false });
   if (error) throw error;
-  return data ?? [];
+  
+  if (!data || data.length === 0) return [];
+  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
+  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
+
+  return data.map((item: any) => ({
+    ...item,
+    course_chapters: item.chapter_id && chaptersMap.has(item.chapter_id) ? { title: chaptersMap.get(item.chapter_id) } : null
+  }));
 }
 
 export async function uploadCourseMaterial(
