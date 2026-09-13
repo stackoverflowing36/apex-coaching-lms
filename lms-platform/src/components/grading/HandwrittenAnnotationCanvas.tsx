@@ -1264,7 +1264,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
             <div
               ref={containerRef}
-              className="flex-1 overflow-auto bg-slate-950 flex items-start justify-center p-4 relative"
+              className="flex-1 overflow-auto bg-slate-950 p-4 relative text-center whitespace-nowrap"
               style={{
                 cursor:
                   activeTool === 'pen'
@@ -1293,8 +1293,8 @@ export const HandwrittenAnnotationCanvas = forwardRef<
               )}
 
               <div
-                className="transition-transform origin-center duration-150 relative shadow-2xl rounded-xl overflow-hidden border border-slate-700/60 bg-white"
-                style={{ transform: `scale(${zoom})` }}
+                className="transition-all duration-150 relative shadow-2xl rounded-xl overflow-hidden border border-slate-700/60 bg-white inline-block align-top"
+                style={{ width: `${800 * zoom}px`, height: `${1100 * zoom}px` }}
               >
                 <canvas
                   ref={canvasRef}
@@ -1304,7 +1304,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   onPointerCancel={handlePointerUp}
-                  className="max-w-none block bg-white touch-none"
+                  className="w-full h-full block bg-white touch-none"
                 />
 
                 {/* Instant Click Ripple Feedback */}

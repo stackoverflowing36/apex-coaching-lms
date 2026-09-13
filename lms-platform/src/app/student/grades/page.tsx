@@ -406,10 +406,7 @@ export default function GradesPage() {
                                 <Award className="h-5 w-5 text-orange-600 shrink-0" />
                                 <div>
                                   <p className="text-xs font-extrabold text-orange-950">
-                                    Teacher&apos;s Checked Copy Available
-                                  </p>
-                                  <p className="text-[11px] text-slate-500">
-                                    Includes handwritten ticks (✓), crosses (✗), and corrections
+                                    Checked copy returned
                                   </p>
                                 </div>
                               </div>

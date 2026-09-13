@@ -450,15 +450,9 @@ export default function AssignmentDetailPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <Badge className="bg-orange-600 text-white border-0 text-xs font-bold px-2.5 py-0.5">
-                              Checked Copy Available
+                              Checked copy returned
                             </Badge>
-                            <span className="text-xs font-bold text-orange-950">
-                              Evaluated with Teacher Corrections &amp; Ticks
-                            </span>
                           </div>
-                          <p className="text-xs text-slate-500 mt-1">
-                            The teacher has marked your handwritten derivations with ticks, crosses, and remarks.
-                          </p>
                         </div>
 
                         <a
@@ -481,6 +475,19 @@ export default function AssignmentDetailPage() {
                           className="w-full object-contain"
                         />
                       </div>
+
+                      {submission.file_url && (submission.file_name?.toLowerCase().endsWith('.pdf') || submission.file_url?.toLowerCase().endsWith('.pdf')) && (
+                        <div className="mt-4 pt-4 border-t border-orange-200/60">
+                          <h4 className="text-xs font-bold text-orange-950 mb-2">
+                            Original Document (All Pages)
+                          </h4>
+                          <iframe
+                            src={`${submission.file_url.startsWith('http') ? submission.file_url : supabase.storage.from('course-materials').getPublicUrl(submission.file_url).data.publicUrl}#toolbar=0`}
+                            className="w-full h-[500px] rounded-xl border border-slate-200 bg-white shadow-sm"
+                            title="Original Document"
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 })()}
