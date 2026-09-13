@@ -710,13 +710,7 @@ export async function gradeSubmission(
 export async function getQuizzes(supabase: SupabaseClient, courseId?: string) {
   let query = supabase.from('quizzes').select(
     `
-      id,
-      course_id,
-      title,
-      description,
-      time_limit_minutes,
-      created_at,
-      chapter_id,
+      *,
       courses:course_id (
         id,
         title,
