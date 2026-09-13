@@ -240,7 +240,21 @@ export async function createLecture(
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    if (error.message.includes('schema cache') || error.message.includes('Could not find the \'chapter_id\' column')) {
+      console.warn("Schema cache error on lectures. Retrying without chapter_id...");
+      const { chapter_id, ...fallbackLecture } = lecture;
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('lectures')
+        .insert(fallbackLecture)
+        .select()
+        .single();
+      
+      if (fallbackError) throw fallbackError;
+      return fallbackData;
+    }
+    throw error;
+  }
   return data;
 }
 
@@ -342,7 +356,21 @@ export async function createAssignment(
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    if (error.message.includes('schema cache') || error.message.includes('Could not find the \'chapter_id\' column')) {
+      console.warn("Schema cache error on assignments. Retrying without chapter_id...");
+      const { chapter_id, ...fallbackAssignment } = assignment;
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('assignments')
+        .insert(fallbackAssignment)
+        .select()
+        .single();
+      
+      if (fallbackError) throw fallbackError;
+      return fallbackData;
+    }
+    throw error;
+  }
   return data;
 }
 
@@ -771,12 +799,29 @@ export async function createQuizWithQuestions(
     .select()
     .single();
 
-  if (quizError) throw quizError;
+  let finalQuizData = quizData;
+
+  if (quizError) {
+    if (quizError.message.includes('schema cache') || quizError.message.includes('Could not find the \'chapter_id\' column')) {
+      console.warn("Schema cache error on quizzes. Retrying without chapter_id...");
+      const { chapter_id, ...fallbackQuiz } = quiz;
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('quizzes')
+        .insert(fallbackQuiz)
+        .select()
+        .single();
+      
+      if (fallbackError) throw fallbackError;
+      finalQuizData = fallbackData;
+    } else {
+      throw quizError;
+    }
+  }
 
   // 2. Insert Questions
-  if (questions.length > 0) {
+  if (questions.length > 0 && finalQuizData) {
     const questionsToInsert = questions.map((q) => ({
-      quiz_id: quizData.id,
+      quiz_id: finalQuizData.id,
       question_text: q.question_text,
       options: q.options,
       correct_option_index: q.correct_option_index,
@@ -790,7 +835,7 @@ export async function createQuizWithQuestions(
     if (questionsError) throw questionsError;
   }
 
-  return quizData;
+  return finalQuizData;
 }
 
 export async function deleteQuiz(supabase: SupabaseClient, quizId: string) {
@@ -1057,7 +1102,26 @@ export async function uploadCourseMaterial(
     .select()
     .single();
 
-  if (insertError) throw insertError;
+  if (insertError) {
+    if (insertError.message.includes('schema cache') || insertError.message.includes('Could not find the \'chapter_id\' column')) {
+      console.warn("Schema cache error on course_materials. Retrying without chapter_id...");
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('course_materials')
+        .insert({
+          course_id: courseId,
+          title: title.trim() || file.name,
+          file_url: publicUrl,
+          file_type: fileType,
+        })
+        .select()
+        .single();
+      
+      if (fallbackError) throw fallbackError;
+      return fallbackData;
+    }
+    throw insertError;
+  }
+
   return materialData;
 }
 
