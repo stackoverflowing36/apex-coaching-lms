@@ -1,5 +1,31 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
+async function insertWithChapterFallback<T extends { chapter_id?: string | null }>(
+  supabase: SupabaseClient,
+  table: string,
+  payload: T
+): Promise<any> {
+  const { data, error } = await supabase.from(table).insert(payload).select().single();
+  if (!error) return data;
+
+  const isSchemaOrCol =
+    error.message?.toLowerCase().includes('chapter_id') ||
+    error.message?.toLowerCase().includes('schema cache') ||
+    error.code === 'PGRST204';
+
+  if (!isSchemaOrCol) throw error;
+
+  console.warn(`Retrying ${table} insert without chapter_id...`);
+  const { chapter_id, ...fallbackPayload } = payload;
+  const { data: fallbackData, error: fallbackError } = await supabase
+    .from(table)
+    .insert(fallbackPayload)
+    .select()
+    .single();
+  if (fallbackError) throw fallbackError;
+  return fallbackData;
+}
+
 // ============================================================
 // User Queries
 // ============================================================
@@ -43,12 +69,16 @@ export async function getCurrentUser(supabase: SupabaseClient) {
   }
 }
 
-export async function getAllStudents(supabase: SupabaseClient) {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .order('full_name', { ascending: true });
-
+export async function getAllStudents(
+  supabase: SupabaseClient,
+  options?: { limit?: number; offset?: number }
+) {
+  let query = supabase.from('users').select('*').order('full_name', { ascending: true });
+  if (options?.limit) {
+    const offset = options.offset ?? 0;
+    query = query.range(offset, offset + options.limit - 1);
+  }
+  const { data, error } = await query;
   if (error) throw error;
   return data ?? [];
 }
@@ -93,58 +123,64 @@ export async function createCourse(
 }
 
 export async function deleteCourse(supabase: SupabaseClient, courseId: string): Promise<boolean> {
-  try {
-    // 1. Delete submissions for all assignments in this course
-    const { data: assignments } = await supabase
-      .from('assignments')
-      .select('id')
-      .eq('course_id', courseId);
+  // 1. Fetch child record IDs that need cascading deletes
+  const [assignmentsRes, quizzesRes] = await Promise.all([
+    supabase.from('assignments').select('id').eq('course_id', courseId),
+    supabase.from('quizzes').select('id').eq('course_id', courseId),
+  ]);
 
-    if (assignments && assignments.length > 0) {
-      const assignmentIds = assignments.map((a: any) => a.id);
-      await supabase.from('submissions').delete().in('assignment_id', assignmentIds);
-    }
+  if (assignmentsRes.error) throw assignmentsRes.error;
+  if (quizzesRes.error) throw quizzesRes.error;
 
-    // 2. Delete assignments
-    await supabase.from('assignments').delete().eq('course_id', courseId);
+  const assignmentIds = (assignmentsRes.data ?? []).map((a: any) => a.id);
+  const quizIds = (quizzesRes.data ?? []).map((q: any) => q.id);
 
-    // 3. Delete quizzes and their attempts & questions
-    const { data: quizzes } = await supabase
-      .from('quizzes')
-      .select('id')
-      .eq('course_id', courseId);
-
-    if (quizzes && quizzes.length > 0) {
-      const quizIds = quizzes.map((q: any) => q.id);
-      await supabase.from('quiz_attempts').delete().in('quiz_id', quizIds);
-      await supabase.from('quiz_questions').delete().in('quiz_id', quizIds);
-    }
-    await supabase.from('quizzes').delete().eq('course_id', courseId);
-
-    // 4. Delete lectures
-    await supabase.from('lectures').delete().eq('course_id', courseId);
-
-    // 5. Delete course materials
-    await supabase.from('course_materials').delete().eq('course_id', courseId);
-
-    // 6. Delete enrollments
-    await supabase.from('enrollments').delete().eq('course_id', courseId);
-
-    // 7. Delete attendance
-    await supabase.from('attendance').delete().eq('course_id', courseId);
-
-    // 8. Delete announcements
-    await supabase.from('announcements').delete().eq('course_id', courseId);
-
-    // 9. Delete course row
-    const { error } = await supabase.from('courses').delete().eq('id', courseId);
-    if (error) throw error;
-
-    return true;
-  } catch (err) {
-    console.error('Failed to delete course and associated records:', err);
-    throw err;
+  // 2. Delete dependent records (submissions, quiz attempts, quiz questions)
+  const dependentDeletes = [];
+  if (assignmentIds.length > 0) {
+    dependentDeletes.push(supabase.from('submissions').delete().in('assignment_id', assignmentIds));
   }
+  if (quizIds.length > 0) {
+    dependentDeletes.push(
+      supabase.from('quiz_attempts').delete().in('quiz_id', quizIds),
+      supabase.from('quiz_questions').delete().in('quiz_id', quizIds)
+    );
+  }
+
+  if (dependentDeletes.length > 0) {
+    const dependentResults = await Promise.all(dependentDeletes);
+    for (const result of dependentResults) {
+      if (result.error) throw result.error;
+    }
+  }
+
+  // 3. Delete all direct course children in parallel (no enrollment table exists in this schema)
+  const [assignmentsDel, lecturesDel, materialsDel, attendanceDel, announcementsDel, quizzesDel] =
+    await Promise.all([
+      supabase.from('assignments').delete().eq('course_id', courseId),
+      supabase.from('lectures').delete().eq('course_id', courseId),
+      supabase.from('course_materials').delete().eq('course_id', courseId),
+      supabase.from('attendance').delete().eq('course_id', courseId),
+      supabase.from('announcements').delete().eq('course_id', courseId),
+      supabase.from('quizzes').delete().eq('course_id', courseId),
+    ]);
+
+  for (const result of [
+    assignmentsDel,
+    lecturesDel,
+    materialsDel,
+    attendanceDel,
+    announcementsDel,
+    quizzesDel,
+  ]) {
+    if (result.error) throw result.error;
+  }
+
+  // 4. Delete course row
+  const { error } = await supabase.from('courses').delete().eq('id', courseId);
+  if (error) throw error;
+
+  return true;
 }
 
 // ============================================================
@@ -256,12 +292,18 @@ export async function enrichListWithChapters(
   const chaptersMap = new Map<string, string>(); // chapterId -> chapterTitle
   const mappingsMap = new Map<string, string>(); // itemId -> chapterId
 
-  try {
-    const { data } = await supabase.from('course_chapters').select('id, title');
-    if (data) {
-      data.forEach((c: any) => chaptersMap.set(c.id, c.title));
-    }
-  } catch {}
+  const idList = Array.from(courseIds);
+  if (idList.length > 0) {
+    try {
+      const { data } = await supabase
+        .from('course_chapters')
+        .select('id, title, course_id')
+        .in('course_id', idList);
+      if (data) {
+        data.forEach((c: any) => chaptersMap.set(c.id, c.title));
+      }
+    } catch {}
+  }
 
   for (const cId of courseIds) {
     try {
@@ -410,36 +452,7 @@ export async function createLecture(
     chapter_id?: string | null;
   }
 ) {
-  let result: any = null;
-  const { data, error } = await supabase
-    .from('lectures')
-    .insert(lecture)
-    .select()
-    .single();
-
-  if (error) {
-    const isSchemaOrCol =
-      error.message?.toLowerCase().includes('chapter_id') ||
-      error.message?.toLowerCase().includes('schema cache') ||
-      error.code === 'PGRST204';
-
-    if (isSchemaOrCol) {
-      console.warn("Retrying lecture insert without chapter_id...");
-      const { chapter_id, ...fallbackLecture } = lecture;
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('lectures')
-        .insert(fallbackLecture)
-        .select()
-        .single();
-      
-      if (fallbackError) throw fallbackError;
-      result = fallbackData;
-    } else {
-      throw error;
-    }
-  } else {
-    result = data;
-  }
+  const result = await insertWithChapterFallback(supabase, 'lectures', lecture);
 
   if (result && lecture.chapter_id) {
     result.chapter_id = lecture.chapter_id;
@@ -527,36 +540,7 @@ export async function createAssignment(
     chapter_id?: string | null;
   }
 ) {
-  let result: any = null;
-  const { data, error } = await supabase
-    .from('assignments')
-    .insert(assignment)
-    .select()
-    .single();
-
-  if (error) {
-    const isSchemaOrCol =
-      error.message?.toLowerCase().includes('chapter_id') ||
-      error.message?.toLowerCase().includes('schema cache') ||
-      error.code === 'PGRST204';
-
-    if (isSchemaOrCol) {
-      console.warn("Retrying assignment insert without chapter_id...");
-      const { chapter_id, ...fallbackAssignment } = assignment;
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('assignments')
-        .insert(fallbackAssignment)
-        .select()
-        .single();
-      
-      if (fallbackError) throw fallbackError;
-      result = fallbackData;
-    } else {
-      throw error;
-    }
-  } else {
-    result = data;
-  }
+  const result = await insertWithChapterFallback(supabase, 'assignments', assignment);
 
   if (result && assignment.chapter_id) {
     result.chapter_id = assignment.chapter_id;
@@ -620,11 +604,19 @@ export function parseSubmissionFeedback(raw: any) {
   };
 }
 
-export async function getMySubmissions(supabase: SupabaseClient) {
-  const { data, error } = await supabase
+export async function getMySubmissions(
+  supabase: SupabaseClient,
+  options?: { limit?: number; offset?: number }
+) {
+  let query = supabase
     .from('submissions')
     .select('*, assignments(id, title, max_marks, due_date, course_id, courses(title, code))')
     .order('submitted_at', { ascending: false });
+  if (options?.limit) {
+    const offset = options.offset ?? 0;
+    query = query.range(offset, offset + options.limit - 1);
+  }
+  const { data, error } = await query;
 
   if (error) throw error;
   const parsed = (data ?? []).map(parseSubmissionFeedback);
@@ -710,7 +702,8 @@ export async function createSubmission(
 export async function getAllSubmissions(
   supabase: SupabaseClient,
   filterCourseId?: string,
-  filterStatus?: string
+  filterStatus?: string,
+  options?: { limit?: number; offset?: number }
 ) {
   let query = supabase.from('submissions').select(
     `
@@ -746,6 +739,10 @@ export async function getAllSubmissions(
 
   if (filterStatus && filterStatus !== 'all') {
     query = query.eq('status', filterStatus);
+  }
+  if (options?.limit) {
+    const offset = options.offset ?? 0;
+    query = query.range(offset, offset + options.limit - 1);
   }
 
   const { data, error } = await query.order('submitted_at', { ascending: false });
@@ -991,35 +988,7 @@ export async function createQuizWithQuestions(
   }[]
 ) {
   // 1. Insert Quiz
-  const { data: quizData, error: quizError } = await supabase
-    .from('quizzes')
-    .insert(quiz)
-    .select()
-    .single();
-
-  let finalQuizData = quizData;
-
-  if (quizError) {
-    const isSchemaOrCol =
-      quizError.message?.toLowerCase().includes('chapter_id') ||
-      quizError.message?.toLowerCase().includes('schema cache') ||
-      quizError.code === 'PGRST204';
-
-    if (isSchemaOrCol) {
-      console.warn("Retrying quiz insert without chapter_id...");
-      const { chapter_id, ...fallbackQuiz } = quiz;
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('quizzes')
-        .insert(fallbackQuiz)
-        .select()
-        .single();
-      
-      if (fallbackError) throw fallbackError;
-      finalQuizData = fallbackData;
-    } else {
-      throw quizError;
-    }
-  }
+  const finalQuizData = await insertWithChapterFallback(supabase, 'quizzes', quiz);
 
   if (finalQuizData && quiz.chapter_id) {
     finalQuizData.chapter_id = quiz.chapter_id;
