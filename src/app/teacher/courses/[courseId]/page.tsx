@@ -284,12 +284,27 @@ export default function CourseBuilderDetailPage() {
   // Handle Delete Lecture
   const handleDeleteLecture = async (lectureId: string) => {
     if (!confirm('Are you sure you want to remove this lecture?')) return;
+    
+    // 1. Optimistically update local state immediately so the faculty sees the list updated
+    const remaining = lectures.filter((l) => l.id !== lectureId);
+    const reindexed = remaining.map((l, i) => ({ ...l, order_index: i + 1 }));
+    setLectures(reindexed);
+
     try {
+      // 2. Delete lecture from database
       await deleteLecture(supabase, lectureId);
+      
+      // 3. Persist reordered sequential indices (1, 2, 3...) to database
+      if (reindexed.length > 0) {
+        const updates = reindexed.map((l, i) => ({ id: l.id, order_index: i + 1 }));
+        await reorderLectures(supabase, updates);
+      }
+      
       toast.success('Lecture removed');
       loadData();
     } catch (err: any) {
       toast.error('Failed to remove lecture', { description: err.message });
+      loadData();
     }
   };
 
@@ -842,8 +857,8 @@ export default function CourseBuilderDetailPage() {
                       </button>
                     </div>
 
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-extrabold text-xs">
-                      #{idx + 1}
+                    <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-400/60 flex items-center justify-center font-black text-sm shadow-sm shrink-0">
+                      {idx + 1}
                     </div>
 
                     <div className="space-y-0.5">

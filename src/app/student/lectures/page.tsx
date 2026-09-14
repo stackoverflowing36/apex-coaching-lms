@@ -216,27 +216,32 @@ export default function LecturesPage() {
                 </div>
 
                 <div className="space-y-2">
-                  {courseLectures.map((lecture: any) => (
+                  {courseLectures.map((lecture: any, idx: number) => (
                     <Link
                       key={lecture.id}
                       href={`/student/lectures/${lecture.id}`}
                       className="group block"
                     >
                       <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 hover:border-emerald-200 transition-all flex items-center gap-4">
-                        {/* Play Thumbnail */}
-                        <div className="shrink-0 w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center relative overflow-hidden group-hover:bg-emerald-700 transition-colors">
-                          <Play className="h-5 w-5 text-white ml-0.5" />
+                        {/* Green Circle Lecture Number */}
+                        <div className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-400/60 flex items-center justify-center font-black text-sm sm:text-base shadow-sm group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all">
+                          {idx + 1}
                         </div>
 
                         {/* Details */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                              Lecture {lecture.order_index}
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                              Lecture {idx + 1}
                             </span>
-                            <Badge className="bg-emerald-50 text-emerald-700 text-[10px] px-2 py-0 border-0 font-bold">
+                            <Badge className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 border-0 font-bold">
                               {lecture.courses?.code}
                             </Badge>
+                            {lecture.course_chapters?.title && (
+                              <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-[10px] px-2.5 py-0.5 font-bold shadow-none">
+                                Chapter: {lecture.course_chapters.title}
+                              </Badge>
+                            )}
                           </div>
                           <p className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate text-sm sm:text-base">
                             {lecture.title}
@@ -244,7 +249,12 @@ export default function LecturesPage() {
                         </div>
 
                         {/* Arrow */}
-                        <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all shrink-0" />
+                        <div className="shrink-0 flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+                            <Play className="h-3.5 w-3.5 ml-0.5 fill-current" />
+                          </div>
+                          <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                        </div>
                       </div>
                     </Link>
                   ))}
@@ -275,10 +285,17 @@ export default function LecturesPage() {
                     <div className="w-11 h-11 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
                       <FileText className="h-5 w-5" />
                     </div>
-                    <div className="space-y-0.5 overflow-hidden">
-                      <Badge className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0 border-0 font-bold mb-1">
-                        {mat.courses?.code || 'BATCH'}
-                      </Badge>
+                    <div className="space-y-1 overflow-hidden flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                        <Badge className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0 border-0 font-bold">
+                          {mat.courses?.code || 'BATCH'}
+                        </Badge>
+                        {mat.course_chapters?.title && (
+                          <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-[10px] px-2 py-0.5 font-bold">
+                            Chapter: {mat.course_chapters.title}
+                          </Badge>
+                        )}
+                      </div>
                       <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
                         {mat.title}
                       </h4>
@@ -330,11 +347,18 @@ export default function LecturesPage() {
                       className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 hover:border-emerald-200 transition-all flex flex-col justify-between space-y-4 h-full cursor-pointer hover:shadow-2xl"
                     >
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Badge className="bg-emerald-50 text-emerald-700 font-bold text-xs">
-                            {quiz.courses?.code}
-                          </Badge>
-                          <span className="text-xs font-bold text-slate-500 flex items-center gap-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <Badge className="bg-emerald-50 text-emerald-700 font-bold text-xs">
+                              {quiz.courses?.code}
+                            </Badge>
+                            {quiz.course_chapters?.title && (
+                              <Badge className="bg-orange-100 text-orange-800 border border-orange-200 font-bold text-[10px] px-2 py-0">
+                                Chapter: {quiz.course_chapters.title}
+                              </Badge>
+                            )}
+                          </div>
+                          <span className="text-xs font-bold text-slate-500 flex items-center gap-1 shrink-0">
                             <Clock className="h-3.5 w-3.5 text-orange-600" />
                             {quiz.time_limit_minutes || 30} mins
                           </span>

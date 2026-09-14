@@ -142,15 +142,27 @@ export default function LectureViewerPage() {
           <div className="bg-white rounded-2xl p-6 shadow-card border border-slate-100/80">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <span className="shrink-0 w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center justify-center font-black text-xs">
+                    {siblingLectures.findIndex((l) => l.id === lecture.id) >= 0
+                      ? siblingLectures.findIndex((l) => l.id === lecture.id) + 1
+                      : lecture.order_index || 1}
+                  </span>
                   <Badge
                     variant="secondary"
                     className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-semibold"
                   >
                     {lecture.courses?.code}
                   </Badge>
+                  {lecture.course_chapters?.title && (
+                    <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-xs font-bold shadow-none">
+                      Chapter: {lecture.course_chapters.title}
+                    </Badge>
+                  )}
                   <span className="text-xs text-slate-400 font-medium">
-                    Lecture {lecture.order_index}
+                    Lecture {siblingLectures.findIndex((l) => l.id === lecture.id) >= 0
+                      ? siblingLectures.findIndex((l) => l.id === lecture.id) + 1
+                      : lecture.order_index || 1}
                   </span>
                 </div>
                 <h1 className="font-display text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -205,7 +217,7 @@ export default function LectureViewerPage() {
             </div>
 
             <div className="divide-y divide-slate-100 max-h-[60vh] overflow-y-auto">
-              {siblingLectures.map((sl) => {
+              {siblingLectures.map((sl, idx) => {
                 const isActive = sl.id === lectureId;
                 return (
                   <Link
@@ -218,21 +230,28 @@ export default function LectureViewerPage() {
                     }`}
                   >
                     <span
-                      className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
+                      className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                         isActive
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-slate-100 text-slate-500'
+                          ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-300'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                       }`}
                     >
-                      {sl.order_index}
+                      {idx + 1}
                     </span>
-                    <p
-                      className={`text-sm font-medium truncate ${
-                        isActive ? 'text-emerald-700' : 'text-slate-600'
-                      }`}
-                    >
-                      {sl.title}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-sm font-semibold truncate ${
+                          isActive ? 'text-emerald-800' : 'text-slate-700'
+                        }`}
+                      >
+                        {sl.title}
+                      </p>
+                      {sl.course_chapters?.title && (
+                        <p className="text-[10px] font-bold text-orange-600 truncate mt-0.5">
+                          Chapter: {sl.course_chapters.title}
+                        </p>
+                      )}
+                    </div>
                   </Link>
                 );
               })}

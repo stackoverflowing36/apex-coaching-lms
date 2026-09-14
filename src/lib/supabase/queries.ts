@@ -248,7 +248,8 @@ export async function enrichListWithChapters(
     courseIds.add(courseId);
   } else {
     items.forEach((it) => {
-      if (it.course_id) courseIds.add(it.course_id);
+      const cId = it.course_id || it.courses?.id;
+      if (cId) courseIds.add(cId);
     });
   }
 
@@ -278,11 +279,13 @@ export async function enrichListWithChapters(
 
   return items.map((item) => {
     const chapterId = item.chapter_id || mappingsMap.get(item.id) || null;
+    const existingTitle = item.course_chapters?.title;
+    const resolvedTitle = (chapterId && chaptersMap.has(chapterId) ? chaptersMap.get(chapterId) : null) || existingTitle || null;
     return {
       ...item,
       chapter_id: chapterId,
-      course_chapters: chapterId && chaptersMap.has(chapterId)
-        ? { title: chaptersMap.get(chapterId) }
+      course_chapters: resolvedTitle
+        ? { title: resolvedTitle }
         : null,
     };
   });
@@ -620,11 +623,26 @@ export function parseSubmissionFeedback(raw: any) {
 export async function getMySubmissions(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from('submissions')
-    .select('*, assignments(title, max_marks, due_date, courses(title, code))')
+    .select('*, assignments(id, title, max_marks, due_date, course_id, courses(title, code))')
     .order('submitted_at', { ascending: false });
 
   if (error) throw error;
-  return (data ?? []).map(parseSubmissionFeedback);
+  const parsed = (data ?? []).map(parseSubmissionFeedback);
+
+  try {
+    const assignmentItems = parsed.map((p: any) => p.assignments).filter(Boolean);
+    if (assignmentItems.length > 0) {
+      const enrichedAssignments = await enrichListWithChapters(supabase, assignmentItems);
+      const map = new Map(enrichedAssignments.map((a: any) => [a.id, a]));
+      parsed.forEach((p: any) => {
+        if (p.assignments?.id && map.has(p.assignments.id)) {
+          p.assignments = map.get(p.assignments.id);
+        }
+      });
+    }
+  } catch {}
+
+  return parsed;
 }
 
 export async function getSubmissionForAssignment(

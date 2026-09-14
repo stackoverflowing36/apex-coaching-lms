@@ -257,10 +257,17 @@ export default function StudentDashboard() {
                   className="block group"
                 >
                   <div className="rounded-xl border border-slate-200/80 p-4 hover:border-emerald-300 hover:shadow-sm transition-all duration-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        {a.courses?.code}
-                      </span>
+                    <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
+                          {a.courses?.code}
+                        </span>
+                        {a.course_chapters?.title && (
+                          <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-[10px] px-1.5 py-0 font-bold shadow-none">
+                            {a.course_chapters.title}
+                          </Badge>
+                        )}
+                      </div>
                       <span
                         className={`px-2 py-0.5 rounded-full text-[11px] font-bold border ${getUrgencyColor(
                           a.due_date

@@ -195,9 +195,14 @@ export default function AssignmentsPage() {
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
                           {a.courses?.code}
                         </span>
+                        {a.course_chapters?.title && (
+                          <Badge className="bg-orange-100 text-orange-800 border border-orange-200 font-bold text-[10px] px-2 py-0.5 shadow-none">
+                            Chapter: {a.course_chapters.title}
+                          </Badge>
+                        )}
                         <span className="text-slate-300">·</span>
                         <span className="text-xs text-slate-400 font-medium">
                           Max {a.max_marks} marks

@@ -263,12 +263,19 @@ export default function AssignmentDetailPage() {
           <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-card border border-slate-100/80">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
-                <Badge
-                  variant="secondary"
-                  className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-semibold mb-3"
-                >
-                  {assignment.courses?.code}
-                </Badge>
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <Badge
+                    variant="secondary"
+                    className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-semibold"
+                  >
+                    {assignment.courses?.code}
+                  </Badge>
+                  {assignment.course_chapters?.title && (
+                    <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-xs font-bold shadow-none">
+                      Chapter: {assignment.course_chapters.title}
+                    </Badge>
+                  )}
+                </div>
                 <h1 className="font-display text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                   {assignment.title}
                 </h1>

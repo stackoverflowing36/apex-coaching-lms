@@ -149,6 +149,11 @@ export default function TeacherAssignmentDetailsPage() {
             <Badge variant="outline" className="border-orange-200 text-orange-700 bg-orange-50 font-bold">
               {assignment.courses?.title || 'Unknown Batch'}
             </Badge>
+            {assignment.course_chapters?.title && (
+              <Badge className="bg-orange-100 text-orange-800 border-orange-200 font-bold shadow-none">
+                Chapter: {assignment.course_chapters.title}
+              </Badge>
+            )}
           </div>
           
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-slate-600 font-medium">

@@ -202,10 +202,15 @@ export default function StudentQuizPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Lectures
         </Button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {allowReattempt && (
             <Badge className="bg-blue-50 text-blue-700 border-blue-200 font-bold text-xs rounded-full">
               Multiple Attempts Allowed
+            </Badge>
+          )}
+          {quiz.course_chapters?.title && (
+            <Badge className="bg-orange-100 text-orange-800 border border-orange-200 font-bold text-xs rounded-full shadow-none">
+              Chapter: {quiz.course_chapters.title}
             </Badge>
           )}
           <Badge className="bg-slate-900 text-white font-bold px-3 py-1 text-xs rounded-full">
@@ -218,6 +223,13 @@ export default function StudentQuizPage() {
         <>
           <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
+              {quiz.course_chapters?.title && (
+                <div className="mb-2">
+                  <Badge className="bg-orange-50 text-orange-700 border border-orange-200 font-bold text-xs">
+                    Chapter: {quiz.course_chapters.title}
+                  </Badge>
+                </div>
+              )}
               <h1 className="font-heading font-extrabold text-2xl text-slate-900 mb-2">
                 {quiz.title}
               </h1>

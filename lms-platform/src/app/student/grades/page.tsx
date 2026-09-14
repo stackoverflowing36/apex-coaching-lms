@@ -271,10 +271,15 @@ export default function GradesPage() {
                           <p className="font-bold text-slate-900 truncate text-sm sm:text-base">
                             {s.assignments?.title || 'Assignment'}
                           </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-xs text-slate-400 font-bold">
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <span className="text-xs text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">
                               {s.assignments?.courses?.code}
                             </span>
+                            {s.assignments?.course_chapters?.title && (
+                              <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-[10px] px-1.5 py-0 font-bold shadow-none">
+                                {s.assignments.course_chapters.title}
+                              </Badge>
+                            )}
                             <span className="text-slate-300">·</span>
                             <span className="text-xs text-slate-400">
                               Submitted {new Date(s.submitted_at).toLocaleDateString(undefined, {
