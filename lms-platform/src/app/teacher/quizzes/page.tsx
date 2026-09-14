@@ -344,7 +344,7 @@ export default function TeacherQuizEnginePage() {
                     id="batchSelect"
                     value={selectedCourseId}
                     onChange={(e) => setSelectedCourseId(e.target.value)}
-                    className="w-full h-11 rounded-2xl border border-slate-200 bg-white px-3 text-xs font-medium focus:ring-2 focus:ring-orange-500"
+                    className="w-full h-11 rounded-2xl border border-slate-200 bg-white px-3 text-base sm:text-xs font-medium focus:ring-2 focus:ring-orange-500"
                     required
                   >
                     {courses.map((c) => (
@@ -366,7 +366,7 @@ export default function TeacherQuizEnginePage() {
                     max="180"
                     value={timeLimitMinutes}
                     onChange={(e) => setTimeLimitMinutes(Number(e.target.value))}
-                    className="rounded-2xl h-11 text-xs"
+                    className="rounded-2xl h-11 text-base sm:text-xs"
                     required
                   />
                 </div>
@@ -382,7 +382,7 @@ export default function TeacherQuizEnginePage() {
                     placeholder="e.g. Weekly Speed Mock #4: Electrostatics & Potential"
                     value={quizTitle}
                     onChange={(e) => setQuizTitle(e.target.value)}
-                    className="rounded-2xl h-11 text-xs font-medium"
+                    className="rounded-2xl h-11 text-base sm:text-xs font-medium"
                     required
                   />
                 </div>
@@ -415,7 +415,7 @@ export default function TeacherQuizEnginePage() {
                   placeholder="Instructions for students: +4 for correct, -1 for incorrect..."
                   value={quizDescription}
                   onChange={(e) => setQuizDescription(e.target.value)}
-                  className="rounded-2xl min-h-[60px] text-xs resize-none"
+                  className="rounded-2xl min-h-[60px] text-base sm:text-xs resize-none"
                 />
               </div>
 

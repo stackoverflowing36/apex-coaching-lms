@@ -596,7 +596,7 @@ export default function CourseBuilderDetailPage() {
                   Add Lecture Module
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-lg">
+              <DialogContent className="rounded-3xl p-5 sm:p-8 max-w-lg max-h-[88dvh] overflow-y-auto w-[calc(100%-1.5rem)] sm:w-full">
                 <DialogHeader className="space-y-1 text-left">
                   <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
                     Add Lecture to {course?.code}
@@ -616,7 +616,7 @@ export default function CourseBuilderDetailPage() {
                       placeholder="e.g. Chapter 4: Electric Potential & Capacitance"
                       value={lectureTitle}
                       onChange={(e) => setLectureTitle(e.target.value)}
-                      className="rounded-2xl h-11 text-xs"
+                      className="rounded-2xl h-11 text-base sm:text-xs"
                       required
                     />
                   </div>
@@ -669,10 +669,11 @@ export default function CourseBuilderDetailPage() {
                     {lectureVideoSource === 'upload' && (
                       <div className="space-y-2 pt-1">
                         <input
+                          id="lecture-video-input"
                           ref={lectureFileInputRef}
                           type="file"
-                          accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv"
-                          className="hidden"
+                          accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-matroska,.mp4,.webm,.mov,.mkv,video/*"
+                          className="sr-only"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) handleLectureFileSelect(file);
@@ -707,18 +708,18 @@ export default function CourseBuilderDetailPage() {
                             </Button>
                           </div>
                         ) : (
-                          <div
-                            onClick={() => lectureFileInputRef.current?.click()}
-                            className="border-2 border-dashed border-slate-200 hover:border-orange-400 bg-slate-50/50 hover:bg-orange-50/20 rounded-2xl p-5 text-center cursor-pointer transition-all"
+                          <label
+                            htmlFor="lecture-video-input"
+                            className="block border-2 border-dashed border-slate-200 hover:border-orange-400 bg-slate-50/50 hover:bg-orange-50/20 rounded-2xl p-5 text-center cursor-pointer transition-all active:bg-orange-50/40"
                           >
                             <Upload className="h-7 w-7 text-orange-500 mx-auto mb-1.5" />
                             <p className="text-xs font-bold text-slate-700">
-                              Click to choose video from your device
+                              Tap here to choose video from device
                             </p>
                             <p className="text-[10px] text-slate-400 mt-0.5">
                               MP4, WebM, MOV, or MKV (up to 500 MB)
                             </p>
-                          </div>
+                          </label>
                         )}
                       </div>
                     )}
@@ -730,7 +731,7 @@ export default function CourseBuilderDetailPage() {
                           placeholder="https://drive.google.com/file/d/.../view?usp=sharing"
                           value={lectureGDriveUrl}
                           onChange={(e) => setLectureGDriveUrl(e.target.value)}
-                          className="rounded-2xl h-11 text-xs"
+                          className="rounded-2xl h-11 text-base sm:text-xs"
                           required={lectureVideoSource === 'gdrive'}
                         />
                         <div className="rounded-xl bg-blue-50 border border-blue-100 p-2.5 text-[11px] text-blue-700 leading-relaxed">
@@ -749,7 +750,7 @@ export default function CourseBuilderDetailPage() {
                           placeholder="https://www.youtube.com/watch?v=... or Vimeo / direct MP4 link"
                           value={lectureVideoUrl}
                           onChange={(e) => setLectureVideoUrl(e.target.value)}
-                          className="rounded-2xl h-11 text-xs"
+                          className="rounded-2xl h-11 text-base sm:text-xs"
                           required={lectureVideoSource === 'url'}
                         />
                         <p className="text-[10px] text-slate-400">
@@ -780,14 +781,14 @@ export default function CourseBuilderDetailPage() {
                       placeholder="https://drive.google.com/... or Supabase PDF link"
                       value={lectureNotesUrl}
                       onChange={(e) => setLectureNotesUrl(e.target.value)}
-                      className="rounded-2xl h-11 text-xs"
+                      className="rounded-2xl h-11 text-base sm:text-xs"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isAddingLecture}
-                    className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-11 shadow-lg shadow-orange-600/25"
+                    className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-lg shadow-orange-600/25"
                   >
                     {isAddingLecture ? (
                       <span className="flex items-center gap-2">
@@ -907,20 +908,21 @@ export default function CourseBuilderDetailPage() {
 
             <form onSubmit={handleFileUpload} className="space-y-4">
               
-              {/* Dropzone Box */}
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition-all ${
+              {/* Dropzone Box with Native Label Trigger for Mobile */}
+              <label
+                htmlFor="course-material-upload"
+                className={`block border-2 border-dashed rounded-3xl p-6 sm:p-8 text-center cursor-pointer transition-all active:bg-orange-50/40 ${
                   selectedFile
                     ? 'border-emerald-400 bg-emerald-50/30'
                     : 'border-slate-300 hover:border-orange-400 hover:bg-orange-50/20'
                 }`}
               >
                 <input
+                  id="course-material-upload"
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                  className="hidden"
+                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*"
+                  className="sr-only"
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       const file = e.target.files[0];
@@ -933,26 +935,32 @@ export default function CourseBuilderDetailPage() {
                 {selectedFile ? (
                   <div className="space-y-2">
                     <FileCheck className="h-10 w-10 text-emerald-600 mx-auto" />
-                    <div className="font-bold text-sm text-slate-900">{selectedFile.name}</div>
+                    <div className="font-bold text-sm sm:text-base text-slate-900 break-all">{selectedFile.name}</div>
                     <div className="text-xs text-slate-500 font-medium">
                       {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to upload
                     </div>
-                    <span className="text-[11px] font-bold text-orange-600 hover:underline">
-                      Click to choose another file
+                    <span className="inline-block text-xs font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-full hover:underline">
+                      Tap to choose another file
                     </span>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <UploadCloud className="h-10 w-10 text-orange-500 mx-auto" />
-                    <div className="font-bold text-sm text-slate-800">
-                      Drag &amp; drop syllabus PDF here, or click to browse
+                    <div>
+                      <div className="font-bold text-sm sm:text-base text-slate-800">
+                        Tap here to select PDF, Notes or Photo from your device
+                      </div>
+                      <div className="text-xs text-slate-400 mt-1">
+                        Supports PDF, DOCX, PNG, JPG (Max 50MB)
+                      </div>
                     </div>
-                    <div className="text-xs text-slate-400">
-                      Supports PDF, DOCX, PNG, JPG (Max 50MB)
+                    <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-orange-600 text-white font-bold text-xs shadow-sm hover:bg-orange-700 transition-colors">
+                      <UploadCloud className="h-3.5 w-3.5" />
+                      <span>Browse Device / Mobile Files</span>
                     </div>
                   </div>
                 )}
-              </div>
+              </label>
 
               {/* Title Input & Upload CTA */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
@@ -965,7 +973,7 @@ export default function CourseBuilderDetailPage() {
                     placeholder="e.g. Complete Mechanics Formula Sheet 2026"
                     value={materialTitle}
                     onChange={(e) => setMaterialTitle(e.target.value)}
-                    className="rounded-2xl h-11 text-xs"
+                    className="rounded-2xl h-11 text-base sm:text-xs"
                   />
                 </div>
                 <div className="sm:col-span-4 space-y-1.5">
@@ -985,7 +993,7 @@ export default function CourseBuilderDetailPage() {
                   <Button
                     type="submit"
                     disabled={!selectedFile || isUploading}
-                    className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-11 shadow-lg shadow-orange-600/25 disabled:opacity-50"
+                    className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-lg shadow-orange-600/25 disabled:opacity-50 transition-all"
                   >
                     {isUploading ? (
                       <span className="flex items-center gap-2">
@@ -1086,7 +1094,7 @@ export default function CourseBuilderDetailPage() {
                   Create Assignment
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-lg">
+              <DialogContent className="rounded-3xl p-5 sm:p-8 max-w-lg max-h-[88dvh] overflow-y-auto w-[calc(100%-1.5rem)] sm:w-full">
                 <DialogHeader className="space-y-1 text-left">
                   <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
                     Create Assignment
@@ -1106,7 +1114,7 @@ export default function CourseBuilderDetailPage() {
                       placeholder="e.g. Chapter 4 Practice Sheet"
                       value={assignmentTitle}
                       onChange={(e) => setAssignmentTitle(e.target.value)}
-                      className="rounded-2xl h-11 text-xs"
+                      className="rounded-2xl h-11 text-base sm:text-xs"
                       required
                     />
                   </div>
@@ -1132,11 +1140,11 @@ export default function CourseBuilderDetailPage() {
                       placeholder="Instructions for the assignment..."
                       value={assignmentDescription}
                       onChange={(e) => setAssignmentDescription(e.target.value)}
-                      className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs h-24 focus:ring-2 focus:ring-orange-500"
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-base sm:text-xs h-24 focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <Label htmlFor="assignDueDate" className="text-xs font-bold text-slate-700">
                         Due Date
@@ -1146,7 +1154,7 @@ export default function CourseBuilderDetailPage() {
                         type="datetime-local"
                         value={assignmentDueDate}
                         onChange={(e) => setAssignmentDueDate(e.target.value)}
-                        className="rounded-2xl h-11 text-xs"
+                        className="rounded-2xl h-11 text-base sm:text-xs"
                         required
                       />
                     </div>
@@ -1160,7 +1168,7 @@ export default function CourseBuilderDetailPage() {
                         min="1"
                         value={assignmentMaxMarks}
                         onChange={(e) => setAssignmentMaxMarks(Number(e.target.value))}
-                        className="rounded-2xl h-11 text-xs"
+                        className="rounded-2xl h-11 text-base sm:text-xs"
                         required
                       />
                     </div>
@@ -1170,12 +1178,13 @@ export default function CourseBuilderDetailPage() {
                     <Label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                       <span>Question Paper / Attachment (PDF or Image)</span>
                       <span className="text-[10px] font-medium text-slate-400">
-                        Drag &amp; drop supported
+                        Optional
                       </span>
                     </Label>
 
-                    {/* Drag and Drop Zone */}
-                    <div
+                    {/* Drag and Drop Zone with Native Label for Mobile */}
+                    <label
+                      htmlFor="assignment-paper-file"
                       onDragOver={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -1199,8 +1208,7 @@ export default function CourseBuilderDetailPage() {
                           handleAssignmentFileDrop(e.dataTransfer.files[0]);
                         }
                       }}
-                      onClick={() => assignmentFileInputRef.current?.click()}
-                      className={`relative border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all duration-200 ${
+                      className={`block relative border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all duration-200 active:bg-orange-50/40 ${
                         isAssignmentDragging
                           ? 'border-orange-500 bg-orange-50/90 scale-[1.01] shadow-md shadow-orange-500/10'
                           : assignmentFile
@@ -1209,10 +1217,11 @@ export default function CourseBuilderDetailPage() {
                       }`}
                     >
                       <input
+                        id="assignment-paper-file"
                         ref={assignmentFileInputRef}
                         type="file"
-                        accept=".pdf,.png,.jpg,.jpeg,.docx"
-                        className="hidden"
+                        accept=".pdf,.png,.jpg,.jpeg,.docx,application/pdf,image/*"
+                        className="sr-only"
                         onChange={(e) => {
                           if (e.target.files && e.target.files[0]) {
                             handleAssignmentFileDrop(e.target.files[0]);
@@ -1243,13 +1252,14 @@ export default function CourseBuilderDetailPage() {
                             <button
                               type="button"
                               onClick={(e) => {
+                                e.preventDefault();
                                 e.stopPropagation();
                                 setAssignmentFile(null);
                                 if (assignmentFileInputRef.current) {
                                   assignmentFileInputRef.current.value = '';
                                 }
                               }}
-                              className="p-1 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                               title="Remove attachment"
                             >
                               <X className="h-4 w-4" />
@@ -1266,22 +1276,20 @@ export default function CourseBuilderDetailPage() {
                             }`}
                           />
                           <p className="text-xs font-bold text-slate-800">
-                            {isAssignmentDragging
-                              ? 'Drop file here to attach'
-                              : 'Drag & drop assignment question paper here'}
+                            Tap to attach question paper or assignment document
                           </p>
                           <p className="text-[10px] text-slate-400">
-                            Supports PDF, DOCX, PNG, JPG (up to 30MB) or click to browse
+                            Supports PDF, DOCX, PNG, JPG (up to 30MB)
                           </p>
                         </div>
                       )}
-                    </div>
+                    </label>
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isCreatingAssignment}
-                    className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-11 shadow-lg shadow-orange-600/25 mt-2"
+                    className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-lg shadow-orange-600/25 mt-2"
                   >
                     {isCreatingAssignment ? (
                       <span className="flex items-center gap-2">

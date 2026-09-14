@@ -148,36 +148,223 @@ export async function deleteCourse(supabase: SupabaseClient, courseId: string): 
 }
 
 // ============================================================
-// Chapter Queries
+// Chapter Queries & Resilient Metadata Persistence
 // ============================================================
 
-export async function getCourseChapters(supabase: SupabaseClient, courseId: string) {
-  const { data, error } = await supabase
-    .from('course_chapters')
-    .select('*')
-    .eq('course_id', courseId)
-    .order('created_at', { ascending: true });
+interface ChapterMetaItem {
+  id: string;
+  course_id: string;
+  title: string;
+  created_at?: string;
+}
 
-  // Return empty array instead of throwing if the table doesn't exist yet to prevent crashes
-  if (error) {
-    console.error('getCourseChapters error:', error);
-    return [];
+interface ChaptersMetadata {
+  chapters: ChapterMetaItem[];
+  mappings: Record<string, string>; // itemId -> chapterId
+}
+
+const chaptersMetadataCache = new Map<string, ChaptersMetadata>();
+
+export async function getStorageChaptersMetadata(supabase: SupabaseClient, courseId: string): Promise<ChaptersMetadata> {
+  if (chaptersMetadataCache.has(courseId)) {
+    return chaptersMetadataCache.get(courseId)!;
   }
-  return data ?? [];
+  try {
+    const filePath = `${courseId}/_chapters_metadata.json`;
+    const { data, error } = await supabase.storage
+      .from('course-materials')
+      .download(filePath);
+    if (!error && data) {
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      const meta: ChaptersMetadata = {
+        chapters: Array.isArray(parsed?.chapters)
+          ? parsed.chapters
+          : Array.isArray(parsed)
+          ? parsed
+          : [],
+        mappings: parsed?.mappings && typeof parsed.mappings === 'object' ? parsed.mappings : {},
+      };
+      chaptersMetadataCache.set(courseId, meta);
+      return meta;
+    }
+  } catch (err) {
+    // console.warn('Could not read chapters metadata from storage:', err);
+  }
+  const defaultMeta: ChaptersMetadata = { chapters: [], mappings: {} };
+  chaptersMetadataCache.set(courseId, defaultMeta);
+  return defaultMeta;
+}
+
+export async function saveStorageChaptersMetadata(
+  supabase: SupabaseClient,
+  courseId: string,
+  metadata: ChaptersMetadata
+): Promise<void> {
+  chaptersMetadataCache.set(courseId, metadata);
+  try {
+    const filePath = `${courseId}/_chapters_metadata.json`;
+    const content = JSON.stringify(metadata, null, 2);
+    const blob = typeof Blob !== 'undefined'
+      ? new Blob([content], { type: 'application/json' })
+      : Buffer.from(content);
+    await supabase.storage
+      .from('course-materials')
+      .upload(filePath, blob, {
+        contentType: 'application/json',
+        upsert: true,
+      });
+  } catch (err) {
+    console.warn('Could not save chapters metadata to storage:', err);
+  }
+}
+
+export async function recordItemChapterMapping(
+  supabase: SupabaseClient,
+  courseId: string,
+  itemId: string,
+  chapterId: string | null | undefined
+) {
+  if (!courseId || !itemId || !chapterId) return;
+  try {
+    const meta = await getStorageChaptersMetadata(supabase, courseId);
+    meta.mappings = meta.mappings || {};
+    meta.mappings[itemId] = chapterId;
+    await saveStorageChaptersMetadata(supabase, courseId, meta);
+  } catch (err) {
+    console.warn('Failed to record item chapter mapping:', err);
+  }
+}
+
+export async function enrichListWithChapters(
+  supabase: SupabaseClient,
+  items: any[],
+  courseId?: string
+) {
+  if (!items || items.length === 0) return items;
+
+  const courseIds = new Set<string>();
+  if (courseId) {
+    courseIds.add(courseId);
+  } else {
+    items.forEach((it) => {
+      if (it.course_id) courseIds.add(it.course_id);
+    });
+  }
+
+  const chaptersMap = new Map<string, string>(); // chapterId -> chapterTitle
+  const mappingsMap = new Map<string, string>(); // itemId -> chapterId
+
+  try {
+    const { data } = await supabase.from('course_chapters').select('id, title');
+    if (data) {
+      data.forEach((c: any) => chaptersMap.set(c.id, c.title));
+    }
+  } catch {}
+
+  for (const cId of courseIds) {
+    try {
+      const meta = await getStorageChaptersMetadata(supabase, cId);
+      if (meta.chapters) {
+        meta.chapters.forEach((c) => chaptersMap.set(c.id, c.title));
+      }
+      if (meta.mappings) {
+        Object.entries(meta.mappings).forEach(([itemId, chId]) => {
+          mappingsMap.set(itemId, chId);
+        });
+      }
+    } catch {}
+  }
+
+  return items.map((item) => {
+    const chapterId = item.chapter_id || mappingsMap.get(item.id) || null;
+    return {
+      ...item,
+      chapter_id: chapterId,
+      course_chapters: chapterId && chaptersMap.has(chapterId)
+        ? { title: chaptersMap.get(chapterId) }
+        : null,
+    };
+  });
+}
+
+export async function getCourseChapters(supabase: SupabaseClient, courseId: string) {
+  let dbChapters: any[] = [];
+  try {
+    const { data, error } = await supabase
+      .from('course_chapters')
+      .select('*')
+      .eq('course_id', courseId)
+      .order('created_at', { ascending: true });
+    if (!error && data && data.length > 0) {
+      dbChapters = data;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  const meta = await getStorageChaptersMetadata(supabase, courseId);
+  const metaChapters = meta.chapters || [];
+
+  const map = new Map<string, any>();
+  for (const ch of dbChapters) {
+    map.set(ch.id, ch);
+  }
+  for (const ch of metaChapters) {
+    if (!map.has(ch.id)) {
+      map.set(ch.id, ch);
+    }
+  }
+
+  return Array.from(map.values());
 }
 
 export async function createCourseChapter(
   supabase: SupabaseClient,
   chapter: { course_id: string; title: string }
 ) {
-  const { data, error } = await supabase
-    .from('course_chapters')
-    .insert(chapter)
-    .select()
-    .single();
+  const generatedId =
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : 'ch_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
 
-  if (error) throw error;
-  return data;
+  const chapterObj = {
+    id: generatedId,
+    course_id: chapter.course_id,
+    title: chapter.title.trim(),
+    created_at: new Date().toISOString(),
+  };
+
+  try {
+    const { data, error } = await supabase
+      .from('course_chapters')
+      .insert({
+        id: chapterObj.id,
+        course_id: chapterObj.course_id,
+        title: chapterObj.title,
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      chapterObj.id = data.id;
+    }
+  } catch (e) {
+    // PostgREST schema cache or missing table: fallback to storage
+  }
+
+  const meta = await getStorageChaptersMetadata(supabase, chapter.course_id);
+  const existingIndex = meta.chapters.findIndex(
+    (c) => c.id === chapterObj.id || c.title.toLowerCase() === chapterObj.title.toLowerCase()
+  );
+  if (existingIndex >= 0) {
+    return meta.chapters[existingIndex];
+  }
+
+  meta.chapters.push(chapterObj);
+  await saveStorageChaptersMetadata(supabase, chapter.course_id, meta);
+
+  return chapterObj;
 }
 
 // ============================================================
@@ -194,14 +381,7 @@ export async function getLectures(supabase: SupabaseClient, courseId?: string) {
   const { data, error } = await query.order('order_index', { ascending: true });
   if (error) throw error;
   
-  if (!data || data.length === 0) return [];
-  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
-  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
-
-  return data.map((item: any) => ({
-    ...item,
-    course_chapters: item.chapter_id && chaptersMap.has(item.chapter_id) ? { title: chaptersMap.get(item.chapter_id) } : null
-  }));
+  return enrichListWithChapters(supabase, data ?? [], courseId);
 }
 
 export async function getLectureById(supabase: SupabaseClient, lectureId: string) {
@@ -212,15 +392,8 @@ export async function getLectureById(supabase: SupabaseClient, lectureId: string
     .single();
 
   if (error) throw error;
-  
-  if (data?.chapter_id) {
-    const { data: chapterData } = await supabase.from('course_chapters').select('title').eq('id', data.chapter_id).single();
-    if (chapterData) {
-      data.course_chapters = { title: chapterData.title };
-    }
-  }
-  
-  return data;
+  const enriched = await enrichListWithChapters(supabase, [data], data?.course_id);
+  return enriched[0];
 }
 
 export async function createLecture(
@@ -234,6 +407,7 @@ export async function createLecture(
     chapter_id?: string | null;
   }
 ) {
+  let result: any = null;
   const { data, error } = await supabase
     .from('lectures')
     .insert(lecture)
@@ -241,8 +415,13 @@ export async function createLecture(
     .single();
 
   if (error) {
-    if (error.message.includes('schema cache') || error.message.includes('Could not find the \'chapter_id\' column')) {
-      console.warn("Schema cache error on lectures. Retrying without chapter_id...");
+    const isSchemaOrCol =
+      error.message?.toLowerCase().includes('chapter_id') ||
+      error.message?.toLowerCase().includes('schema cache') ||
+      error.code === 'PGRST204';
+
+    if (isSchemaOrCol) {
+      console.warn("Retrying lecture insert without chapter_id...");
       const { chapter_id, ...fallbackLecture } = lecture;
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('lectures')
@@ -251,11 +430,20 @@ export async function createLecture(
         .single();
       
       if (fallbackError) throw fallbackError;
-      return fallbackData;
+      result = fallbackData;
+    } else {
+      throw error;
     }
-    throw error;
+  } else {
+    result = data;
   }
-  return data;
+
+  if (result && lecture.chapter_id) {
+    result.chapter_id = lecture.chapter_id;
+    await recordItemChapterMapping(supabase, lecture.course_id, result.id, lecture.chapter_id);
+  }
+
+  return result;
 }
 
 export async function updateLecture(
@@ -310,14 +498,7 @@ export async function getAssignments(supabase: SupabaseClient, courseId?: string
   const { data, error } = await query.order('due_date', { ascending: true });
   if (error) throw error;
   
-  if (!data || data.length === 0) return [];
-  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
-  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
-
-  return data.map((item: any) => ({
-    ...item,
-    course_chapters: item.chapter_id && chaptersMap.has(item.chapter_id) ? { title: chaptersMap.get(item.chapter_id) } : null
-  }));
+  return enrichListWithChapters(supabase, data ?? [], courseId);
 }
 
 export async function getAssignmentById(supabase: SupabaseClient, assignmentId: string) {
@@ -328,15 +509,8 @@ export async function getAssignmentById(supabase: SupabaseClient, assignmentId: 
     .single();
 
   if (error) throw error;
-
-  if (data?.chapter_id) {
-    const { data: chapterData } = await supabase.from('course_chapters').select('title').eq('id', data.chapter_id).single();
-    if (chapterData) {
-      data.course_chapters = { title: chapterData.title };
-    }
-  }
-
-  return data;
+  const enriched = await enrichListWithChapters(supabase, [data], data?.course_id);
+  return enriched[0];
 }
 
 export async function createAssignment(
@@ -350,6 +524,7 @@ export async function createAssignment(
     chapter_id?: string | null;
   }
 ) {
+  let result: any = null;
   const { data, error } = await supabase
     .from('assignments')
     .insert(assignment)
@@ -357,8 +532,13 @@ export async function createAssignment(
     .single();
 
   if (error) {
-    if (error.message.includes('schema cache') || error.message.includes('Could not find the \'chapter_id\' column')) {
-      console.warn("Schema cache error on assignments. Retrying without chapter_id...");
+    const isSchemaOrCol =
+      error.message?.toLowerCase().includes('chapter_id') ||
+      error.message?.toLowerCase().includes('schema cache') ||
+      error.code === 'PGRST204';
+
+    if (isSchemaOrCol) {
+      console.warn("Retrying assignment insert without chapter_id...");
       const { chapter_id, ...fallbackAssignment } = assignment;
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('assignments')
@@ -367,11 +547,20 @@ export async function createAssignment(
         .single();
       
       if (fallbackError) throw fallbackError;
-      return fallbackData;
+      result = fallbackData;
+    } else {
+      throw error;
     }
-    throw error;
+  } else {
+    result = data;
   }
-  return data;
+
+  if (result && assignment.chapter_id) {
+    result.chapter_id = assignment.chapter_id;
+    await recordItemChapterMapping(supabase, assignment.course_id, result.id, assignment.chapter_id);
+  }
+
+  return result;
 }
 
 export async function deleteAssignment(supabase: SupabaseClient, assignmentId: string) {
@@ -730,13 +919,9 @@ export async function getQuizzes(supabase: SupabaseClient, courseId?: string) {
   const { data, error } = await query.order('created_at', { ascending: false });
   if (error) throw error;
 
-  if (!data || data.length === 0) return [];
-  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
-  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
-
-  return data.map((quiz: any) => ({
+  const enriched = await enrichListWithChapters(supabase, data ?? [], courseId);
+  return enriched.map((quiz: any) => ({
     ...quiz,
-    course_chapters: quiz.chapter_id && chaptersMap.has(quiz.chapter_id) ? { title: chaptersMap.get(quiz.chapter_id) } : null,
     questions_count: quiz.quiz_questions?.length ?? 0,
     total_marks:
       quiz.quiz_questions?.reduce((sum: number, q: any) => sum + (q.marks ?? 1), 0) ?? 0,
@@ -767,7 +952,8 @@ export async function getQuizWithQuestions(supabase: SupabaseClient, quizId: str
     .single();
 
   if (error) throw error;
-  return data;
+  const enriched = await enrichListWithChapters(supabase, [data], data?.course_id);
+  return enriched[0];
 }
 
 export async function createQuizWithQuestions(
@@ -796,8 +982,13 @@ export async function createQuizWithQuestions(
   let finalQuizData = quizData;
 
   if (quizError) {
-    if (quizError.message.includes('schema cache') || quizError.message.includes('Could not find the \'chapter_id\' column')) {
-      console.warn("Schema cache error on quizzes. Retrying without chapter_id...");
+    const isSchemaOrCol =
+      quizError.message?.toLowerCase().includes('chapter_id') ||
+      quizError.message?.toLowerCase().includes('schema cache') ||
+      quizError.code === 'PGRST204';
+
+    if (isSchemaOrCol) {
+      console.warn("Retrying quiz insert without chapter_id...");
       const { chapter_id, ...fallbackQuiz } = quiz;
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('quizzes')
@@ -810,6 +1001,11 @@ export async function createQuizWithQuestions(
     } else {
       throw quizError;
     }
+  }
+
+  if (finalQuizData && quiz.chapter_id) {
+    finalQuizData.chapter_id = quiz.chapter_id;
+    await recordItemChapterMapping(supabase, quiz.course_id, finalQuizData.id, quiz.chapter_id);
   }
 
   // 2. Insert Questions
@@ -1049,14 +1245,7 @@ export async function getCourseMaterials(supabase: SupabaseClient, courseId?: st
   const { data, error } = await query.order('uploaded_at', { ascending: false });
   if (error) throw error;
   
-  if (!data || data.length === 0) return [];
-  const { data: chaptersData } = await supabase.from('course_chapters').select('id, title');
-  const chaptersMap = new Map((chaptersData || []).map((c: any) => [c.id, c.title]));
-
-  return data.map((item: any) => ({
-    ...item,
-    course_chapters: item.chapter_id && chaptersMap.has(item.chapter_id) ? { title: chaptersMap.get(item.chapter_id) } : null
-  }));
+  return enrichListWithChapters(supabase, data ?? [], courseId);
 }
 
 export async function uploadCourseMaterial(
@@ -1066,7 +1255,7 @@ export async function uploadCourseMaterial(
   title: string,
   chapterId?: string | null
 ) {
-  const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const sanitizedFileName = (file.name || 'document').replace(/[^a-zA-Z0-9.-]/g, '_');
   const filePath = `${courseId}/${Date.now()}_${sanitizedFileName}`;
 
   const { data: uploadData, error: uploadError } = await supabase.storage
@@ -1084,36 +1273,50 @@ export async function uploadCourseMaterial(
 
   const fileType = file.type || file.name.split('.').pop() || 'unknown';
 
-  const { data: materialData, error: insertError } = await supabase
+  let materialData: any = null;
+  const insertPayload: any = {
+    course_id: courseId,
+    title: title.trim() || file.name,
+    file_url: publicUrl,
+    file_type: fileType,
+  };
+  if (chapterId) {
+    insertPayload.chapter_id = chapterId;
+  }
+
+  const { data, error: insertError } = await supabase
     .from('course_materials')
-    .insert({
-      course_id: courseId,
-      title: title.trim() || file.name,
-      file_url: publicUrl,
-      file_type: fileType,
-      chapter_id: chapterId || null,
-    })
+    .insert(insertPayload)
     .select()
     .single();
 
   if (insertError) {
-    if (insertError.message.includes('schema cache') || insertError.message.includes('Could not find the \'chapter_id\' column')) {
-      console.warn("Schema cache error on course_materials. Retrying without chapter_id...");
+    const isSchemaOrCol =
+      insertError.message?.toLowerCase().includes('chapter_id') ||
+      insertError.message?.toLowerCase().includes('schema cache') ||
+      insertError.code === 'PGRST204';
+
+    if (isSchemaOrCol) {
+      console.warn("Retrying course_materials insert without chapter_id...");
+      delete insertPayload.chapter_id;
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('course_materials')
-        .insert({
-          course_id: courseId,
-          title: title.trim() || file.name,
-          file_url: publicUrl,
-          file_type: fileType,
-        })
+        .insert(insertPayload)
         .select()
         .single();
-      
+
       if (fallbackError) throw fallbackError;
-      return fallbackData;
+      materialData = fallbackData;
+    } else {
+      throw insertError;
     }
-    throw insertError;
+  } else {
+    materialData = data;
+  }
+
+  if (materialData && chapterId) {
+    materialData.chapter_id = chapterId;
+    await recordItemChapterMapping(supabase, courseId, materialData.id, chapterId);
   }
 
   return materialData;
