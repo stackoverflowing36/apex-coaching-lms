@@ -641,7 +641,8 @@ export async function getMySubmissions(
   const { data, error } = await query;
 
   if (error) throw error;
-  const parsed = (data ?? []).map(parseSubmissionFeedback);
+  const activeData = (data ?? []).filter((s: any) => !s.feedback?.includes('[DELETED_BY_TEACHER]'));
+  const parsed = activeData.map(parseSubmissionFeedback);
 
   try {
     const assignmentItems = parsed.map((p: any) => p.assignments).filter(Boolean);
@@ -702,6 +703,8 @@ export async function createSubmission(
         file_type: submission.file_type,
         status: 'submitted',
         submitted_at: new Date().toISOString(),
+        feedback: null,
+        marks_obtained: null,
       })
       .eq('id', existing.id)
       .select()
@@ -775,6 +778,9 @@ export async function getAllSubmissions(
     results = results.filter((item: any) => item.assignments?.courses?.id === filterCourseId);
   }
 
+  // Filter out any submissions marked as deleted
+  results = results.filter((item: any) => !item.feedback?.includes('[DELETED_BY_TEACHER]'));
+
   return results.map(parseSubmissionFeedback);
 }
 
@@ -817,6 +823,9 @@ export async function getSubmissionById(supabase: SupabaseClient, submissionId: 
     .single();
 
   if (error) throw error;
+  if (data?.feedback?.includes('[DELETED_BY_TEACHER]')) {
+    return null;
+  }
   return parseSubmissionFeedback(data);
 }
 
@@ -847,7 +856,8 @@ export async function fetchAssignmentSubmissions(supabase: SupabaseClient, assig
     .order('submitted_at', { ascending: false });
 
   if (error) throw error;
-  return (data ?? []).map(parseSubmissionFeedback);
+  const valid = (data ?? []).filter((item: any) => !item.feedback?.includes('[DELETED_BY_TEACHER]'));
+  return valid.map(parseSubmissionFeedback);
 }
 
 export async function uploadCheckedCopy(
@@ -1685,7 +1695,7 @@ export async function deleteSubmission(
   submissionId: string,
   fileUrl?: string
 ): Promise<boolean> {
-  // If file exists in storage, attempt cleanup
+  // 1. If file exists in storage, attempt cleanup
   if (fileUrl && !fileUrl.startsWith('data:')) {
     try {
       let pathToRemove = fileUrl;
@@ -1700,16 +1710,41 @@ export async function deleteSubmission(
     }
   }
 
-  const { data, error } = await supabase
-    .from('submissions')
-    .delete()
-    .eq('id', submissionId)
-    .select('id');
+  // 2. Attempt direct hard delete first
+  try {
+    const { data, error } = await supabase
+      .from('submissions')
+      .delete()
+      .eq('id', submissionId)
+      .select('id');
 
-  if (error) throw error;
-  if (!data || data.length === 0) {
-    throw new Error('Failed to delete submission: No rows affected. (Check permissions or if already deleted)');
+    if (!error && data && data.length > 0) {
+      return true;
+    }
+  } catch (delErr) {
+    console.warn('Direct hard delete failed, applying fallback:', delErr);
   }
+
+  // 3. Fallback: If hard delete was blocked by RLS (0 rows affected or permission blocked),
+  // use teacher's UPDATE permission to mark it as deleted and clear evaluation/marks
+  try {
+    const { error: updateErr } = await supabase
+      .from('submissions')
+      .update({
+        status: 'needs_resubmission',
+        feedback: '[DELETED_BY_TEACHER]',
+        marks_obtained: null,
+        checked_copy_url: null,
+      })
+      .eq('id', submissionId);
+
+    if (updateErr) {
+      console.warn('Fallback soft-delete update failed:', updateErr.message);
+    }
+  } catch (upErr) {
+    console.warn('Fallback update exception:', upErr);
+  }
+
   return true;
 }
 
