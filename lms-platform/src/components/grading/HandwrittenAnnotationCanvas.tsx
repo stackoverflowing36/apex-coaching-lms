@@ -345,8 +345,8 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       function exportOverlayCanvas() {
         try {
           const overlayCanvas = document.createElement('canvas');
-          overlayCanvas.width = canvas.width || 800;
-          overlayCanvas.height = canvas.height || 1100;
+          overlayCanvas.width = canvas?.width || 800;
+          overlayCanvas.height = canvas?.height || 1100;
           const oCtx = overlayCanvas.getContext('2d');
           if (oCtx) {
             oCtx.fillStyle = '#ffffff';

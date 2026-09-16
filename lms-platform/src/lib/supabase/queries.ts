@@ -19,7 +19,7 @@ async function insertWithChapterFallback<T extends { chapter_id?: string | null 
   const { chapter_id, ...fallbackPayload } = payload;
   const { data: fallbackData, error: fallbackError } = await supabase
     .from(table)
-    .insert(fallbackPayload)
+    .insert(fallbackPayload as any)
     .select()
     .single();
   if (fallbackError) throw fallbackError;
@@ -305,7 +305,7 @@ export async function enrichListWithChapters(
     } catch {}
   }
 
-  for (const cId of courseIds) {
+  for (const cId of idList) {
     try {
       const meta = await getStorageChaptersMetadata(supabase, cId);
       if (meta.chapters) {
@@ -333,7 +333,22 @@ export async function enrichListWithChapters(
   });
 }
 
+const chaptersCache = new Map<string, { chapters: any[]; timestamp: number }>();
+const chaptersPromiseCache = new Map<string, Promise<any[]>>();
+const CHAPTERS_CACHE_TTL = 30000; // 30 seconds
+
 export async function getCourseChapters(supabase: SupabaseClient, courseId: string) {
+  const cached = chaptersCache.get(courseId);
+  if (cached && Date.now() - cached.timestamp < CHAPTERS_CACHE_TTL) {
+    return cached.chapters;
+  }
+
+  if (chaptersPromiseCache.has(courseId)) {
+    return chaptersPromiseCache.get(courseId);
+  }
+
+  const promise = (async () => {
+
   let dbChapters: any[] = [];
   try {
     const { data, error } = await supabase
@@ -361,7 +376,14 @@ export async function getCourseChapters(supabase: SupabaseClient, courseId: stri
     }
   }
 
-  return Array.from(map.values());
+  const result = Array.from(map.values());
+  chaptersCache.set(courseId, { chapters: result, timestamp: Date.now() });
+  chaptersPromiseCache.delete(courseId);
+  return result;
+  })();
+
+  chaptersPromiseCache.set(courseId, promise);
+  return promise;
 }
 
 export async function createCourseChapter(
@@ -1260,7 +1282,6 @@ export async function uploadCourseMaterial(
 
   const fileType = file.type || file.name.split('.').pop() || 'unknown';
 
-  let materialData: any = null;
   const insertPayload: any = {
     course_id: courseId,
     title: title.trim() || file.name,
@@ -1271,35 +1292,7 @@ export async function uploadCourseMaterial(
     insertPayload.chapter_id = chapterId;
   }
 
-  const { data, error: insertError } = await supabase
-    .from('course_materials')
-    .insert(insertPayload)
-    .select()
-    .single();
-
-  if (insertError) {
-    const isSchemaOrCol =
-      insertError.message?.toLowerCase().includes('chapter_id') ||
-      insertError.message?.toLowerCase().includes('schema cache') ||
-      insertError.code === 'PGRST204';
-
-    if (isSchemaOrCol) {
-      console.warn("Retrying course_materials insert without chapter_id...");
-      delete insertPayload.chapter_id;
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('course_materials')
-        .insert(insertPayload)
-        .select()
-        .single();
-
-      if (fallbackError) throw fallbackError;
-      materialData = fallbackData;
-    } else {
-      throw insertError;
-    }
-  } else {
-    materialData = data;
-  }
+  const materialData = await insertWithChapterFallback(supabase, 'course_materials', insertPayload);
 
   if (materialData && chapterId) {
     materialData.chapter_id = chapterId;
@@ -1707,12 +1700,16 @@ export async function deleteSubmission(
     }
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('submissions')
     .delete()
-    .eq('id', submissionId);
+    .eq('id', submissionId)
+    .select('id');
 
   if (error) throw error;
+  if (!data || data.length === 0) {
+    throw new Error('Failed to delete submission: No rows affected. (Check permissions or if already deleted)');
+  }
   return true;
 }
 

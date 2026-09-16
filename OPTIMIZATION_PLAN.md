@@ -20,7 +20,7 @@
 ### Task 4 [Medium — duplicated retry logic in 3+ places]
 **File:** `src/lib/supabase/queries.ts`, functions `createLecture`, `createAssignment`, `createQuizWithQuestions`
 
-[ ] Task 4 — confirmed at src/lib/supabase/queries.ts:402-449, 519-566, 977-1027 (found duplicate try/catch chapter_id fallback logic in 3 places)
+[x] Task 4 — confirmed at src/lib/supabase/queries.ts:402-449, 519-566, 977-1027 (found duplicate try/catch chapter_id fallback logic in 3 places)
 
 ### Task 5 [Medium — unbounded queries]
 **File:** `src/lib/supabase/queries.ts`, functions `getAllStudents`, `getMySubmissions`, `getAllSubmissions`
@@ -30,7 +30,7 @@
 ### Task 6 [Low/Medium — redundant client-side refetching]
 **File:** `src/components/chapters/ChapterSelect.tsx` and `src/lib/supabase/queries.ts` function `getCourseChapters`
 
-[ ] Task 6 — confirmed at src/components/chapters/ChapterSelect.tsx:22-43 (found useEffect calling getCourseChapters on every mount) and src/lib/supabase/queries.ts:294-322 (getCourseChapters function)
+[x] Task 6 — confirmed at src/components/chapters/ChapterSelect.tsx:22-43 (found useEffect calling getCourseChapters on every mount) and src/lib/supabase/queries.ts:294-322 (getCourseChapters function)
 
 ### Task 7 [Documented, not fixed — flag only]
 **File:** `src/lib/supabase/queries.ts`, `chaptersMetadataCache`

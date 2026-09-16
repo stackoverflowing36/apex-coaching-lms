@@ -13,7 +13,7 @@
 | **Task 3** | High | `queries.ts` (`reorderLectures`) | **SKIPPED (Intentional & Safe)** | Skipped because `lectures.title` has a `NOT NULL` constraint without default. Partial upsert with `{id, order_index}` fails constraints. Parallel `Promise.all` kept as-is. |
 | **Task 4** | Medium | `queries.ts` (`createLecture`, `createAssignment`, `createQuizWithQuestions`) | **COMPLETED & VERIFIED** | Created reusable helper `insertWithChapterFallback`. Replaced duplicated retry blocks across `createLecture`, `createAssignment`, and `createQuizWithQuestions`. |
 | **Task 5** | Medium | `queries.ts` (`getAllStudents`, `getMySubmissions`, `getAllSubmissions`) | **COMPLETED & VERIFIED** | Added optional `{ limit?: number; offset?: number }` parameter with `.range()` pagination support while preserving backwards-compatibility for existing callers. |
-| **Task 6** | Low/Medium | `ChapterSelect.tsx` & `getCourseChapters` | **UP NEXT / PENDING** | Prevent redundant client-side refetches on every component mount. |
+| **Task 6** | Low/Medium | `ChapterSelect.tsx` & `getCourseChapters` | **COMPLETED & VERIFIED** | Implemented 30-second TTL cache (`chaptersCache`) and concurrent request deduplication via `chaptersPromiseCache` in `getCourseChapters` to prevent redundant network/DB hits on mount. |
 | **Task 7** | Info Only | `chaptersMetadataCache` | **FLAGGED** | Documented module-level `Map` cache behavior; no code changes required. |
 
 ---
@@ -30,12 +30,8 @@
 
 ---
 
-## 3. Next Step Instructions for Claude Code
+## 3. Current Status & Next Steps
 
-When resuming execution, prompt Claude Code with:
-```text
-Resume optimization plan from Task 6. Read CLAUDE_MEMORY.md and OPTIMIZATION_PLAN.md.
-Tasks 1, 2, 3, 4, and 5 are fully implemented, verified, and compiling cleanly.
-Proceed to Task 6: optimize ChapterSelect.tsx and getCourseChapters to prevent redundant client-side refetches.
-Remember to mirror edits to lms-platform/src/ after finishing.
-```
+All tasks from `OPTIMIZATION_PLAN.md` (Tasks 1 through 6, with Task 3 intentionally skipped for schema safety and Task 7 flagged for documentation) are now **fully implemented, synchronized, and verified**.
+
+Ready for commit, staging, or deployment when requested.

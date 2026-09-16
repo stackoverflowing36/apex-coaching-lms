@@ -54,10 +54,14 @@ export default function TeacherGradingHubPage() {
     if (!submissionToDelete) return;
     try {
       setIsDeleting(true);
-      await deleteSubmission(supabase, submissionToDelete.id, submissionToDelete.file_url);
+      const idToDelete = submissionToDelete.id;
+      setSubmissions((prev) => prev.filter((s) => s.id !== idToDelete));
+      
+      await deleteSubmission(supabase, idToDelete, submissionToDelete.file_url);
       toast.success('Submission deleted successfully');
       setSubmissionToDelete(null);
-      await loadData();
+      // Background reload to ensure consistency
+      loadData().catch(console.error);
     } catch (err: any) {
       toast.error('Failed to delete submission', { description: err.message });
     } finally {
