@@ -44,6 +44,20 @@
 ### C. Master Prompt & Architecture Design for Correction Pad
 - Formulated the comprehensive production roadmap for the teacher correction pad (`HandwrittenAnnotationCanvas.tsx` & `[submissionId]/page.tsx`).
 
+### D. Production-Grade Correction Pad Upgrade (COMPLETED — September 17, 2026)
+- **Component**: `src/components/grading/HandwrittenAnnotationCanvas.tsx` (mirrored to `lms-platform/`)
+- **Commit**: `066ba58` — "feat(canvas): 3-layer canvas architecture with DPR, Bézier RAF drawing, per-page strokes, pan/zoom, hotkeys"
+- **Implemented**:
+  1. **3-layer canvas**: `bgCanvasRef` (document image), `annotCanvasRef` (committed strokes), `activeCanvasRef` (RAF scratchpad).
+  2. **High-DPI**: Canvas buffers scaled by `dpr = Math.min(window.devicePixelRatio || 1, 2)`.
+  3. **Smooth handwriting**: Midpoint quadratic Bézier interpolation via `requestAnimationFrame` with mutable `activePointsRef` — zero React re-renders during drag.
+  4. **Multi-page PDF isolation**: `Record<number, AnnotationStroke[]>` with per-page undo/redo stacks.
+  5. **Pan & Zoom**: Spacebar + drag panning, wheel zoom (cursor-anchored), Fit Width / Fit Page / 100% presets.
+  6. **Hotkeys**: 1/V (Smart Check), 2/X (Cross), 3/P (Pen), 4/H (Highlighter), 5/E (Eraser), 6/T (Text), Ctrl+Z/Y (Undo/Redo), Ctrl+S (Save), [ / ] (brush size).
+  7. **Storage**: Debounced 500ms localStorage save with point decimation and 4MB quota guard.
+- **Verification**: `npm run build` in `lms-platform/` passed with 0 errors across all 20 routes.
+- **API preserved**: `getExportBlob()`, `getStrokesCount()`, `getStrokes()`, `clearSavedDraft()` unchanged.
+
 ---
 
 ## 3. Tomorrow's Mission: Production-Grade Correction Pad Upgrade
