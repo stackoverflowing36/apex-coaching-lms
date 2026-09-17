@@ -1711,6 +1711,7 @@ export async function deleteSubmission(
   }
 
   // 2. Attempt direct hard delete first
+  let hardDeleteSucceeded = false;
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -1719,11 +1720,13 @@ export async function deleteSubmission(
       .select('id');
 
     if (!error && data && data.length > 0) {
-      return true;
+      hardDeleteSucceeded = true;
     }
   } catch (delErr) {
     console.warn('Direct hard delete failed, applying fallback:', delErr);
   }
+
+  if (hardDeleteSucceeded) return true;
 
   // 3. Fallback: If hard delete was blocked by RLS (0 rows affected or permission blocked),
   // use teacher's UPDATE permission to mark it as deleted and clear evaluation/marks
@@ -1739,13 +1742,18 @@ export async function deleteSubmission(
       .eq('id', submissionId);
 
     if (updateErr) {
-      console.warn('Fallback soft-delete update failed:', updateErr.message);
+      console.error('Fallback soft-delete update failed:', updateErr.message);
+      throw new Error(
+        `Could not delete submission: ${updateErr.message || 'soft-delete update rejected'}`
+      );
     }
+    return true;
   } catch (upErr) {
-    console.warn('Fallback update exception:', upErr);
+    console.error('Fallback update exception:', upErr);
+    throw new Error(
+      `Could not delete submission: ${(upErr as Error)?.message || 'soft-delete update rejected'}`
+    );
   }
-
-  return true;
 }
 
 export async function uploadLectureVideo(
