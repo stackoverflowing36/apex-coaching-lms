@@ -1737,7 +1737,6 @@ export async function deleteSubmission(
         status: 'needs_resubmission',
         feedback: '[DELETED_BY_TEACHER]',
         marks_obtained: null,
-        checked_copy_url: null,
       })
       .eq('id', submissionId);
 
