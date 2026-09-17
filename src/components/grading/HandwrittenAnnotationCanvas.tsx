@@ -32,6 +32,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Hand,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -94,39 +95,70 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   },
   ref
 ) {
+  // ── Layout refs ──
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  // Three stacked layers — only active one receives pointer events.
+  const bgCanvasRef = useRef<HTMLCanvasElement>(null);
+  const annotCanvasRef = useRef<HTMLCanvasElement>(null);
+  const activeCanvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
-  // Active Tool & Style State
-  const [activeTool, setActiveTool] = useState<ToolType>('smart_check');
-  const [activeColor, setActiveColor] = useState<string>('#ef4444'); // Default teacher red
-  const [brushSize, setBrushSize] = useState<number>(3);
-  const [selectedMark, setSelectedMark] = useState<string>('+1');
-  const [zoom, setZoom] = useState<number>(1);
-  const [isDrawing, setIsDrawing] = useState<boolean>(false);
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
-  const [isProcessingPdf, setIsProcessingPdf] = useState<boolean>(false);
+  // Document dimensions (natural pixel space). Canvas buffers are sized * DPR.
+  const [docWidth, setDocWidth] = useState(800);
+  const [docHeight, setDocHeight] = useState(1100);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // ── High-DPI ──
+  const dprRef = useRef(Math.min(window.devicePixelRatio || 1, 2));
+
+  // ── Pan / Zoom ──
+  const [zoom, setZoom] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const panRef = useRef({ x: 0, y: 0 });
+  const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+  const isPanningRef = useRef(false);
+  const spaceHeldRef = useRef(false);
+
+  // ── Active drawing (RAF-driven, no React state updates while dragging) ──
+  const isDrawingRef = useRef(false);
+  const activePointsRef = useRef<{ x: number; y: number }[]>([]);
+  const activeStyleRef = useRef<{ color: string; size: number; isHighlighter: boolean }>({
+    color: '#ef4444',
+    size: 3,
+    isHighlighter: false,
+  });
+  const rafIdRef = useRef<number>(0);
+
+  // ── State: per-page strokes + per-page undo/redo ──
+  const [strokes, setStrokes] = useState<Record<number, AnnotationStroke[]>>({ 1: [] });
+  const [undoStack, setUndoStack] = useState<Record<number, AnnotationStroke[][]>>({ 1: [] });
+  const [redoStack, setRedoStack] = useState<Record<number, AnnotationStroke[][]>>({ 1: [] });
 
   // Multi-page PDF State
   const [pdfPage, setPdfPage] = useState<number>(1);
   const [pdfTotalPages, setPdfTotalPages] = useState<number>(1);
   const pdfDocRef = useRef<any>(null);
+  const [isProcessingPdf, setIsProcessingPdf] = useState(false);
 
-  // View mode: 'annotate' = live canvas, 'returned' = show checkedCopyUrl directly
+  // Active Tool & Style State
+  const [activeTool, setActiveTool] = useState<ToolType>('smart_check');
+  const [activeColor, setActiveColor] = useState<string>('#ef4444');
+  const [brushSize, setBrushSize] = useState<number>(3);
+  const [selectedMark, setSelectedMark] = useState<string>('+1');
+
+  // View mode
   const [viewMode, setViewMode] = useState<'annotate' | 'returned'>('annotate');
-
-  // History State for Undo / Redo
-  const [strokes, setStrokes] = useState<AnnotationStroke[]>([]);
-  const [undoStack, setUndoStack] = useState<AnnotationStroke[][]>([]);
-  const [redoStack, setRedoStack] = useState<AnnotationStroke[][]>([]);
 
   // Text Tool State
   const [textInputPos, setTextInputPos] = useState<{ x: number; y: number } | null>(null);
   const [textInputValue, setTextInputValue] = useState<string>('');
 
-  // Visual click ripple for instant tactile feedback
-  const [clickRipple, setClickRipple] = useState<{ x: number; y: number; color: string } | null>(null);
+  // Visual click ripple
+  const [clickRipple, setClickRipple] = useState<{ x: number; y: number; color: string } | null>(
+    null
+  );
 
   const colors = [
     { label: 'Teacher Red (Corrections)', value: '#ef4444', bg: 'bg-red-500' },
@@ -138,38 +170,91 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
   const quickMarks = ['+1', '+2', '+5', '-1', '½', '10/10'];
 
-  // ─── localStorage Persistence ───────────────────────────────────────────
   const storageKey = persistenceKey ? `${STORAGE_PREFIX}${persistenceKey}` : null;
 
+  // ── Helpers ──
+  const pageStrokes = useCallback((page: number) => strokes[page] || [], [strokes]);
+  const pageUndo = useCallback((page: number) => undoStack[page] || [], [undoStack]);
+  const pageRedo = useCallback((page: number) => redoStack[page] || [], [redoStack]);
+
+  const setPageStrokes = useCallback(
+    (updater: (prev: AnnotationStroke[]) => AnnotationStroke[]) => {
+      setStrokes((prev) => ({ ...prev, [pdfPage]: updater(prev[pdfPage] || []) }));
+    },
+    [pdfPage]
+  );
+  const setPageUndo = useCallback(
+    (updater: (prev: AnnotationStroke[][]) => AnnotationStroke[][]) => {
+      setUndoStack((prev) => ({ ...prev, [pdfPage]: updater(prev[pdfPage] || []) }));
+    },
+    [pdfPage]
+  );
+  const setPageRedo = useCallback(
+    (updater: (prev: AnnotationStroke[][]) => AnnotationStroke[][]) => {
+      setRedoStack((prev) => ({ ...prev, [pdfPage]: updater(prev[pdfPage] || []) }));
+    },
+    [pdfPage]
+  );
+
+  // ── Canvas sizing (DPR-scaled buffers) ──
+  const syncCanvases = useCallback(() => {
+    const dpr = dprRef.current;
+    [bgCanvasRef, annotCanvasRef, activeCanvasRef].forEach(({ current }) => {
+      if (!current) return;
+      current.width = Math.round(docWidth * dpr);
+      current.height = Math.round(docHeight * dpr);
+      current.style.width = `${docWidth}px`;
+      current.style.height = `${docHeight}px`;
+      const ctx = current.getContext('2d');
+      if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    });
+  }, [docWidth, docHeight]);
+
+  // ── localStorage Persistence (debounced v2) ──
   useEffect(() => {
     if (!storageKey || readOnly) return;
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) {
-        const parsed: AnnotationStroke[] = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
           setStrokes(parsed);
-          toast.info(`Restored ${parsed.length} annotation${parsed.length !== 1 ? 's' : ''} from draft`, {
-            duration: 2500,
-          });
+          const count = Object.values(parsed).reduce(
+            (sum: number, arr: AnnotationStroke[]) => sum + (Array.isArray(arr) ? arr.length : 0),
+            0
+          );
+          if (count > 0)
+            toast.info(`Restored ${count} annotation${count !== 1 ? 's' : ''} from draft`, {
+              duration: 2500,
+            });
         }
       }
-    } catch {
-      // Corrupt data — ignore silently
-    }
+    } catch {}
   }, [storageKey, readOnly]);
 
+  const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!storageKey || readOnly) return;
-    try {
-      if (strokes.length > 0) {
-        localStorage.setItem(storageKey, JSON.stringify(strokes));
-      } else {
-        localStorage.removeItem(storageKey);
-      }
-    } catch {
-      // Storage quota exceeded — ignore
-    }
+    if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
+    saveDraftTimerRef.current = setTimeout(() => {
+      try {
+        const compact = decimateStrokesForStorage(strokes);
+        const sizeKB = new Blob([JSON.stringify(compact)]).size / 1024;
+        if (sizeKB > 4 * 1024) {
+          // Exceeds safe localStorage quota — skip
+          if (storageKey) localStorage.removeItem(storageKey);
+          return;
+        }
+        if (Object.values(compact).some((arr) => arr.length > 0)) {
+          localStorage.setItem(storageKey, JSON.stringify(compact));
+        } else {
+          localStorage.removeItem(storageKey);
+        }
+      } catch {}
+    }, 500);
+    return () => {
+      if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
+    };
   }, [strokes, storageKey, readOnly]);
 
   const clearSavedDraft = useCallback(() => {
@@ -180,38 +265,21 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     }
   }, [storageKey]);
 
-  // Trigger brief visual ripple at click point
   const triggerClickFeedback = (canvasX: number, canvasY: number, color: string) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    setClickRipple({
-      x: (canvasX / canvas.width) * 100,
-      y: (canvasY / canvas.height) * 100,
-      color,
-    });
-    setTimeout(() => {
-      setClickRipple(null);
-    }, 450);
+    setClickRipple({ x: (canvasX / docWidth) * 100, y: (canvasY / docHeight) * 100, color });
+    setTimeout(() => setClickRipple(null), 450);
   };
 
-  // Render single annotation stroke on any 2D canvas context
-  const renderAnnotationStroke = (
-    ctx: CanvasRenderingContext2D,
-    stroke: AnnotationStroke,
-    canvasScale: number
-  ) => {
+  // ── Drawing primitives (natural-pixel coords, DPR applied via canvas transform) ──
+  const drawStroke = useCallback((ctx: CanvasRenderingContext2D, stroke: AnnotationStroke) => {
     ctx.save();
-
-    if (stroke.isHighlighter) {
-      ctx.globalAlpha = 0.35;
-    }
+    if (stroke.isHighlighter) ctx.globalAlpha = 0.35;
 
     if (stroke.type === 'freehand' && stroke.points && stroke.points.length > 0) {
       ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = stroke.size * canvasScale;
+      ctx.lineWidth = stroke.size;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-
       ctx.beginPath();
       ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
       for (let i = 1; i < stroke.points.length; i++) {
@@ -220,11 +288,10 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       ctx.stroke();
     } else if (stroke.type === 'tick' && stroke.x !== undefined && stroke.y !== undefined) {
       ctx.strokeStyle = stroke.color || '#10b981';
-      ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
+      ctx.lineWidth = Math.max(3, stroke.size * 1.3);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-
-      const size = Math.max(26, 28 * (stroke.size / 3)) * canvasScale;
+      const size = Math.max(26, 28 * (stroke.size / 3));
       ctx.beginPath();
       ctx.moveTo(stroke.x - size * 0.42, stroke.y);
       ctx.lineTo(stroke.x - size * 0.1, stroke.y + size * 0.38);
@@ -232,11 +299,10 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       ctx.stroke();
     } else if (stroke.type === 'cross' && stroke.x !== undefined && stroke.y !== undefined) {
       ctx.strokeStyle = stroke.color || '#ef4444';
-      ctx.lineWidth = Math.max(3, stroke.size * 1.3) * canvasScale;
+      ctx.lineWidth = Math.max(3, stroke.size * 1.3);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-
-      const size = Math.max(22, 24 * (stroke.size / 3)) * canvasScale;
+      const size = Math.max(22, 24 * (stroke.size / 3));
       ctx.beginPath();
       ctx.moveTo(stroke.x - size * 0.45, stroke.y - size * 0.45);
       ctx.lineTo(stroke.x + size * 0.45, stroke.y + size * 0.45);
@@ -244,22 +310,26 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       ctx.lineTo(stroke.x - size * 0.45, stroke.y + size * 0.45);
       ctx.stroke();
     } else if (stroke.type === 'question' && stroke.x !== undefined && stroke.y !== undefined) {
-      const radius = Math.max(16, stroke.size * 5) * canvasScale;
+      const radius = Math.max(16, stroke.size * 5);
       ctx.beginPath();
       ctx.arc(stroke.x, stroke.y, radius, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(245, 158, 11, 0.18)';
       ctx.fill();
       ctx.strokeStyle = stroke.color || '#f59e0b';
-      ctx.lineWidth = Math.max(2, stroke.size * 0.8) * canvasScale;
+      ctx.lineWidth = Math.max(2, stroke.size * 0.8);
       ctx.stroke();
-
-      ctx.font = `bold ${Math.max(16, stroke.size * 4.2) * canvasScale}px Inter, sans-serif`;
+      ctx.font = `bold ${Math.max(16, stroke.size * 4.2)}px Inter, sans-serif`;
       ctx.fillStyle = stroke.color || '#f59e0b';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('?', stroke.x, stroke.y);
-    } else if (stroke.type === 'mark' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
-      const radius = Math.max(18, stroke.size * 5.5) * canvasScale;
+    } else if (
+      stroke.type === 'mark' &&
+      stroke.x !== undefined &&
+      stroke.y !== undefined &&
+      stroke.text
+    ) {
+      const radius = Math.max(18, stroke.size * 5.5);
       ctx.beginPath();
       ctx.arc(stroke.x, stroke.y, radius, 0, Math.PI * 2);
       ctx.fillStyle =
@@ -269,132 +339,111 @@ export const HandwrittenAnnotationCanvas = forwardRef<
           ? 'rgba(16, 185, 129, 0.16)'
           : 'rgba(37, 99, 235, 0.16)';
       ctx.fill();
-
       ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = Math.max(2, stroke.size / 2) * canvasScale;
+      ctx.lineWidth = Math.max(2, stroke.size / 2);
       ctx.stroke();
-
-      ctx.font = `bold ${Math.max(12, stroke.size * 3.8) * canvasScale}px Inter, sans-serif`;
+      ctx.font = `bold ${Math.max(12, stroke.size * 3.8)}px Inter, sans-serif`;
       ctx.fillStyle = stroke.color;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(stroke.text, stroke.x, stroke.y);
     } else if (stroke.type === 'text' && stroke.x !== undefined && stroke.y !== undefined && stroke.text) {
-      ctx.font = `bold ${Math.max(14, stroke.size * 4.5) * canvasScale}px Inter, sans-serif`;
+      ctx.font = `bold ${Math.max(14, stroke.size * 4.5)}px Inter, sans-serif`;
       ctx.fillStyle = stroke.color;
       ctx.textBaseline = 'top';
       ctx.fillText(stroke.text, stroke.x, stroke.y);
     }
-
     ctx.restore();
-  };
+  }, []);
 
-  // Redraw Canvas with background document + all annotations
-  const redrawCanvas = useCallback(() => {
-    const canvas = canvasRef.current;
+  // ── Layer renderers ──
+  const drawBackground = useCallback(() => {
+    const canvas = bgCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
+    ctx.setTransform(dprRef.current, 0, 0, dprRef.current, 0, 0);
+    ctx.clearRect(0, 0, docWidth, docHeight);
     if (imageRef.current && imageRef.current.naturalWidth > 0) {
-      if (
-        canvas.width !== imageRef.current.naturalWidth ||
-        canvas.height !== imageRef.current.naturalHeight
-      ) {
-        canvas.width = imageRef.current.naturalWidth;
-        canvas.height = imageRef.current.naturalHeight;
-      }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(imageRef.current, 0, 0);
+      ctx.drawImage(imageRef.current, 0, 0, docWidth, docHeight);
     } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, docWidth, docHeight);
     }
+  }, [docWidth, docHeight]);
 
-    const canvasScale = Math.max(1, canvas.width / 800);
-    strokes.forEach((stroke) => {
-      renderAnnotationStroke(ctx, stroke, canvasScale);
-    });
-  }, [strokes]);
+  const drawAnnotations = useCallback(() => {
+    const canvas = annotCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(dprRef.current, 0, 0, dprRef.current, 0, 0);
+    ctx.clearRect(0, 0, docWidth, docHeight);
+    pageStrokes(pdfPage).forEach((stroke) => drawStroke(ctx, stroke));
+  }, [docWidth, docHeight, pdfPage, pageStrokes, drawStroke]);
 
-  // Export Canvas to PNG Blob (100% taint-proof)
-  const getCanvasBlob = useCallback((): Promise<Blob | null> => {
-    return new Promise((resolve) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return resolve(null);
-
-      try {
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              // Fallback overlay export if toBlob passed null
-              exportOverlayCanvas();
-            }
-          },
-          'image/png',
-          0.95
-        );
-      } catch (err) {
-        console.warn('Direct canvas.toBlob failed, using overlay fallback:', err);
-        exportOverlayCanvas();
+  const startActiveLoop = useCallback(() => {
+    cancelAnimationFrame(rafIdRef.current);
+    const loop = () => {
+      const canvas = activeCanvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.setTransform(dprRef.current, 0, 0, dprRef.current, 0, 0);
+      ctx.clearRect(0, 0, docWidth, docHeight);
+      const pts = activePointsRef.current;
+      if (pts.length >= 2) {
+        const { color, size, isHighlighter } = activeStyleRef.current;
+        ctx.save();
+        if (isHighlighter) ctx.globalAlpha = 0.35;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length - 1; i++) {
+          const p1 = pts[i];
+          const mid = { x: (p1.x + pts[i + 1].x) / 2, y: (p1.y + pts[i + 1].y) / 2 };
+          ctx.quadraticCurveTo(p1.x, p1.y, mid.x, mid.y);
+        }
+        const last = pts[pts.length - 1];
+        if (pts.length >= 2) {
+          const prev = pts[pts.length - 2];
+          ctx.lineTo(last.x, last.y);
+        }
+        ctx.stroke();
+        ctx.restore();
       }
+      if (isDrawingRef.current) rafIdRef.current = requestAnimationFrame(loop);
+    };
+    rafIdRef.current = requestAnimationFrame(loop);
+  }, [docWidth, docHeight]);
 
-      function exportOverlayCanvas() {
-        try {
-          const overlayCanvas = document.createElement('canvas');
-          overlayCanvas.width = canvas?.width || 800;
-          overlayCanvas.height = canvas?.height || 1100;
-          const oCtx = overlayCanvas.getContext('2d');
-          if (oCtx) {
-            oCtx.fillStyle = '#ffffff';
-            oCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-            if (imageRef.current && imageRef.current.naturalWidth > 0) {
-              try {
-                oCtx.drawImage(imageRef.current, 0, 0);
-              } catch {}
-            }
-            const canvasScale = Math.max(1, overlayCanvas.width / 800);
-            strokes.forEach((stroke) => {
-              renderAnnotationStroke(oCtx, stroke, canvasScale);
-            });
-            overlayCanvas.toBlob((b) => resolve(b), 'image/png');
-            return;
-          }
-        } catch {}
-        resolve(null);
-      }
-    });
-  }, [strokes]);
+  const stopActiveLoop = useCallback(() => {
+    cancelAnimationFrame(rafIdRef.current);
+  }, []);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      getExportBlob: async () => {
-        return await getCanvasBlob();
-      },
-      getStrokesCount: () => strokes.length,
-      getStrokes: () => strokes,
-      clearSavedDraft,
-    }),
-    [getCanvasBlob, strokes, clearSavedDraft]
-  );
-
-  useEffect(() => {
-    if (strokes.length > 0 && onExportBlob) {
-      getCanvasBlob().then((blob) => {
-        if (blob) onExportBlob(blob);
+  // ── Persistence: point decimation for localStorage quota guard ──
+  const decimateStrokesForStorage = useCallback((data: Record<number, AnnotationStroke[]>) => {
+    const out: Record<number, AnnotationStroke[]> = {};
+    for (const [page, list] of Object.entries(data)) {
+      out[page] = list.map((s) => {
+        if (!s.points || s.points.length < 3) return s;
+        const keep: { x: number; y: number }[] = [s.points[0]];
+        const step = Math.max(1, Math.floor(s.points.length / 60));
+        for (let i = 1; i < s.points.length - 1; i += step) keep.push(s.points[i]);
+        keep.push(s.points[s.points.length - 1]);
+        return { ...s, points: keep };
       });
     }
-  }, [strokes, getCanvasBlob, onExportBlob]);
+    return out;
+  }, []);
 
-  // Helper to dynamically load PDF.js from CDN
+  // ── PDF ──
   const loadPdfJs = async () => {
     if (typeof window === 'undefined') return null;
     if ((window as any).pdfjsLib) return (window as any).pdfjsLib;
-
     return new Promise((resolve) => {
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
@@ -404,38 +453,35 @@ export const HandwrittenAnnotationCanvas = forwardRef<
           lib.GlobalWorkerOptions.workerSrc =
             'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
           resolve(lib);
-        } else {
-          resolve(null);
-        }
+        } else resolve(null);
       };
       script.onerror = () => resolve(null);
       document.head.appendChild(script);
     });
   };
 
-  // Render a specific PDF page onto an image element
   const renderPdfPageToCanvas = useCallback(
     async (pdfDoc: any, pageNumber: number) => {
       try {
         setIsProcessingPdf(true);
         const page = await pdfDoc.getPage(pageNumber);
         const viewport = page.getViewport({ scale: 1.5 });
-
         const offscreenCanvas = document.createElement('canvas');
         offscreenCanvas.width = viewport.width;
         offscreenCanvas.height = viewport.height;
         const offscreenCtx = offscreenCanvas.getContext('2d');
-
         if (offscreenCtx) {
           await page.render({ canvasContext: offscreenCtx, viewport }).promise;
           const dataUrl = offscreenCanvas.toDataURL('image/png');
-
           const img = new Image();
           img.onload = () => {
             imageRef.current = img;
+            const w = img.naturalWidth || viewport.width;
+            const h = img.naturalHeight || viewport.height;
+            setDocWidth(w);
+            setDocHeight(h);
             setImageLoaded(true);
             setIsProcessingPdf(false);
-            redrawCanvas();
           };
           img.src = dataUrl;
         }
@@ -444,23 +490,18 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         setIsProcessingPdf(false);
       }
     },
-    [redrawCanvas]
+    []
   );
 
-  // Load Image or PDF onto Canvas with Taint-Proof Blob
   useEffect(() => {
     let isMounted = true;
     const targetUrl = imageUrl;
     if (!targetUrl) return;
-
     let objectUrlToRevoke: string | null = null;
 
     const setupDocument = async () => {
       const isPdfFile =
-        isPdf ||
-        targetUrl.toLowerCase().endsWith('.pdf') ||
-        targetUrl.toLowerCase().includes('.pdf');
-
+        isPdf || targetUrl.toLowerCase().endsWith('.pdf') || targetUrl.toLowerCase().includes('.pdf');
       if (isPdfFile) {
         setIsProcessingPdf(true);
         try {
@@ -482,14 +523,11 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         }
       }
 
-      // Standard Image setup with guaranteed taint-proof blob loading
       let resolvedSrc = targetUrl;
       try {
-        // Fetch through our local same-origin proxy to eliminate any CORS taint
         const proxyUrl = targetUrl.startsWith('http')
           ? `/api/proxy-file?url=${encodeURIComponent(targetUrl)}`
           : targetUrl;
-
         const res = await fetch(proxyUrl);
         if (res.ok) {
           const blob = await res.blob();
@@ -501,45 +539,42 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       }
 
       if (!isMounted) return;
-
       const img = new Image();
       img.crossOrigin = 'anonymous';
-
       img.onload = () => {
         if (!isMounted) return;
         imageRef.current = img;
+        setDocWidth(img.naturalWidth);
+        setDocHeight(img.naturalHeight);
         setImageLoaded(true);
-        redrawCanvas();
       };
-
       img.onerror = () => {
         if (!isMounted) return;
         const fallback = new Image();
         fallback.onload = () => {
           if (!isMounted) return;
           imageRef.current = fallback;
+          setDocWidth(fallback.naturalWidth);
+          setDocHeight(fallback.naturalHeight);
           setImageLoaded(true);
-          redrawCanvas();
         };
         fallback.src = targetUrl;
       };
-
       img.src = resolvedSrc;
     };
 
     setupDocument();
-
     return () => {
       isMounted = false;
-      if (objectUrlToRevoke) {
-        URL.revokeObjectURL(objectUrlToRevoke);
-      }
+      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
     };
-  }, [imageUrl, isPdf, redrawCanvas, renderPdfPageToCanvas]);
+  }, [imageUrl, isPdf, renderPdfPageToCanvas]);
 
+  // ── Layer rendering when deps change ──
   useEffect(() => {
-    redrawCanvas();
-  }, [strokes, imageLoaded, redrawCanvas]);
+    drawBackground();
+    drawAnnotations();
+  }, [drawBackground, drawAnnotations]);
 
   const handlePageChange = (newPage: number) => {
     if (!pdfDocRef.current || newPage < 1 || newPage > pdfTotalPages) return;
@@ -547,60 +582,56 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     renderPdfPageToCanvas(pdfDocRef.current, newPage);
   };
 
-  // Coordinate Helper
+  // ── Coordinate mapping (canvas/pan-zoom aware) ──
   const getCanvasCoords = (
-    e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>
+    e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement> | MouseEvent
   ): { x: number; y: number } | null => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    const rect = canvas.getBoundingClientRect();
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return null;
+    const rect = wrapper.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return null;
-
     const clientX = 'clientX' in e ? e.clientX : (e as any).touches?.[0]?.clientX;
     const clientY = 'clientY' in e ? e.clientY : (e as any).touches?.[0]?.clientY;
     if (clientX === undefined || clientY === undefined) return null;
-
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
-    return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY,
-    };
+    return { x: (clientX - rect.left) / zoom, y: (clientY - rect.top) / zoom };
   };
 
-  const saveHistory = () => {
-    setUndoStack((prev) => [...prev, [...strokes]]);
-    setRedoStack([]);
-  };
+  // ── Undo / Redo (per-page) ──
+  const saveHistory = useCallback(() => {
+    setPageUndo((prev) => [...prev, [...pageStrokes(pdfPage)]]);
+    setPageRedo(() => []);
+  }, [pdfPage, pageStrokes, setPageUndo, setPageRedo]);
 
-  const handleUndo = () => {
-    if (undoStack.length === 0) return;
-    const previous = undoStack[undoStack.length - 1];
-    setRedoStack((prev) => [...prev, [...strokes]]);
-    setStrokes(previous);
-    setUndoStack((prev) => prev.slice(0, -1));
-  };
+  const handleUndo = useCallback(() => {
+    const stack = pageUndo(pdfPage);
+    if (stack.length === 0) return;
+    const previous = stack[stack.length - 1];
+    setPageRedo((prev) => [...prev, [...pageStrokes(pdfPage)]]);
+    setPageStrokes(() => previous);
+    setPageUndo((prev) => prev.slice(0, -1));
+  }, [pdfPage, pageStrokes, pageUndo, setPageStrokes, setPageUndo, setPageRedo]);
 
-  const handleRedo = () => {
-    if (redoStack.length === 0) return;
-    const next = redoStack[redoStack.length - 1];
-    setUndoStack((prev) => [...prev, [...strokes]]);
-    setStrokes(next);
-    setRedoStack((prev) => prev.slice(0, -1));
-  };
+  const handleRedo = useCallback(() => {
+    const stack = pageRedo(pdfPage);
+    if (stack.length === 0) return;
+    const next = stack[stack.length - 1];
+    setPageUndo((prev) => [...prev, [...pageStrokes(pdfPage)]]);
+    setPageStrokes(() => next);
+    setPageRedo((prev) => prev.slice(0, -1));
+  }, [pdfPage, pageStrokes, pageRedo, setPageStrokes, setPageUndo, setPageRedo]);
 
-  const handleClear = () => {
-    if (strokes.length === 0) return;
+  const handleClear = useCallback(() => {
+    if (pageStrokes(pdfPage).length === 0) return;
     saveHistory();
-    setStrokes([]);
+    setPageStrokes(() => []);
     clearSavedDraft();
     toast.info('All annotations cleared');
-  };
+  }, [pdfPage, pageStrokes, saveHistory, setPageStrokes, clearSavedDraft]);
 
-  // Pointer Down Handler
+  // ── Pointer Handlers ──
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (readOnly) return;
+    if (spaceHeldRef.current || isPanningRef.current) return;
 
     if (activeTool === 'pen' || activeTool === 'highlighter') {
       try {
@@ -611,37 +642,28 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     const coords = getCanvasCoords(e);
     if (!coords) return;
 
-    // 1. SMART CHECK TOOL (Tick <-> Cross toggle)
     if (activeTool === 'smart_check') {
       saveHistory();
-      const canvasScale = Math.max(1, (canvasRef.current?.width || 800) / 800);
-      const hitRadius = 120 * canvasScale;
-
-      const existingIndex = strokes.findIndex(
+      const hitRadius = 120;
+      const existingIndex = pageStrokes(pdfPage).findIndex(
         (s) =>
           (s.type === 'tick' || s.type === 'cross') &&
           s.x !== undefined &&
           s.y !== undefined &&
           Math.hypot(s.x - coords.x, s.y - coords.y) < hitRadius
       );
-
       if (existingIndex !== -1) {
-        const existing = strokes[existingIndex];
+        const existing = pageStrokes(pdfPage)[existingIndex];
         const toggledType = existing.type === 'tick' ? 'cross' : 'tick';
         const toggledColor = toggledType === 'tick' ? '#10b981' : '#ef4444';
-        setStrokes((prev) => {
+        setPageStrokes((prev) => {
           const updated = [...prev];
-          updated[existingIndex] = {
-            ...existing,
-            type: toggledType,
-            color: toggledColor,
-          };
+          updated[existingIndex] = { ...existing, type: toggledType, color: toggledColor };
           return updated;
         });
         triggerClickFeedback(coords.x, coords.y, toggledColor);
         return;
       }
-
       const tickStroke: AnnotationStroke = {
         id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
         type: 'tick',
@@ -650,81 +672,83 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         color: '#10b981',
         size: brushSize,
       };
-      setStrokes((prev) => [...prev, tickStroke]);
+      setPageStrokes((prev) => [...prev, tickStroke]);
       triggerClickFeedback(coords.x, coords.y, '#10b981');
       return;
     }
 
-    // 2. DEDICATED TICK TOOL
     if (activeTool === 'tick') {
       saveHistory();
-      const newStroke: AnnotationStroke = {
-        id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-        type: 'tick',
-        x: coords.x,
-        y: coords.y,
-        color: '#10b981',
-        size: brushSize,
-      };
-      setStrokes((prev) => [...prev, newStroke]);
+      setPageStrokes((prev) => [
+        ...prev,
+        {
+          id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          type: 'tick',
+          x: coords.x,
+          y: coords.y,
+          color: '#10b981',
+          size: brushSize,
+        },
+      ]);
       triggerClickFeedback(coords.x, coords.y, '#10b981');
       return;
     }
 
-    // 3. DEDICATED CROSS TOOL
     if (activeTool === 'cross') {
       saveHistory();
-      const newStroke: AnnotationStroke = {
-        id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-        type: 'cross',
-        x: coords.x,
-        y: coords.y,
-        color: '#ef4444',
-        size: brushSize,
-      };
-      setStrokes((prev) => [...prev, newStroke]);
+      setPageStrokes((prev) => [
+        ...prev,
+        {
+          id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          type: 'cross',
+          x: coords.x,
+          y: coords.y,
+          color: '#ef4444',
+          size: brushSize,
+        },
+      ]);
       triggerClickFeedback(coords.x, coords.y, '#ef4444');
       return;
     }
 
-    // 4. QUESTION MARK TOOL
     if (activeTool === 'question') {
       saveHistory();
-      const newStroke: AnnotationStroke = {
-        id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-        type: 'question',
-        x: coords.x,
-        y: coords.y,
-        color: '#f59e0b',
-        size: brushSize,
-      };
-      setStrokes((prev) => [...prev, newStroke]);
+      setPageStrokes((prev) => [
+        ...prev,
+        {
+          id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          type: 'question',
+          x: coords.x,
+          y: coords.y,
+          color: '#f59e0b',
+          size: brushSize,
+        },
+      ]);
       triggerClickFeedback(coords.x, coords.y, '#f59e0b');
       return;
     }
 
-    // 5. SCORE MARK STAMP
     if (activeTool === 'mark') {
       saveHistory();
-      const newStroke: AnnotationStroke = {
-        id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-        type: 'mark',
-        x: coords.x,
-        y: coords.y,
-        text: selectedMark,
-        color: activeColor,
-        size: brushSize,
-      };
-      setStrokes((prev) => [...prev, newStroke]);
+      setPageStrokes((prev) => [
+        ...prev,
+        {
+          id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          type: 'mark',
+          x: coords.x,
+          y: coords.y,
+          text: selectedMark,
+          color: activeColor,
+          size: brushSize,
+        },
+      ]);
       triggerClickFeedback(coords.x, coords.y, activeColor);
       return;
     }
 
-    // 6. ERASER TOOL
     if (activeTool === 'eraser') {
-      const canvasScale = Math.max(1, (canvasRef.current?.width || 800) / 800);
-      const eraseRadius = 35 * canvasScale;
-      const strokeToErase = strokes.findIndex((s) => {
+      const eraseRadius = 35;
+      const strokeToErase = pageStrokes(pdfPage).findIndex((s) => {
         if (s.x !== undefined && s.y !== undefined) {
           return Math.hypot(s.x - coords.x, s.y - coords.y) < eraseRadius;
         }
@@ -735,93 +759,248 @@ export const HandwrittenAnnotationCanvas = forwardRef<
       });
       if (strokeToErase !== -1) {
         saveHistory();
-        setStrokes((prev) => prev.filter((_, i) => i !== strokeToErase));
+        setPageStrokes((prev) => prev.filter((_, i) => i !== strokeToErase));
         toast.info('Erased annotation', { duration: 1000 });
       }
       return;
     }
 
-    // 7. TEXT TOOL
     if (activeTool === 'text') {
       setTextInputPos({ x: coords.x, y: coords.y });
       setTextInputValue('');
       return;
     }
 
-    // 8. CONTINUOUS DRAWING (PEN / HIGHLIGHTER)
     if (activeTool === 'pen' || activeTool === 'highlighter') {
       saveHistory();
-      setIsDrawing(true);
-      const isHighlighter = activeTool === 'highlighter';
-      const effectiveSize = isHighlighter ? Math.max(12, brushSize * 3) : brushSize;
-      const effectiveColor = isHighlighter
-        ? activeColor === '#ef4444'
-          ? '#eab308'
-          : activeColor
-        : activeColor;
-
-      const newStroke: AnnotationStroke = {
-        id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-        type: 'freehand',
-        points: [coords],
-        color: effectiveColor,
-        size: effectiveSize,
-        isHighlighter,
+      isDrawingRef.current = true;
+      activePointsRef.current = [coords];
+      activeStyleRef.current = {
+        color: activeTool === 'highlighter'
+          ? activeColor === '#ef4444'
+            ? '#eab308'
+            : activeColor
+          : activeColor,
+        size: activeTool === 'highlighter' ? Math.max(12, brushSize * 3) : brushSize,
+        isHighlighter: activeTool === 'highlighter',
       };
-      setStrokes((prev) => [...prev, newStroke]);
+      startActiveLoop();
     }
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || readOnly) return;
+    if (!isDrawingRef.current || readOnly) return;
     const coords = getCanvasCoords(e);
     if (!coords) return;
-
-    setStrokes((prev) => {
-      if (prev.length === 0) return prev;
-      const lastStroke = { ...prev[prev.length - 1] };
-      if (lastStroke.type === 'freehand' && lastStroke.points) {
-        lastStroke.points = [...lastStroke.points, coords];
-        return [...prev.slice(0, -1), lastStroke];
-      }
-      return prev;
-    });
+    const pts = activePointsRef.current;
+    // Point decimation: skip points closer than ~1.5 natural px
+    if (pts.length > 0) {
+      const last = pts[pts.length - 1];
+      if (Math.hypot(coords.x - last.x, coords.y - last.y) < 1.5) return;
+    }
+    pts.push(coords);
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (isDrawing) {
-      setIsDrawing(false);
-    }
     try {
       if ((e.target as HTMLElement).hasPointerCapture?.(e.pointerId)) {
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
       }
     } catch {}
+    if (isDrawingRef.current) {
+      isDrawingRef.current = false;
+      stopActiveLoop();
+      const pts = activePointsRef.current;
+      if (pts.length >= 2) {
+        const { color, size, isHighlighter } = activeStyleRef.current;
+        const stroke: AnnotationStroke = {
+          id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          type: 'freehand',
+          points: pts,
+          color,
+          size,
+          isHighlighter,
+        };
+        drawAnnotations();
+        setPageStrokes((prev) => [...prev, stroke]);
+      }
+      activePointsRef.current = [];
+    }
   };
 
+  // ── Pan handlers on the wrapper (when space held / hand tool) ──
+  const onWrapperPointerDown = (e: React.PointerEvent) => {
+    if (!spaceHeldRef.current) return;
+    e.preventDefault();
+    isPanningRef.current = true;
+    panStartRef.current = { x: e.clientX, y: e.clientY, panX, panY };
+  };
+  const onWrapperPointerMove = (e: React.PointerEvent) => {
+    if (!isPanningRef.current) return;
+    const dx = e.clientX - panStartRef.current.x;
+    const dy = e.clientY - panStartRef.current.y;
+    setPanX(panStartRef.current.panX + dx);
+    setPanY(panStartRef.current.panY + dy);
+  };
+  const onWrapperPointerUp = () => {
+    isPanningRef.current = false;
+  };
+
+  // Wheel zoom (zoom around cursor)
+  const onWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const rect = wrapper.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / zoom;
+    const py = (e.clientY - rect.top) / zoom;
+    const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+    const newZoom = Math.max(0.3, Math.min(3, zoom * factor));
+    const newPanX = panX + (1 - newZoom / zoom) * (e.clientX - rect.left - panX);
+    const newPanY = panY + (1 - newZoom / zoom) * (e.clientY - rect.top - panY);
+    setZoom(newZoom);
+    setPanX(newPanX);
+    setPanY(newPanY);
+  };
+
+  // Zoom presets
+  const handleFitWidth = () => {
+    const container = containerRef.current;
+    if (!container || docWidth === 0) return;
+    const z = container.clientWidth / docWidth;
+    setZoom(z);
+    setPanX(0);
+    setPanY(0);
+  };
+  const handleFitPage = () => {
+    const container = containerRef.current;
+    if (!container || docWidth === 0 || docHeight === 0) return;
+    const z = Math.min(container.clientWidth / docWidth, container.clientHeight / docHeight);
+    setZoom(z);
+    setPanX(0);
+    setPanY(0);
+  };
+  const handleResetZoom = () => {
+    setZoom(1);
+    setPanX(0);
+    setPanY(0);
+  };
+
+  // ── Text tool ──
   const handleAddText = () => {
     if (!textInputValue.trim() || !textInputPos) {
       setTextInputPos(null);
       return;
     }
     saveHistory();
-    const newStroke: AnnotationStroke = {
-      id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-      type: 'text',
-      x: textInputPos.x,
-      y: textInputPos.y,
-      text: textInputValue.trim(),
-      color: activeColor,
-      size: brushSize,
-    };
-    setStrokes((prev) => [...prev, newStroke]);
+    setPageStrokes((prev) => [
+      ...prev,
+      {
+        id: 'stroke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        type: 'text',
+        x: textInputPos.x,
+        y: textInputPos.y,
+        text: textInputValue.trim(),
+        color: activeColor,
+        size: brushSize,
+      },
+    ]);
     setTextInputPos(null);
     setTextInputValue('');
   };
 
+  // ── Export (composite bg + annotations + active) ──
+  const getCanvasBlob = useCallback((): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      try {
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = Math.round(docWidth * dprRef.current);
+        exportCanvas.height = Math.round(docHeight * dprRef.current);
+        const ctx = exportCanvas.getContext('2d');
+        if (!ctx) return resolve(null);
+        ctx.setTransform(dprRef.current, 0, 0, dprRef.current, 0, 0);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, docWidth, docHeight);
+        if (imageRef.current && imageRef.current.naturalWidth > 0) {
+          ctx.drawImage(imageRef.current, 0, 0, docWidth, docHeight);
+        }
+        pageStrokes(pdfPage).forEach((stroke) => drawStroke(ctx, stroke));
+        exportCanvas.toBlob((blob) => resolve(blob), 'image/png', 0.95);
+      } catch {
+        resolve(null);
+      }
+    });
+  }, [docWidth, docHeight, pdfPage, pageStrokes, drawStroke]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getExportBlob: async () => await getCanvasBlob(),
+      getStrokesCount: () => pageStrokes(pdfPage).length,
+      getStrokes: () => pageStrokes(pdfPage),
+      clearSavedDraft,
+    }),
+    [getCanvasBlob, pdfPage, pageStrokes, clearSavedDraft]
+  );
+
+  useEffect(() => {
+    if (onExportBlob) {
+      getCanvasBlob().then((blob) => {
+        if (blob) onExportBlob(blob);
+      });
+    }
+  }, [getCanvasBlob, onExportBlob]);
+
+  // ── Keyboard shortcuts ──
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const k = e.key.toLowerCase();
+      if (k === ' ') {
+        e.preventDefault();
+        spaceHeldRef.current = true;
+        return;
+      }
+      if (!e.ctrlKey && !e.metaKey) {
+        if (k === '1' || k === 'v') setActiveTool('smart_check');
+        else if (k === '2' || k === 'x') setActiveTool('cross');
+        else if (k === '3' || k === 'p') setActiveTool('pen');
+        else if (k === '4' || k === 'h') setActiveTool('highlighter');
+        else if (k === '5' || k === 'e') setActiveTool('eraser');
+        else if (k === '6' || k === 't') setActiveTool('text');
+        else if (k === '[') setBrushSize((s) => Math.max(1, s - 1));
+        else if (k === ']') setBrushSize((s) => Math.min(20, s + 1));
+      } else {
+        if (k === 'z') {
+          e.preventDefault();
+          handleUndo();
+        } else if (k === 'y') {
+          e.preventDefault();
+          handleRedo();
+        } else if (k === 's') {
+          e.preventDefault();
+          onSaveAnnotations?.();
+        }
+      }
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.key === ' ') spaceHeldRef.current = false;
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('keyup', onKeyUp);
+    };
+  }, [handleUndo, handleRedo, onSaveAnnotations]);
+
+  // Sync pan ref to state
+  panRef.current = { x: panX, y: panY };
+
   return (
     <div className="flex flex-col h-full w-full bg-slate-950 select-none overflow-hidden rounded-2xl border border-slate-800">
-      {/* ── Returned Checked Copy View Mode Switcher (if exists) ── */}
+      {/* ── Returned Checked Copy View Mode Switcher ── */}
       {checkedCopyUrl && (
         <div className="px-3 py-1.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -851,7 +1030,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
               </button>
             </div>
           </div>
-          {viewMode === 'annotate' && storageKey && strokes.length > 0 && (
+          {viewMode === 'annotate' && storageKey && Object.values(strokes).some((arr) => arr.length > 0) && (
             <span className="text-[11px] font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Draft Auto-saved Locally
@@ -905,7 +1084,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
            SIDE-BY-SIDE INTERFACE: VERTICAL SIDE TRAY ON THE LEFT + CANVAS
            ═══════════════════════════════════════════════════════════════════ */
         <div className="flex flex-row flex-1 overflow-hidden relative">
-          {/* ── VERTICAL SIDE TOOL TRAY (Always visible on the side) ── */}
+          {/* ── VERTICAL SIDE TOOL TRAY ── */}
           {!readOnly && (
             <aside className="w-14 sm:w-16 md:w-52 shrink-0 bg-slate-900/95 backdrop-blur border-r border-slate-800 flex flex-col justify-between p-2 select-none z-20 overflow-y-auto gap-3">
               <div className="space-y-3">
@@ -914,8 +1093,6 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-1 hidden md:block">
                     Stamps
                   </span>
-
-                  {/* Smart Check (1-Click Tick / Re-Click Cross) */}
                   <button
                     type="button"
                     onClick={() => setActiveTool('smart_check')}
@@ -929,9 +1106,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                     <MousePointerClick className="h-4 w-4 shrink-0 text-emerald-400" />
                     <span className="hidden md:inline font-semibold">Smart Check</span>
                   </button>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                    {/* Tick */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('tick')}
@@ -945,8 +1120,6 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       <Check className="h-4 w-4 stroke-[3] shrink-0" />
                       <span className="hidden md:inline">Tick</span>
                     </button>
-
-                    {/* Cross */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('cross')}
@@ -961,9 +1134,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       <span className="hidden md:inline">Cross</span>
                     </button>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                    {/* Question */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('question')}
@@ -977,8 +1148,6 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       <HelpCircle className="h-4 w-4 shrink-0" />
                       <span className="hidden md:inline">Clarify</span>
                     </button>
-
-                    {/* Score Mark */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('mark')}
@@ -993,8 +1162,6 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       <span className="hidden md:inline font-mono">{selectedMark}</span>
                     </button>
                   </div>
-
-                  {/* Mark Pills Selector */}
                   {activeTool === 'mark' && (
                     <div className="flex flex-wrap gap-1 p-1 bg-slate-800/80 rounded-xl border border-slate-700">
                       {quickMarks.map((m) => (
@@ -1003,9 +1170,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                           type="button"
                           onClick={() => setSelectedMark(m)}
                           className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                            selectedMark === m
-                              ? 'bg-blue-600 text-white'
-                              : 'text-slate-300 hover:bg-slate-700'
+                            selectedMark === m ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700'
                           }`}
                         >
                           {m}
@@ -1022,9 +1187,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-1 hidden md:block">
                     Draw &amp; Text
                   </span>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                    {/* Freehand Pen */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('pen')}
@@ -1038,8 +1201,6 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       <Pen className="h-4 w-4 shrink-0" />
                       <span className="hidden md:inline">Pen</span>
                     </button>
-
-                    {/* Highlighter */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('highlighter')}
@@ -1054,9 +1215,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       <span className="hidden md:inline">Highlt</span>
                     </button>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                    {/* Text remark */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('text')}
@@ -1070,8 +1229,6 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       <Type className="h-4 w-4 shrink-0" />
                       <span className="hidden md:inline">Note</span>
                     </button>
-
-                    {/* Eraser */}
                     <button
                       type="button"
                       onClick={() => setActiveTool('eraser')}
@@ -1110,7 +1267,6 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                       />
                     ))}
                   </div>
-
                   <div className="flex items-center justify-center md:justify-start gap-1 px-1 pt-1">
                     {[2, 4, 7].map((s) => (
                       <button
@@ -1141,7 +1297,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                     <button
                       type="button"
                       onClick={handleUndo}
-                      disabled={undoStack.length === 0}
+                      disabled={pageUndo(pdfPage).length === 0}
                       className="p-1.5 text-slate-400 hover:text-white disabled:opacity-30 rounded-lg hover:bg-slate-800 transition-colors"
                       title="Undo (Ctrl+Z)"
                     >
@@ -1150,7 +1306,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                     <button
                       type="button"
                       onClick={handleRedo}
-                      disabled={redoStack.length === 0}
+                      disabled={pageRedo(pdfPage).length === 0}
                       className="p-1.5 text-slate-400 hover:text-white disabled:opacity-30 rounded-lg hover:bg-slate-800 transition-colors"
                       title="Redo"
                     >
@@ -1158,7 +1314,11 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                     </button>
                     <button
                       type="button"
-                      onClick={() => setZoom((z) => Math.min(2.5, z + 0.15))}
+                      onClick={() => {
+                        const container = containerRef.current;
+                        if (!container || docWidth === 0) return;
+                        setZoom((z) => Math.min(3, z * 1.2));
+                      }}
                       className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
                       title="Zoom In"
                     >
@@ -1166,27 +1326,53 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                     </button>
                     <button
                       type="button"
-                      onClick={() => setZoom((z) => Math.max(0.6, z - 0.15))}
+                      onClick={() => {
+                        const container = containerRef.current;
+                        if (!container || docWidth === 0) return;
+                        setZoom((z) => Math.max(0.3, z / 1.2));
+                      }}
                       className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
                       title="Zoom Out"
                     >
                       <ZoomOut className="h-3.5 w-3.5" />
                     </button>
                   </div>
-
                   <div className="flex items-center justify-between gap-1 px-1">
-                    <button
-                      type="button"
-                      onClick={() => setZoom(1)}
-                      className="px-2 py-0.5 text-[10px] font-bold text-slate-400 hover:text-white rounded hover:bg-slate-800"
-                    >
-                      {Math.round(zoom * 100)}%
-                    </button>
-
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={handleFitWidth}
+                        className="px-1.5 py-0.5 text-[9px] font-bold text-slate-400 hover:text-white rounded hover:bg-slate-800"
+                        title="Fit Width"
+                      >
+                        Fit W
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleFitPage}
+                        className="px-1.5 py-0.5 text-[9px] font-bold text-slate-400 hover:text-white rounded hover:bg-slate-800"
+                        title="Fit Page"
+                      >
+                        Fit P
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleResetZoom}
+                        className={`px-1.5 py-0.5 text-[9px] font-bold rounded hover:bg-slate-800 ${
+                          zoom === 1 ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
+                        }`}
+                        title="100%"
+                      >
+                        100%
+                      </button>
+                      <span className="px-1 py-0.5 text-[9px] font-bold text-slate-300 font-mono">
+                        {Math.round(zoom * 100)}%
+                      </span>
+                    </div>
                     <button
                       type="button"
                       onClick={handleClear}
-                      disabled={strokes.length === 0}
+                      disabled={pageStrokes(pdfPage).length === 0}
                       className="p-1 text-red-400 hover:text-red-300 disabled:opacity-30 rounded hover:bg-slate-800 transition-colors"
                       title="Clear All Annotations"
                     >
@@ -1196,15 +1382,13 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                 </div>
               </div>
 
-              {/* 5. DEDICATED DIRECT SAVE BUTTON IN SIDE TRAY */}
+              {/* 5. SAVE BUTTON ── */}
               <div className="pt-2 border-t border-slate-800 space-y-1">
                 {onSaveAnnotations && (
                   <button
                     type="button"
                     onClick={async () => {
-                      if (onSaveAnnotations) {
-                        await onSaveAnnotations();
-                      }
+                      if (onSaveAnnotations) await onSaveAnnotations();
                     }}
                     disabled={isSavingAnnotations}
                     className="w-full flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30 transition-all disabled:opacity-50"
@@ -1221,15 +1405,20 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                   </button>
                 )}
                 <div className="text-[10px] text-slate-500 text-center font-medium">
-                  {strokes.length} mark{strokes.length !== 1 ? 's' : ''}
+                  {pageStrokes(pdfPage).length} mark{pageStrokes(pdfPage).length !== 1 ? 's' : ''}
                 </div>
               </div>
             </aside>
           )}
 
-          {/* ── MAIN CANVAS VIEWPORT (Right side of the side tray) ── */}
-          <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-950">
-            {/* Multi-page PDF Header controls if PDF document */}
+          {/* ── MAIN CANVAS VIEWPORT ── */}
+          <div
+            className="flex-1 flex flex-col h-full overflow-hidden bg-slate-950"
+            onPointerDown={onWrapperPointerDown}
+            onPointerMove={onWrapperPointerMove}
+            onPointerUp={onWrapperPointerUp}
+            onPointerCancel={onWrapperPointerUp}
+          >
             {pdfTotalPages > 1 && (
               <div className="px-3 py-1.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs text-slate-300">
                 <div className="flex items-center gap-1.5 font-bold">
@@ -1265,23 +1454,8 @@ export const HandwrittenAnnotationCanvas = forwardRef<
             <div
               ref={containerRef}
               className="flex-1 overflow-auto bg-slate-950 p-4 relative text-center whitespace-nowrap"
-              style={{
-                cursor:
-                  activeTool === 'pen'
-                    ? 'crosshair'
-                    : activeTool === 'highlighter'
-                    ? 'crosshair'
-                    : activeTool === 'smart_check'
-                    ? 'pointer'
-                    : activeTool === 'tick' ||
-                      activeTool === 'cross' ||
-                      activeTool === 'question' ||
-                      activeTool === 'mark'
-                    ? 'cell'
-                    : activeTool === 'eraser'
-                    ? 'not-allowed'
-                    : 'default',
-              }}
+              style={{ cursor: spaceHeldRef.current ? 'grab' : 'default' }}
+              onWheel={onWheel}
             >
               {isProcessingPdf && (
                 <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-30 flex flex-col items-center justify-center text-white gap-2">
@@ -1293,18 +1467,42 @@ export const HandwrittenAnnotationCanvas = forwardRef<
               )}
 
               <div
-                className="transition-all duration-150 relative shadow-2xl rounded-xl overflow-hidden border border-slate-700/60 bg-white inline-block align-top"
-                style={{ width: `${800 * zoom}px`, height: `${1100 * zoom}px` }}
+                ref={wrapperRef}
+                className="transition-transform duration-150 relative shadow-2xl rounded-xl overflow-hidden border border-slate-700/60 bg-white inline-block align-top"
+                style={{
+                  transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
+                  width: `${docWidth}px`,
+                  height: `${docHeight}px`,
+                  cursor: spaceHeldRef.current
+                    ? 'grab'
+                    : activeTool === 'pen' || activeTool === 'highlighter'
+                    ? 'crosshair'
+                    : activeTool === 'smart_check'
+                    ? 'pointer'
+                    : activeTool === 'tick' || activeTool === 'cross' || activeTool === 'question' || activeTool === 'mark'
+                    ? 'cell'
+                    : activeTool === 'eraser'
+                    ? 'not-allowed'
+                    : 'default',
+                }}
               >
                 <canvas
-                  ref={canvasRef}
-                  width={800}
-                  height={1100}
+                  ref={bgCanvasRef}
+                  style={{ pointerEvents: 'none' }}
+                  className="absolute inset-0 block bg-white touch-none"
+                />
+                <canvas
+                  ref={annotCanvasRef}
+                  style={{ pointerEvents: 'none' }}
+                  className="absolute inset-0 block bg-white touch-none"
+                />
+                <canvas
+                  ref={activeCanvasRef}
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   onPointerCancel={handlePointerUp}
-                  className="w-full h-full block bg-white touch-none"
+                  className="block bg-white touch-none"
                 />
 
                 {/* Instant Click Ripple Feedback */}
@@ -1322,15 +1520,13 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                   />
                 )}
 
-                {/* Floating Text Input Box when typing teacher remark */}
+                {/* Floating Text Input Box */}
                 {textInputPos && (
                   <div
                     className="absolute z-30 flex items-center gap-1.5 bg-slate-900/95 p-2 rounded-xl border border-slate-700 shadow-2xl"
                     style={{
-                      left:
-                        (textInputPos.x / (canvasRef.current?.width || 1)) * 100 + '%',
-                      top:
-                        (textInputPos.y / (canvasRef.current?.height || 1)) * 100 + '%',
+                      left: `${(textInputPos.x / docWidth) * 100}%`,
+                      top: `${(textInputPos.y / docHeight) * 100}%`,
                     }}
                   >
                     <input
@@ -1385,7 +1581,10 @@ export const HandwrittenAnnotationCanvas = forwardRef<
                   ? '💬 Remark: Click anywhere to type'
                   : '🧽 Eraser: Click on any mark to delete'}
               </span>
-
+              <span className="text-slate-500">
+                {spaceHeldRef.current ? 'Space=Pan · ' : ''}
+                Zoom {Math.round(zoom * 100)}%
+              </span>
               {checkedCopyUrl && (
                 <button
                   type="button"
