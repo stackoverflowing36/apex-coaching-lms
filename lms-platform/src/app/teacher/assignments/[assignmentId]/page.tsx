@@ -18,6 +18,7 @@ import {
   GraduationCap,
   Trash2,
   Loader2,
+  Pencil,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
@@ -25,10 +26,15 @@ import {
   getAssignmentById,
   fetchAssignmentSubmissions,
   deleteSubmission,
+  updateAssignment,
+  getCourseChapters,
 } from '@/lib/supabase/queries';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -47,6 +53,70 @@ export default function TeacherAssignmentDetailsPage() {
   const [assignment, setAssignment] = useState<any>(null);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Edit State
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    due_date: '',
+    max_marks: 0,
+    chapter_id: '',
+    attachment_url: '',
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [chapters, setChapters] = useState<any[]>([]);
+
+  const handleEditOpen = () => {
+    const descriptionText = assignment?.description || '';
+    const match = descriptionText.match(/\[ATTACHMENT:(https?:\/\/[^\]]+)\]/);
+    setEditForm({
+      title: assignment?.title || '',
+      description: match
+        ? descriptionText.replace(match[0], '').trim()
+        : descriptionText.trim(),
+      due_date: assignment?.due_date ? assignment.due_date.slice(0, 10) : '',
+      max_marks: assignment?.max_marks || 0,
+      chapter_id: assignment?.chapter_id || '',
+      attachment_url: match?.[1] || '',
+    });
+    getCourseChapters(supabase, assignment?.course_id || '')
+      .then((data) => setChapters(data ?? []))
+      .catch(console.error);
+    setIsEditing(true);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!assignment) return;
+
+    try {
+      setIsSaving(true);
+      const description = editForm.description.trim();
+      const attachmentMarker = editForm.attachment_url
+        ? `[ATTACHMENT:${editForm.attachment_url.trim()}]`
+        : '';
+      const updatedDescription = attachmentMarker
+        ? `${description}${description ? '\n' : ''}${attachmentMarker}`
+        : description;
+
+      const updatedAssignment = await updateAssignment(supabase, assignment.id, {
+        title: editForm.title.trim(),
+        description: updatedDescription,
+        due_date: editForm.due_date,
+        max_marks: Number(editForm.max_marks),
+        chapter_id: editForm.chapter_id || null,
+      });
+
+      setAssignment(updatedAssignment);
+      setIsEditing(false);
+      toast.success('Assignment updated successfully');
+    } catch (err: any) {
+      toast.error('Failed to update assignment', { description: err.message });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Deletion State
   const [submissionToDelete, setSubmissionToDelete] = useState<any | null>(null);
@@ -121,6 +191,10 @@ export default function TeacherAssignmentDetailsPage() {
     descriptionText = descriptionText.replace(match[0], '').trim();
   }
 
+  const handleEditChange = (field: string, value: string | number) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  };
+
   // Calculate Stats
   const totalSubmissions = submissions.length;
   const pendingSubmissions = submissions.filter(s => s.status !== 'graded').length;
@@ -150,18 +224,29 @@ export default function TeacherAssignmentDetailsPage() {
         </div>
         
         <div className="relative z-10 space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900">
-              {assignment.title}
-            </h1>
-            <Badge variant="outline" className="border-orange-200 text-orange-700 bg-orange-50 font-bold">
-              {assignment.courses?.title || 'Unknown Batch'}
-            </Badge>
-            {assignment.course_chapters?.title && (
-              <Badge className="bg-orange-100 text-orange-800 border-orange-200 font-bold shadow-none">
-                Chapter: {assignment.course_chapters.title}
+          <div className="flex flex-wrap items-center gap-3 justify-between">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900">
+                {assignment.title}
+              </h1>
+              <Badge variant="outline" className="border-orange-200 text-orange-700 bg-orange-50 font-bold">
+                {assignment.courses?.title || 'Unknown Batch'}
               </Badge>
-            )}
+              {assignment.course_chapters?.title && (
+                <Badge className="bg-orange-100 text-orange-800 border-orange-200 font-bold shadow-none">
+                  Chapter: {assignment.course_chapters.title}
+                </Badge>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleEditOpen}
+              className="rounded-full gap-1.5 font-bold text-xs"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Edit
+            </Button>
           </div>
           
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-slate-600 font-medium">
@@ -176,6 +261,148 @@ export default function TeacherAssignmentDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditing} onOpenChange={(open) => !open && setIsEditing(false)}>
+        <DialogContent className="rounded-3xl p-6 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="space-y-2 text-left">
+            <DialogTitle className="font-heading font-extrabold text-xl text-slate-900 flex items-center gap-2">
+              <Pencil className="h-5 w-5" />
+              Edit Assignment
+            </DialogTitle>
+            <p className="text-xs text-slate-500">
+              Update assignment details, description, and settings
+            </p>
+          </DialogHeader>
+
+          <form onSubmit={handleEditSubmit} className="space-y-6 mt-4">
+            {/* Title */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-title" className="text-xs font-bold text-slate-700">
+                Title <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="edit-title"
+                value={editForm.title}
+                onChange={(e) => handleEditChange('title', e.target.value)}
+                placeholder="Enter assignment title"
+                required
+                className="rounded-2xl text-sm font-medium"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-description" className="text-xs font-bold text-slate-700">
+                Description
+              </Label>
+              <Textarea
+                id="edit-description"
+                value={editForm.description}
+                onChange={(e) => handleEditChange('description', e.target.value)}
+                placeholder="Enter assignment description"
+                rows={4}
+                className="resize-none rounded-2xl text-sm font-medium"
+              />
+            </div>
+
+            {/* Row with Due Date and Max Marks */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-due-date" className="text-xs font-bold text-slate-700">
+                  Due Date
+                </Label>
+                <Input
+                  id="edit-due-date"
+                  type="date"
+                  value={editForm.due_date}
+                  onChange={(e) => handleEditChange('due_date', e.target.value)}
+                  className="rounded-2xl text-sm font-medium"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-max-marks" className="text-xs font-bold text-slate-700">
+                  Max Marks
+                </Label>
+                <Input
+                  id="edit-max-marks"
+                  type="number"
+                  min="1"
+                  value={editForm.max_marks}
+                  onChange={(e) => handleEditChange('max_marks', Number(e.target.value))}
+                  placeholder="e.g., 100"
+                  className="rounded-2xl text-sm font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Chapter */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-chapter" className="text-xs font-bold text-slate-700">
+                Chapter (Optional)
+              </Label>
+              <select
+                id="edit-chapter"
+                value={editForm.chapter_id}
+                onChange={(e) => handleEditChange('chapter_id', e.target.value)}
+                className="flex h-10 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+              >
+                <option value="">No Chapter</option>
+                {chapters.map((chapter) => (
+                  <option key={chapter.id} value={chapter.id}>
+                    {chapter.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Attachment URL */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-attachment" className="text-xs font-bold text-slate-700">
+                Attachment URL
+              </Label>
+              <Input
+                id="edit-attachment"
+                type="url"
+                value={editForm.attachment_url}
+                onChange={(e) => handleEditChange('attachment_url', e.target.value)}
+                placeholder="https://example.com/document.pdf"
+                className="rounded-2xl text-sm font-medium"
+              />
+              <p className="text-xs text-slate-500">
+                URL will be added to description as: [ATTACHMENT:url]
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsEditing(false)}
+                disabled={isSaving}
+                className="rounded-full text-xs font-bold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSaving || !editForm.title.trim()}
+                className="rounded-full text-xs font-bold bg-orange-600 hover:bg-orange-700 text-white shadow-md shadow-orange-600/20"
+              >
+                {isSaving ? (
+                  <span className="flex items-center gap-1.5">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Saving...
+                  </span>
+                ) : (
+                  'Save Changes'
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         

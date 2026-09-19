@@ -23,18 +23,17 @@ Detailed progress, schema verifications, bug fixes from previous sessions, and i
 
 ---
 
-## 🎯 Current Focus: Production Upgrade of the Teacher Correction Pad
+## 🎯 Current Focus: Faculty Assignment Editing (Due Date & Parameters)
 
-- **Target Component**: `src/components/grading/HandwrittenAnnotationCanvas.tsx` (and mirror in `lms-platform/`).
-- **Target Page**: `src/app/teacher/grading/[submissionId]/page.tsx` (and mirror in `lms-platform/`).
+- **Target Files**:
+  - `src/lib/supabase/queries.ts` (and mirror in `lms-platform/`).
+  - `src/app/teacher/assignments/[assignmentId]/page.tsx` (and mirror in `lms-platform/`).
+  - `src/app/teacher/courses/[courseId]/page.tsx` (and mirror in `lms-platform/`).
 - **Core Goals**:
-  1. **Multi-layer Canvas**: Separate background (`bgCanvasRef`), committed annotations (`annotCanvasRef`), and active drawing (`activeCanvasRef` driven by `requestAnimationFrame`) to eliminate React re-render lag on pointer moves.
-  2. **High-DPI Retina Scaling**: Multiply canvas buffer by `window.devicePixelRatio` (capped at 2) for crisp rendering.
-  3. **Smooth Handwriting**: Midpoint Quadratic Bézier curve interpolation for natural, smooth pen strokes.
-  4. **Multi-Page PDF Isolation**: Partition annotations per page (`Record<number, AnnotationStroke[]>`) so strokes on Page 1 do not bleed onto Page 2.
-  5. **Pan & Zoom Engine**: Spacebar + drag (Hand tool), smooth zoom presets ("Fit Width", "Fit Page", 100%).
-  6. **Power-User Hotkeys**: 1/V (Smart Check), 2/X (Cross), 3/P (Pen), 4/H (Highlighter), 5/E (Eraser), 6/T (Text Note), Space (Pan), Ctrl+Z/Y (Undo/Redo), Ctrl+S (Save).
-  7. **Mirror & Build**: Sync changes to `lms-platform/` and run `npm run build`.
+  1. **`updateAssignment` Query**: Implement in `queries.ts` supporting `title`, `description`, `due_date`, `max_marks`, and `chapter_id` with schema fallback.
+  2. **Edit Modal in Assignment Details**: Add "Edit Assignment" button & dialog in `[assignmentId]/page.tsx` pre-filled with existing values.
+  3. **Course Assignment List Action**: Add "Edit" button in `courses/[courseId]/page.tsx`.
+  4. **Mirror & Build**: Maintain dual-directory parity with `lms-platform/` and ensure `npx tsc --noEmit` passes with 0 errors.
 
 ---
 

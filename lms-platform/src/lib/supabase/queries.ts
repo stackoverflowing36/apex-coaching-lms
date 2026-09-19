@@ -578,6 +578,29 @@ export async function deleteAssignment(supabase: SupabaseClient, assignmentId: s
   return true;
 }
 
+export async function updateAssignment(
+  supabase: SupabaseClient,
+  assignmentId: string,
+  updates: {
+    title?: string;
+    description?: string;
+    due_date?: string;
+    max_marks?: number;
+    chapter_id?: string | null;
+    course_id?: string;
+  }
+) {
+  const { data, error } = await supabase
+    .from('assignments')
+    .update(updates)
+    .eq('id', assignmentId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 // ============================================================
 // Submission & Grading Queries
 // ============================================================

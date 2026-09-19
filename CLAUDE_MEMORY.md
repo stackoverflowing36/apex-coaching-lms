@@ -1,8 +1,7 @@
 # CLAUDE_MEMORY.md — Context Memory, Daily Log & Production Roadmap
 
 > **Purpose**: This memory checkpoint stores the architectural context, bug fixes, schema verifications, completed tasks, and exact implementation plans for **Claude Code**. When starting a new session or resuming work tomorrow, Claude Code reads this file to immediately pick up where it left off with zero context loss.
->
-> **Last Updated**: End of Session — September 16, 2026
+> **Last Updated**: September 19, 2026
 
 ---
 
@@ -11,7 +10,7 @@
 1. **Dual-Directory Structure (STRICT INVARIANT)**:
    - The workspace maintains two identical source trees: `src/` (root) and `lms-platform/src/`.
    - **MANDATORY**: Any change made in `src/` must be mirrored to `lms-platform/src/`.
-   - Verification command: Run `npm run build` inside `lms-platform/` (all 20/20 routes must compile with 0 errors).
+   - Verification command: Run `npx tsc --noEmit` and `npm run build` inside `lms-platform/` (all routes must compile with 0 errors).
 2. **Tech Stack**:
    - Framework: Next.js 14.2.5 (App Router, dynamic rendering, server/client components).
    - Database / Auth / Storage: Supabase (`@supabase/ssr`, Postgres, Storage bucket `course-materials`).
@@ -19,11 +18,11 @@
 3. **Git Branch & Remote**:
    - Active branch: `main`
    - Remote: `https://github.com/stackoverflowing36/apex-coaching-lms.git`
-   - Latest commit: `d744575` (*"fix(grading): optimistic submission deletion & query optimizations"*) — clean working tree.
+   - Latest commit: `ca42d46` (*"fix(grading): resolve TypeScript errors in HandwrittenAnnotationCanvas"*) — clean working tree.
 
 ---
 
-## 2. Completed Work & Changelog (Today's Session)
+## 2. Completed Work & Changelog
 
 ### A. Database Queries & Schema Hardening (`queries.ts`)
 - **`deleteCourse`**: Verified live schema: the real database table is `attendance` (table `attendance_records` does not exist). Safely removed nonexistent `enrollments` table deletion. Parallelized child deletion promises with `Promise.all`.
@@ -41,10 +40,17 @@
   - `deleteSubmission` in `queries.ts`: Added `.select('id')` and an explicit check throwing an error if 0 rows were affected (preventing silent RLS failures).
   - All changes mirrored to `lms-platform/`.
 
-### C. Master Prompt & Architecture Design for Correction Pad
-- Formulated the comprehensive production roadmap for the teacher correction pad (`HandwrittenAnnotationCanvas.tsx` & `[submissionId]/page.tsx`).
+### C. Submission Deletion Schema Cache & Fallback Fix (`queries.ts`)
+- **Bug Fixed**: `Could not delete submission: Could not find the 'checked_copy_url' column of 'submissions' in the schema cache`
+- **Root Cause**: `deleteSubmission` attempted an update on `checked_copy_url`, which does not exist as a separate column on `submissions` (checked copy URL is embedded in `feedback` as `[CHECKED_COPY:<url>]`).
+- **Fix Applied**:
+  - Cleaned up storage file first if `file_url` exists.
+  - Attempted direct hard delete via `.from('submissions').delete().eq('id', submissionId)`.
+  - If a foreign key constraint or RLS blocks deletion, safely falls back to soft delete (`status = 'cancelled'`, `marks_obtained = null`, `feedback = null`).
+  - Added proper error throwing instead of returning `true` on failure.
+  - Handled rollback in `teacher/grading/page.tsx` and `teacher/assignments/[assignmentId]/page.tsx` if delete fails.
 
-### D. Production-Grade Correction Pad Upgrade (COMPLETED — September 17, 2026)
+### D. Production-Grade Correction Pad Upgrade (COMPLETED)
 - **Component**: `src/components/grading/HandwrittenAnnotationCanvas.tsx` (mirrored to `lms-platform/`)
 - **Commit**: `066ba58` — "feat(canvas): 3-layer canvas architecture with DPR, Bézier RAF drawing, per-page strokes, pan/zoom, hotkeys"
 - **Implemented**:
@@ -56,77 +62,47 @@
   6. **Hotkeys**: 1/V (Smart Check), 2/X (Cross), 3/P (Pen), 4/H (Highlighter), 5/E (Eraser), 6/T (Text), Ctrl+Z/Y (Undo/Redo), Ctrl+S (Save), [ / ] (brush size).
   7. **Storage**: Debounced 500ms localStorage save with point decimation and 4MB quota guard.
 - **Verification**: `npm run build` in `lms-platform/` passed with 0 errors across all 20 routes.
-- **API preserved**: `getExportBlob()`, `getStrokesCount()`, `getStrokes()`, `clearSavedDraft()` unchanged.
+
+### E. TypeScript Compiler Fixes (`HandwrittenAnnotationCanvas.tsx`)
+- **Commit**: `ca42d46` — "fix(grading): resolve TypeScript errors in HandwrittenAnnotationCanvas"
+- **Resolved 3 Errors**:
+  1. `No overload matches this call` & `'count' is of type 'unknown'` (lines 222-226): Added `parsed as Record<string, AnnotationStroke[]>` to `Object.values()` so `arr` in `.reduce()` is typed as `AnnotationStroke[]`.
+  2. `Element implicitly has an 'any' type because index expression is not of type 'number'` (line 431): Cast `out[Number(page)] = ...` since `page` from `Object.entries(data)` is a `string`.
+- **Verification**: `npx tsc --noEmit` exits with 0 errors across both `src/` and `lms-platform/src/`.
+
+### F. Faculty Assignment Editing (Due Date & Parameters)
+- **Component / Pages**:
+  - `src/lib/supabase/queries.ts` (and mirror in `lms-platform/`): Added `updateAssignment(supabase, assignmentId, updates)`.
+  - `src/app/teacher/assignments/[assignmentId]/page.tsx` (and mirror in `lms-platform/`): Added "Edit Assignment" button and full modal dialog allowing faculty to edit title, due date, max marks, chapter, instructions, and attachments.
+- **Verification**: Mirrored to `lms-platform/`.
+
 
 ---
 
-## 3. Tomorrow's Mission: Production-Grade Correction Pad Upgrade
+## 3. Active Mission: Faculty Assignment Editing (Due Date & Parameters)
 
 ### Target Files:
-- `src/components/grading/HandwrittenAnnotationCanvas.tsx` <-> `lms-platform/src/components/grading/HandwrittenAnnotationCanvas.tsx`
-- `src/app/teacher/grading/[submissionId]/page.tsx` <-> `lms-platform/src/app/teacher/grading/[submissionId]/page.tsx`
+- `src/lib/supabase/queries.ts` <-> `lms-platform/src/lib/supabase/queries.ts`
+- `src/app/teacher/assignments/[assignmentId]/page.tsx` <-> `lms-platform/src/app/teacher/assignments/[assignmentId]/page.tsx`
+- `src/app/teacher/courses/[courseId]/page.tsx` <-> `lms-platform/src/app/teacher/courses/[courseId]/page.tsx`
 
-### Diagnosed Defects to Fix:
-1. **React State Thrashing**:
-   - `handlePointerMove` currently calls `setStrokes(...)` on every mouse/pointer event (60–120+ times/sec).
-   - This triggers a React re-render cycle per move, which calls `redrawCanvas()`, clearing and repainting the entire document image and all historical strokes.
-   - **Solution**: Multi-layer canvas architecture.
-2. **Single-Layer Canvas Bottleneck**:
-   - Document image, saved strokes, and the actively drawn stroke are all on one canvas.
-   - **Solution**: Three-layer canvas architecture:
-     - `bgCanvasRef` (Layer 1): Document background image / PDF page (only updates on doc/page load or pan/zoom).
-     - `annotCanvasRef` (Layer 2): Committed annotations (renders finalized strokes; redraws only on undo/redo/page change).
-     - `activeCanvasRef` (Layer 3): Active scratchpad canvas driven by `requestAnimationFrame`. Points stored in a mutable ref (`activePointsRef`), **zero React re-renders while dragging**.
-3. **High-DPI / Retina Blurring**:
-   - Fixed CSS pixel dimensions cause blurriness on Retina / Mac / 4K displays.
-   - **Solution**: Scale canvas by `dpr = Math.min(window.devicePixelRatio || 1, 2)`.
-4. **Multi-Page PDF Stroke Bleeding**:
-   - Currently, a single flat `strokes` array is used across all PDF pages. Annotations on Page 1 appear on Page 2.
-   - **Solution**: Per-page stroke map: `pageAnnotations: Record<number, AnnotationStroke[]>`. When switching pages (`pdfPage`), switch active stroke array and isolated undo/redo stacks.
-5. **Jagged Polyline Handwriting**:
-   - Lines use raw `lineTo()`.
-   - **Solution**: Midpoint Quadratic Bézier curve interpolation (`ctx.quadraticCurveTo(p1.x, p1.y, midX, midY)`) with pointer pressure modulation.
-6. **Viewport Navigation (Pan & Zoom)**:
-   - Current zoom is primitive CSS width/height scaling.
-   - **Solution**: Full pan/zoom engine with Spacebar + drag (Hand tool), two-finger drag/pinch on touchscreens, and "Fit Width" / "Fit Page" / "100%" presets.
-7. **Storage Quota & Debounced Auto-Save**:
-   - Avoid `QuotaExceededError` (5MB) by implementing debounced local storage saving (500ms) with point decimation (skipping redundant points closer than 2px).
-8. **Teacher Productivity Shortcuts**:
-   - `V` / `1`: Smart Check (✓ / ✗ toggle)
-   - `X` / `2`: Red Cross (✗)
-   - `P` / `3`: Pen
-   - `H` / `4`: Highlighter
-   - `E` / `5`: Eraser
-   - `T` / `6`: Text Note
-   - `Space` (hold): Pan / Hand tool
-   - `Ctrl+Z` / `Cmd+Z`: Undo
-   - `Ctrl+Y` / `Cmd+Shift+Z`: Redo
-   - `[` / `]`: Decrease / Increase brush size
-   - `Ctrl+S` / `Cmd+S`: Save annotations
-
----
-
-## 4. Tomorrow's Resumption Checklist for Claude Code
-
-When starting tomorrow's session, Claude Code should execute the following sequence:
-
-1. **Review & Status Check**:
-   - Run `git status` to ensure clean tree.
-   - Confirm active branch is `main`.
-2. **Implement Multi-Layer Canvas in `HandwrittenAnnotationCanvas.tsx`**:
-   - Set up `bgCanvasRef`, `annotCanvasRef`, `activeCanvasRef`.
-   - Implement RAF-driven drawing loop with Bézier smoothing.
-   - Add High-DPI scaling (`devicePixelRatio`).
-   - Implement `pageAnnotations: Record<number, AnnotationStroke[]>`.
-   - Add Pan & Zoom engine (Hand tool, Spacebar drag, preset buttons).
-   - Add keyboard shortcut listeners.
-3. **Verify Integration in `[submissionId]/page.tsx`**:
-   - Verify `canvasHandleRef.current.getExportBlob()` composites all layers into a crisp PNG blob.
-   - Verify cloud upload via `uploadCheckedCopy` in `src/lib/supabase/queries.ts`.
-4. **Mirror to `lms-platform/`**:
-   - Copy `src/components/grading/HandwrittenAnnotationCanvas.tsx` -> `lms-platform/src/components/grading/HandwrittenAnnotationCanvas.tsx`.
-   - Copy any modified files in `src/app/teacher/grading/...` -> `lms-platform/src/app/teacher/grading/...`.
-5. **Build Verification**:
-   - Run `cd lms-platform && npm run build` to verify 0 errors across all routes.
-6. **Commit & Push**:
-   - Stage, commit with conventional commit message, and push to GitHub.
+### Requirements:
+1. **Backend Query**:
+   - Add `updateAssignment(supabase, assignmentId, updates)` in `queries.ts`.
+   - Support updating `title`, `description`, `due_date`, `max_marks`, `chapter_id`.
+   - Include schema fallback for `chapter_id` in case `assignments` table does not have the column in the cache (use `recordItemChapterMapping`).
+2. **Assignment Details Page (`[assignmentId]/page.tsx`)**:
+   - Add an **"Edit Assignment"** button in the header section.
+   - Open an Edit Modal/Dialog pre-populated with current values:
+     - Title (`Input`)
+     - Due Date & Time (`Input type="datetime-local"` or formatted date)
+     - Max Marks (`Input type="number"`)
+     - Chapter (`Select` dropdown if course has chapters)
+     - Description / Instructions (`Textarea`)
+     - Attached Resource URL (`Input`, handling `[ATTACHMENT:<url>]` in description)
+   - On submit, call `updateAssignment`, show toast notifications, and update state locally.
+3. **Course Assignments Tab (`courses/[courseId]/page.tsx`)**:
+   - Add an "Edit" action button in the assignments list next to "View Details" and "Delete".
+4. **Dual-Directory Parity**:
+   - Always copy changes to `lms-platform/`.
+   - Run `npx tsc --noEmit` and ensure 0 errors.
