@@ -219,7 +219,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
           setStrokes(parsed);
-          const count = Object.values(parsed).reduce(
+          const count = Object.values(parsed as Record<string, AnnotationStroke[]>).reduce(
             (sum: number, arr: AnnotationStroke[]) => sum + (Array.isArray(arr) ? arr.length : 0),
             0
           );
@@ -428,7 +428,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   const decimateStrokesForStorage = useCallback((data: Record<number, AnnotationStroke[]>) => {
     const out: Record<number, AnnotationStroke[]> = {};
     for (const [page, list] of Object.entries(data)) {
-      out[page] = list.map((s) => {
+      out[Number(page)] = list.map((s) => {
         if (!s.points || s.points.length < 3) return s;
         const keep: { x: number; y: number }[] = [s.points[0]];
         const step = Math.max(1, Math.floor(s.points.length / 60));
