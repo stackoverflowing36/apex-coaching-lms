@@ -9,15 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm',
-        destructive:
-          'bg-orange-600 text-white hover:bg-orange-700 shadow-sm',
+        default: 'bg-[#a05120] text-white hover:bg-[#854218] shadow-sm',
+        rust: 'bg-[#a05120] text-white hover:bg-[#854218] shadow-sm',
+        dark: 'bg-[#111111] text-[#fbfbfa] hover:bg-[#262626] shadow-sm',
+        studioOutline: 'border border-[#988a79] bg-transparent text-[#111111] hover:bg-[#f3f1ec]',
+        destructive: 'bg-[#63200c] text-white hover:bg-[#4a1708] shadow-sm',
         outline:
-          'border-2 border-slate-200 bg-white text-slate-700 hover:border-emerald-500 hover:text-emerald-600',
+          'border border-stone-300 bg-white text-stone-800 hover:border-[#a05120] hover:text-[#a05120]',
         secondary:
-          'bg-slate-100 text-slate-700 hover:bg-slate-200',
-        ghost: 'hover:bg-slate-100 text-slate-700',
-        link: 'text-emerald-600 underline-offset-4 hover:underline',
+          'bg-[#f3f1ec] text-[#111111] hover:bg-[#eae6df]',
+        ghost: 'hover:bg-stone-100 text-stone-700',
+        link: 'text-[#a05120] underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-6 py-2',

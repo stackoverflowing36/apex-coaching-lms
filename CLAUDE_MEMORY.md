@@ -70,22 +70,42 @@
   2. `Element implicitly has an 'any' type because index expression is not of type 'number'` (line 431): Cast `out[Number(page)] = ...` since `page` from `Object.entries(data)` is a `string`.
 - **Verification**: `npx tsc --noEmit` exits with 0 errors across both `src/` and `lms-platform/src/`.
 
-### F. Faculty Assignment Editing (Due Date & Parameters) — COMPLETED
-- **Component / Pages**:
-  - `src/lib/supabase/queries.ts` (and mirror in `lms-platform/`): Added `updateAssignment(supabase, assignmentId, updates)` supporting `title`, `description`, `due_date`, `max_marks`, `chapter_id`, `course_id`.
-  - `src/app/teacher/assignments/[assignmentId]/page.tsx` (and mirror in `lms-platform/`): Added "Edit Assignment" button and full modal dialog allowing faculty to edit title, due date, max marks, chapter, instructions, and attachments.
-  - `src/app/teacher/courses/[courseId]/page.tsx` (and mirror in `lms-platform/`): Added "Edit" button in the assignments list next to "View Details" and "Delete", linking to the assignment details page where the Edit modal lives.
-- **Verification**: `npx tsc --noEmit` passes with 0 errors; `npm run build` in `lms-platform/` passes with 0 errors across all 20+ routes.
-
+### G. Complete CIID Design System UI Overhaul — COMPLETED
+- **Scope**: Re-engineered the complete user interface across Public Landing, Authentication, Student Portal, and Teacher Portal.
+- **Design Tokens**:
+  - Fonts: `Barlow_Condensed` (headings, badges, uppercase editorial labels), `Barlow` (body).
+  - Palette: Deep Studio Dark (`#111111`), Cream (`#fbfbfa` / `#f3f1ec`), Rust (`#a05120`), Mint (`#a8f1e0`), Rose (`#e2bcc2`), Gold (`#ffb956`), Lavender (`#b39dff`), Stone (`#988a79`).
+  - Architecture: Split Studio `grid-cols-12`, 1px architectural borders (`border-stone-200`), rounded pill capsule actions (`rounded-pill`), rounded studio cards (`studio-card`, `rounded-studio`).
+- **Refactored Files**:
+  1. `src/app/layout.tsx` (Google Fonts Barlow & Barlow_Condensed)
+  2. `tailwind.config.ts` (CIID colors, font families, radius tokens)
+  3. `src/app/globals.css` (CIID utility classes: `.studio-card`, `.btn-pill`, `.btn-rust`, `.btn-dark`, `.btn-studio-outline`)
+  4. `src/components/ui/badge.tsx` & `src/components/ui/button.tsx` (CIID variants)
+  5. `src/components/layout/Navbar.tsx` & `src/app/page.tsx` (Split Studio landing page & 1px metric ticker)
+  6. `src/components/InstituteFeatureGrid.tsx` (Pastel badge feature matrix)
+  7. `src/app/login/page.tsx` & `src/app/signup/page.tsx` (Studio auth split panels)
+  8. `src/app/student/layout.tsx` & `src/app/teacher/layout.tsx` (Capsule navbar, pill switcher, studio dropdowns)
+  9. `src/app/student/dashboard/page.tsx` & `src/app/teacher/dashboard/page.tsx` (Split Studio dashboards, 1px metric grids, feeds)
+  10. `src/app/teacher/assignments/[assignmentId]/page.tsx` (Assignment manager, stats, edit modal, submission queue)
+  11. `src/app/student/assignments/page.tsx` (Capsule batch pills, search, studio submission cards)
+  12. `src/app/student/grades/page.tsx` (KPI overview cards, capsule evaluation tabs, studio grade list)
+  13. `src/app/student/lectures/page.tsx` (Vault header, capsule tabs, studio lecture cards)
+  14. `src/app/teacher/courses/page.tsx` (Course builder, modal, studio batch cards)
+  15. `src/app/teacher/announcements/page.tsx` (Live broadcast console and announcement feed)
+  16. `src/app/teacher/quizzes/page.tsx` (MCQ engine header, batch filter pills, studio quiz cards)
+  17. `src/app/teacher/attendance/page.tsx` (Register, KPI stat boxes, roster table with pastel status pills)
+  18. `src/app/student/quizzes/[quizId]/page.tsx` (Quiz player, question card, results view with pastel scores)
+  19. `src/app/teacher/grading/[submissionId]/page.tsx` (Split-screen grading console, canvas header, marks input, verdict pills)
+- **Dual-Directory Parity**: Mirrored all changes to `lms-platform/`.
+- **Validation**: `npx tsc --noEmit` exits with 0 errors in both root and `lms-platform/`. Next.js `npm run build` succeeds across all 20+ routes with 0 errors.
 
 ---
 
-## 3. Active Mission: Faculty Assignment Editing (Due Date & Parameters)
+## 3. Active Mission: Production Stability & Cloudflare DNS Configuration
 
 ### Target Files:
-- `src/lib/supabase/queries.ts` <-> `lms-platform/src/lib/supabase/queries.ts`
-- `src/app/teacher/assignments/[assignmentId]/page.tsx` <-> `lms-platform/src/app/teacher/assignments/[assignmentId]/page.tsx`
-- `src/app/teacher/courses/[courseId]/page.tsx` <-> `lms-platform/src/app/teacher/courses/[courseId]/page.tsx`
+- Repository root & `lms-platform/`
+- Production DNS setup for domain (Eduflow LMS)
 
 ### Requirements:
 1. **Backend Query**:

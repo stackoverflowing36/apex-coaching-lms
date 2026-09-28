@@ -162,24 +162,24 @@ export default function StudentQuizPage() {
 
   if (loading) {
     return (
-      <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-3">
-        <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
-        <p className="text-sm font-medium">Loading quiz &amp; attempts...</p>
+      <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+        <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+        <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading quiz &amp; attempts...</p>
       </div>
     );
   }
 
   if (!quiz) {
     return (
-      <div className="bg-white rounded-2xl shadow-card border border-slate-100/80 p-16 text-center max-w-2xl mx-auto mt-10">
-        <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-        <p className="font-semibold text-slate-600 text-lg">Quiz not found</p>
+      <div className="studio-card p-16 text-center max-w-2xl mx-auto mt-10 space-y-4">
+        <AlertCircle className="h-12 w-12 text-stone-300 mx-auto" />
+        <p className="font-display font-bold uppercase text-lg text-stone-800">Quiz not found</p>
         <Button
           variant="outline"
-          className="mt-6 rounded-full"
+          className="rounded-pill font-condensed uppercase tracking-wider text-xs"
           onClick={() => router.push('/student/lectures')}
         >
-          Back to Quizzes
+          Back to Vault
         </Button>
       </div>
     );
@@ -191,29 +191,29 @@ export default function StudentQuizPage() {
   const allowReattempt = quiz.description?.includes('[REATTEMPT_ALLOWED]');
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in-up pb-20">
+    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300 pb-20">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"
           onClick={() => router.push('/student/lectures')}
-          className="text-slate-500 hover:text-emerald-600 font-medium h-9 px-3 rounded-full"
+          className="text-stone-600 hover:text-stone-900 font-condensed uppercase tracking-wider text-xs h-9 px-4 rounded-pill border border-stone-200 bg-[#fbfbfa]"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-3.5 w-3.5 mr-2" />
           Back to Lectures
         </Button>
         <div className="flex items-center gap-2 flex-wrap">
           {allowReattempt && (
-            <Badge className="bg-blue-50 text-blue-700 border-blue-200 font-bold text-xs rounded-full">
+            <Badge className="bg-[#b39dff]/20 text-stone-800 border-stone-300 font-condensed uppercase tracking-wider font-bold text-[10px] rounded-pill">
               Multiple Attempts Allowed
             </Badge>
           )}
           {quiz.course_chapters?.title && (
-            <Badge className="bg-orange-100 text-orange-800 border border-orange-200 font-bold text-xs rounded-full shadow-none">
+            <Badge className="bg-[#ffb956]/20 text-stone-800 border-stone-300 font-condensed uppercase tracking-wider font-bold text-[10px] rounded-pill">
               Chapter: {quiz.course_chapters.title}
             </Badge>
           )}
-          <Badge className="bg-slate-900 text-white font-bold px-3 py-1 text-xs rounded-full">
+          <Badge className="bg-[#111111] text-[#fbfbfa] font-condensed uppercase tracking-wider font-bold px-3 py-1 text-[10px] rounded-pill">
             {quiz.courses?.code || 'PRACTICE'}
           </Badge>
         </div>
@@ -221,47 +221,47 @@ export default function StudentQuizPage() {
 
       {!isSubmitted ? (
         <>
-          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="studio-card p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div>
               {quiz.course_chapters?.title && (
                 <div className="mb-2">
-                  <Badge className="bg-orange-50 text-orange-700 border border-orange-200 font-bold text-xs">
+                  <Badge className="bg-[#a05120]/10 text-[#a05120] border-0 font-condensed uppercase tracking-wider font-bold text-[10px]">
                     Chapter: {quiz.course_chapters.title}
                   </Badge>
                 </div>
               )}
-              <h1 className="font-heading font-extrabold text-2xl text-slate-900 mb-2">
+              <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] mb-2 tracking-tight">
                 {quiz.title}
               </h1>
-              <p className="text-sm text-slate-500">{quiz.description}</p>
+              <p className="text-xs uppercase tracking-wider font-condensed text-stone-500">{quiz.description}</p>
               {attempts.length > 0 && (
-                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200">
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-[#ffb956]/20 text-stone-800 text-[10px] font-bold uppercase tracking-wider font-condensed border border-stone-300">
                   <span>Re-attempting (Practice Mode)</span>
                   <span>•</span>
                   <span>Official score locked at {officialScore} / {totalQuizMarks}</span>
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-200/60">
+            <div className="flex items-center gap-4 bg-[#fbfbfa] p-3 rounded-studio border border-stone-200">
               <div className="flex flex-col items-center px-4">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Questions</span>
-                <span className="font-heading font-bold text-lg text-slate-800">
+                <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-condensed">Questions</span>
+                <span className="font-display font-bold uppercase text-xl text-stone-900">
                   {questions.length}
                 </span>
               </div>
-              <div className="w-px h-8 bg-slate-200"></div>
+              <div className="w-px h-8 bg-stone-200"></div>
               <div className="flex flex-col items-center px-4">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Total Marks</span>
-                <span className="font-heading font-bold text-lg text-slate-800">
+                <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-condensed">Total Marks</span>
+                <span className="font-display font-bold uppercase text-xl text-stone-900">
                   {totalQuizMarks}
                 </span>
               </div>
-              <div className="w-px h-8 bg-slate-200"></div>
-              <div className="flex flex-col items-center px-4 text-orange-600">
-                <span className="text-[10px] font-bold uppercase flex items-center gap-1">
+              <div className="w-px h-8 bg-stone-200"></div>
+              <div className="flex flex-col items-center px-4 text-[#a05120]">
+                <span className="text-[10px] font-bold uppercase tracking-wider font-condensed flex items-center gap-1">
                   <Clock className="h-3 w-3" /> Time
                 </span>
-                <span className="font-heading font-bold text-lg">{quiz.time_limit_minutes}m</span>
+                <span className="font-display font-bold uppercase text-xl">{quiz.time_limit_minutes}m</span>
               </div>
             </div>
           </div>
@@ -270,13 +270,12 @@ export default function StudentQuizPage() {
             <Button
               onClick={handleSubmit}
               disabled={isSubmittingAttempt}
-              variant="destructive"
-              className="rounded-full px-6 h-10 text-xs font-bold shadow-md shadow-red-500/20"
+              className="rounded-pill px-6 h-10 text-xs font-bold font-condensed uppercase tracking-wider bg-[#a05120] hover:bg-[#864319] text-white shadow-sm"
             >
               {isSubmittingAttempt ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
-                  Submitting &amp; Saving Score...
+                  Submitting Score...
                 </>
               ) : (
                 'End Attempt & Submit'
@@ -285,12 +284,12 @@ export default function StudentQuizPage() {
           </div>
 
           {questions.length > 0 ? (
-            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 space-y-8">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <h2 className="font-heading font-bold text-lg text-slate-800">
+            <div className="studio-card p-6 sm:p-8 space-y-6">
+              <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+                <h2 className="font-display font-bold uppercase text-base text-[#111111] tracking-tight">
                   Question {currentQuestionIndex + 1} of {questions.length}
                 </h2>
-                <Badge className="bg-emerald-50 text-emerald-700 font-bold">
+                <Badge className="bg-[#a8f1e0]/40 text-stone-900 font-condensed uppercase tracking-wider font-bold border-stone-300">
                   {currentQuestion.marks || 1} Marks
                 </Badge>
               </div>
@@ -298,7 +297,7 @@ export default function StudentQuizPage() {
               <div className="space-y-6">
                 <FormattedQuestionText
                   text={currentQuestion.question_text}
-                  textClassName="text-lg font-medium text-slate-900 leading-relaxed"
+                  textClassName="text-base font-medium text-stone-900 leading-relaxed"
                 />
 
                 <div className="space-y-3">
@@ -308,24 +307,24 @@ export default function StudentQuizPage() {
                       <div
                         key={idx}
                         onClick={() => handleSelectOption(currentQuestion.id, idx)}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                        className={`p-4 rounded-studio border cursor-pointer transition-all ${
                           isSelected
-                            ? 'border-emerald-500 bg-emerald-50/50 shadow-sm'
-                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                            ? 'border-[#a05120] bg-[#a05120]/5 shadow-sm'
+                            : 'border-stone-200 bg-[#fbfbfa] hover:border-stone-400'
                         } flex items-center gap-3`}
                       >
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            isSelected ? 'border-emerald-500' : 'border-slate-300'
+                            isSelected ? 'border-[#a05120]' : 'border-stone-300'
                           }`}
                         >
                           {isSelected && (
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#a05120]" />
                           )}
                         </div>
                         <span
                           className={`text-sm ${
-                            isSelected ? 'font-semibold text-slate-900' : 'text-slate-700'
+                            isSelected ? 'font-semibold text-stone-900' : 'text-stone-700'
                           }`}
                         >
                           {option}
@@ -336,12 +335,12 @@ export default function StudentQuizPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-6 border-t border-slate-100 mt-8">
+              <div className="flex items-center justify-between pt-6 border-t border-stone-200 mt-8">
                 <Button
                   variant="outline"
                   disabled={currentQuestionIndex === 0}
                   onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
-                  className="rounded-full px-6 h-11 text-xs font-bold"
+                  className="rounded-pill px-6 h-10 text-xs font-bold font-condensed uppercase tracking-wider border-stone-300 hover:bg-stone-100"
                 >
                   Previous
                 </Button>
@@ -350,11 +349,7 @@ export default function StudentQuizPage() {
                   <Button
                     onClick={handleSubmit}
                     disabled={isSubmittingAttempt}
-                    className={`rounded-full px-8 h-11 text-xs font-bold shadow-lg transition-all ${
-                      allAnswered
-                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25'
-                        : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                    }`}
+                    className="rounded-pill px-8 h-10 text-xs font-bold font-condensed uppercase tracking-wider bg-[#a05120] hover:bg-[#864319] text-white shadow-sm"
                   >
                     {isSubmittingAttempt ? (
                       <>
@@ -368,7 +363,7 @@ export default function StudentQuizPage() {
                 ) : (
                   <Button
                     onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
-                    className="rounded-full bg-slate-900 hover:bg-slate-800 text-white px-8 h-11 text-xs font-bold"
+                    className="rounded-pill bg-[#111111] hover:bg-stone-800 text-[#fbfbfa] px-8 h-10 text-xs font-bold font-condensed uppercase tracking-wider"
                   >
                     Next Question
                   </Button>
@@ -376,80 +371,80 @@ export default function StudentQuizPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-16 text-center shadow-xl border border-slate-100">
-              <p className="text-slate-500">No questions found for this quiz.</p>
+            <div className="studio-card p-16 text-center">
+              <p className="text-xs uppercase tracking-wider font-condensed text-stone-500">No questions found for this quiz.</p>
             </div>
           )}
         </>
       ) : (
         /* RESULTS VIEW */
-        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-100 text-center space-y-8 max-w-2xl mx-auto">
+        <div className="studio-card p-8 sm:p-12 text-center space-y-8 max-w-2xl mx-auto">
           <div className="space-y-4">
-            <div className="w-24 h-24 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="h-12 w-12" />
+            <div className="w-20 h-20 rounded-pill bg-[#a8f1e0]/40 text-stone-900 flex items-center justify-center mx-auto mb-4 border border-stone-300">
+              <CheckCircle2 className="h-10 w-10 text-stone-900" />
             </div>
-            <h2 className="font-heading font-extrabold text-3xl text-slate-900">
+            <h2 className="font-display font-bold uppercase text-3xl text-[#111111] tracking-tight">
               Quiz Completed!
             </h2>
-            <p className="text-slate-500">
+            <p className="text-xs uppercase tracking-wider font-condensed text-stone-500">
               You have completed the quiz for{' '}
-              <span className="font-bold text-slate-700">{quiz.title}</span>. Your score has been saved.
+              <span className="font-bold text-stone-800">{quiz.title}</span>. Your score has been saved.
             </p>
           </div>
 
           {/* Score Display Card */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
             {/* Official 1st Attempt Score */}
-            <div className="bg-emerald-50/80 rounded-3xl p-6 border border-emerald-200 flex flex-col items-center justify-center">
-              <div className="flex items-center gap-1.5 text-xs font-extrabold text-emerald-800 uppercase tracking-wider mb-2">
-                <Award className="h-4 w-4 text-emerald-600" />
+            <div className="bg-[#a8f1e0]/30 rounded-studio p-6 border border-stone-300 flex flex-col items-center justify-center">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-stone-900 uppercase tracking-wider font-condensed mb-2">
+                <Award className="h-4 w-4 text-[#a05120]" />
                 <span>Official Score (1st Attempt)</span>
               </div>
-              <div className="font-heading font-extrabold text-4xl text-emerald-700">
+              <div className="font-display font-bold uppercase text-4xl text-[#111111]">
                 {officialScore ?? score}{' '}
-                <span className="text-xl text-emerald-500">/ {totalQuizMarks}</span>
+                <span className="text-xl text-stone-500">/ {totalQuizMarks}</span>
               </div>
-              <div className="text-[11px] text-emerald-600 mt-2 font-medium">
+              <div className="text-[11px] text-stone-600 mt-2 font-condensed font-semibold uppercase tracking-wider">
                 {Math.round(((officialScore ?? score) / totalQuizMarks) * 100)}% Grade Saved
               </div>
             </div>
 
             {/* Total Attempts / Practice info */}
-            <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200 flex flex-col items-center justify-center">
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            <div className="bg-[#fbfbfa] rounded-studio p-6 border border-stone-200 flex flex-col items-center justify-center">
+              <div className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-condensed mb-2">
                 {attempts.length > 1 ? 'Latest Attempt' : 'Attempt Count'}
               </div>
-              <div className="font-heading font-extrabold text-4xl text-slate-800">
+              <div className="font-display font-bold uppercase text-4xl text-stone-900">
                 {attempts.length > 1 && latestAttemptScore !== null ? (
                   <>
                     {latestAttemptScore}{' '}
-                    <span className="text-xl text-slate-400">/ {totalQuizMarks}</span>
+                    <span className="text-xl text-stone-400">/ {totalQuizMarks}</span>
                   </>
                 ) : (
                   <>
                     {Math.max(1, attempts.length)}{' '}
-                    <span className="text-xl text-slate-400">attempt</span>
+                    <span className="text-xl text-stone-400">attempt</span>
                   </>
                 )}
               </div>
-              <div className="text-[11px] text-slate-500 mt-2 font-medium">
+              <div className="text-[11px] text-stone-500 mt-2 font-condensed font-semibold uppercase tracking-wider">
                 {attempts.length > 1 ? `Total attempts: ${attempts.length}` : 'First attempt locked as score'}
               </div>
             </div>
           </div>
 
           {allowReattempt && (
-            <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-xs text-blue-900 leading-relaxed max-w-lg mx-auto">
+            <div className="p-4 rounded-studio bg-stone-100 border border-stone-200 text-xs text-stone-700 leading-relaxed max-w-lg mx-auto">
               ℹ️ <strong>Multiple attempts enabled:</strong> You can re-take this quiz for further practice. Per grading policy, your <strong>1st attempt score ({officialScore ?? score}/{totalQuizMarks})</strong> is strictly preserved as your permanent grade.
             </div>
           )}
 
-          <div className="pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               onClick={() => router.push('/student/lectures')}
-              className="rounded-full bg-slate-900 hover:bg-slate-800 text-white h-12 px-8 font-bold w-full sm:w-auto"
+              className="rounded-pill bg-[#111111] hover:bg-stone-800 text-[#fbfbfa] h-11 px-8 font-condensed font-bold uppercase tracking-wider text-xs w-full sm:w-auto"
             >
-              Return to Course
+              Return to Vault
             </Button>
             {allowReattempt && (
               <Button
@@ -459,9 +454,9 @@ export default function StudentQuizPage() {
                   setCurrentQuestionIndex(0);
                 }}
                 variant="outline"
-                className="rounded-full border-slate-300 text-slate-700 hover:bg-slate-50 h-12 px-8 font-bold w-full sm:w-auto flex items-center gap-2"
+                className="rounded-pill border-stone-300 text-stone-700 hover:bg-stone-100 h-11 px-8 font-condensed font-bold uppercase tracking-wider text-xs w-full sm:w-auto flex items-center gap-2"
               >
-                <RotateCcw className="h-4 w-4 text-slate-500" />
+                <RotateCcw className="h-4 w-4 text-stone-500" />
                 <span>Re-attempt Quiz (Practice)</span>
               </Button>
             )}

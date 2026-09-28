@@ -116,33 +116,33 @@ export default function LecturesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="font-display uppercase text-3xl sm:text-4xl font-bold text-[#111111] tracking-tight">
             Academic Vault &amp; Resources
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500 mt-1">
             {lectures.length} video lectures · {materials.length} PDF study materials · {quizzes.length} practice quizzes
           </p>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters (CIID Capsule & Pills) */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
           <Input
             placeholder="Search lectures, syllabus PDFs, or tests..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 rounded-2xl border-slate-200 focus:border-emerald-400 focus:ring-emerald-400 text-xs h-11 bg-white"
+            className="pl-10 rounded-pill border-stone-200 bg-white focus:border-stone-900 focus:ring-0 text-xs h-10"
           />
         </div>
         <div className="flex gap-2 flex-wrap items-center">
           <button
             onClick={() => setSelectedCourse(null)}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
               !selectedCourse
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                ? 'bg-[#111111] text-[#fbfbfa] shadow-sm'
+                : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-400'
             }`}
           >
             All Batches
@@ -151,10 +151,10 @@ export default function LecturesPage() {
             <button
               key={c.id}
               onClick={() => setSelectedCourse(c.id === selectedCourse ? null : c.id)}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+              className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
                 selectedCourse === c.id
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:border-emerald-300'
+                  ? 'bg-[#a05120] text-white shadow-sm'
+                  : 'bg-white text-stone-600 border border-stone-200 hover:border-[#a05120]'
               }`}
             >
               {c.code}
@@ -166,27 +166,27 @@ export default function LecturesPage() {
       {/* Resource Tabs */}
       <Tabs defaultValue="lectures" className="space-y-6">
         <div className="overflow-x-auto pb-1 -mb-1">
-          <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80 inline-flex flex-nowrap min-w-max">
+          <TabsList className="bg-[#f3f1ec] p-1 rounded-pill border border-stone-200 inline-flex flex-nowrap min-w-max">
             <TabsTrigger
               value="lectures"
-              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+              className="rounded-pill text-xs font-semibold uppercase tracking-wider px-4 sm:px-5 py-2 data-[state=active]:bg-[#111111] data-[state=active]:text-[#fbfbfa] data-[state=active]:shadow-sm text-stone-600"
             >
               <Video className="h-3.5 w-3.5 mr-1.5" />
-              Video Lectures ({filteredLectures.length})
+              Lectures ({filteredLectures.length})
             </TabsTrigger>
             <TabsTrigger
               value="materials"
-              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+              className="rounded-pill text-xs font-semibold uppercase tracking-wider px-4 sm:px-5 py-2 data-[state=active]:bg-[#111111] data-[state=active]:text-[#fbfbfa] data-[state=active]:shadow-sm text-stone-600"
             >
               <FileText className="h-3.5 w-3.5 mr-1.5" />
               PDF Notes ({filteredMaterials.length})
             </TabsTrigger>
             <TabsTrigger
               value="quizzes"
-              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+              className="rounded-pill text-xs font-semibold uppercase tracking-wider px-4 sm:px-5 py-2 data-[state=active]:bg-[#111111] data-[state=active]:text-[#fbfbfa] data-[state=active]:shadow-sm text-stone-600"
             >
               <HelpCircle className="h-3.5 w-3.5 mr-1.5" />
-              Practice Quizzes ({filteredQuizzes.length})
+              Quizzes ({filteredQuizzes.length})
             </TabsTrigger>
           </TabsList>
         </div>
@@ -222,38 +222,38 @@ export default function LecturesPage() {
                       href={`/student/lectures/${lecture.id}`}
                       className="group block"
                     >
-                      <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 hover:border-emerald-200 transition-all flex items-center gap-4">
-                        {/* Green Circle Lecture Number */}
-                        <div className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-400/60 flex items-center justify-center font-black text-sm sm:text-base shadow-sm group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 transition-all">
+                      <div className="studio-card p-5 hover:border-stone-900 transition-all flex items-center gap-4">
+                        {/* Number Indicator */}
+                        <div className="shrink-0 w-11 h-11 rounded-studio bg-stone-100 text-stone-900 flex items-center justify-center font-display font-bold text-sm sm:text-base border border-stone-200 group-hover:bg-[#111111] group-hover:text-white transition-all">
                           {idx + 1}
                         </div>
 
                         {/* Details */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider bg-stone-200/70 px-2 py-0.5 rounded-pill font-condensed">
                               Lecture {idx + 1}
                             </span>
-                            <Badge className="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 border-0 font-bold">
+                            <Badge variant="stone" className="text-[10px] px-2 py-0.5 uppercase font-semibold">
                               {lecture.courses?.code}
                             </Badge>
                             {lecture.course_chapters?.title && (
-                              <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-[10px] px-2.5 py-0.5 font-bold shadow-none">
+                              <Badge variant="rust" className="text-[10px] px-2 py-0.5 uppercase font-semibold">
                                 Chapter: {lecture.course_chapters.title}
                               </Badge>
                             )}
                           </div>
-                          <p className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors truncate text-sm sm:text-base">
+                          <p className="font-semibold text-[#111111] group-hover:text-[#a05120] transition-colors truncate text-sm sm:text-base">
                             {lecture.title}
                           </p>
                         </div>
 
                         {/* Arrow */}
                         <div className="shrink-0 flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+                          <div className="w-8 h-8 rounded-pill bg-stone-100 flex items-center justify-center text-stone-600 group-hover:bg-[#111111] group-hover:text-white transition-colors">
                             <Play className="h-3.5 w-3.5 ml-0.5 fill-current" />
                           </div>
-                          <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                          <ChevronRight className="h-4 w-4 text-stone-400 group-hover:text-[#111111] group-hover:translate-x-1 transition-all" />
                         </div>
                       </div>
                     </Link>

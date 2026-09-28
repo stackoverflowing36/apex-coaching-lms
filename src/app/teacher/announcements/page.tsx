@@ -126,15 +126,15 @@ export default function TeacherAnnouncementsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
-              <Megaphone className="h-5 w-5" />
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center">
+              <Megaphone className="h-4 w-4" />
             </div>
-            <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
               Academic Notice Broadcast
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500">
             Send real-time alerts, class schedule changes, and test reminders to enrolled batches and the portal ticker.
           </p>
         </div>
@@ -143,16 +143,16 @@ export default function TeacherAnnouncementsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Column: Broadcast Composer (5 cols) */}
-        <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 shadow-xl border border-slate-100 space-y-6">
+        <div className="lg:col-span-5 studio-card p-6 sm:p-7 space-y-6">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600">
-              <Radio className="h-4 w-4 animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#a05120]">
+              <Radio className="h-3.5 w-3.5 animate-pulse" />
               <span>Live Broadcast Console</span>
             </div>
-            <h2 className="font-heading font-extrabold text-xl text-slate-900">
+            <h2 className="font-display font-bold uppercase text-xl text-[#111111] tracking-tight">
               New Notice Announcement
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-stone-500 font-condensed">
               Dispatches instantly to student dashboards and the public landing page ticker.
             </p>
           </div>
@@ -161,14 +161,14 @@ export default function TeacherAnnouncementsPage() {
             
             {/* Target Batch Selector */}
             <div className="space-y-1.5">
-              <Label htmlFor="targetBatch" className="text-xs font-bold text-slate-700">
+              <Label htmlFor="targetBatch" className="text-xs font-semibold uppercase tracking-wider text-stone-700 font-condensed">
                 Target Audience
               </Label>
               <select
                 id="targetBatch"
                 value={targetCourseId}
                 onChange={(e) => setTargetCourseId(e.target.value)}
-                className="w-full h-11 rounded-2xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold focus:ring-2 focus:ring-orange-500"
+                className="w-full h-10 rounded-pill border border-stone-200 bg-[#fbfbfa] px-3.5 text-xs font-semibold uppercase tracking-wider text-stone-700 focus:border-stone-900"
               >
                 <option value="all">📢 All Institute Batches &amp; Public Notice</option>
                 {courses.map((c) => (
@@ -181,7 +181,7 @@ export default function TeacherAnnouncementsPage() {
 
             {/* Title Input */}
             <div className="space-y-1.5">
-              <Label htmlFor="noticeTitle" className="text-xs font-bold text-slate-700">
+              <Label htmlFor="noticeTitle" className="text-xs font-semibold uppercase tracking-wider text-stone-700 font-condensed">
                 Headline / Subject
               </Label>
               <Input
@@ -189,14 +189,14 @@ export default function TeacherAnnouncementsPage() {
                 placeholder="e.g. Schedule Change for Physics Mechanics Class"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="rounded-2xl h-11 text-xs font-medium"
+                className="rounded-pill h-10 text-xs border-stone-200 bg-[#fbfbfa]"
                 required
               />
             </div>
 
             {/* Content Textarea */}
             <div className="space-y-1.5">
-              <Label htmlFor="noticeBody" className="text-xs font-bold text-slate-700">
+              <Label htmlFor="noticeBody" className="text-xs font-semibold uppercase tracking-wider text-stone-700 font-condensed">
                 Notice Content &amp; Details
               </Label>
               <Textarea
@@ -204,14 +204,14 @@ export default function TeacherAnnouncementsPage() {
                 placeholder="Write the full announcement message here..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="rounded-2xl min-h-[120px] text-xs resize-none"
+                className="rounded-studio min-h-[120px] text-xs resize-none border-stone-200 bg-[#fbfbfa]"
                 required
               />
             </div>
 
             {/* Quick Presets */}
             <div className="space-y-1.5 pt-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">
+              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-condensed">
                 Quick Template Inserts:
               </span>
               <div className="space-y-1">
@@ -223,7 +223,7 @@ export default function TeacherAnnouncementsPage() {
                       if (!title) setTitle(preset.slice(2, 40) + '...');
                       setContent(preset);
                     }}
-                    className="w-full text-left text-[11px] text-slate-600 hover:text-orange-700 bg-slate-50 hover:bg-orange-50 p-2 rounded-xl border border-slate-200/60 transition-colors truncate block"
+                    className="w-full text-left text-[11px] text-stone-600 hover:text-stone-900 bg-[#fbfbfa] hover:bg-stone-100 p-2 rounded-studio border border-stone-200 transition-colors truncate block"
                   >
                     {preset}
                   </button>
@@ -232,10 +232,10 @@ export default function TeacherAnnouncementsPage() {
             </div>
 
             {/* Broadcast CTA */}
-            <Button
+            <button
               type="submit"
               disabled={isBroadcasting}
-              className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-12 shadow-xl shadow-orange-600/25 transition-all mt-2"
+              className="w-full btn-pill btn-rust text-xs font-semibold uppercase tracking-wider py-3 flex items-center justify-center gap-2 mt-2"
             >
               {isBroadcasting ? (
                 <span className="flex items-center gap-2">
@@ -248,7 +248,7 @@ export default function TeacherAnnouncementsPage() {
                   Broadcast Live Notice
                 </span>
               )}
-            </Button>
+            </button>
 
           </form>
         </div>
@@ -256,25 +256,25 @@ export default function TeacherAnnouncementsPage() {
         {/* Right Column: History of Sent Announcements (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-heading font-extrabold text-base text-slate-900 flex items-center gap-2">
-              <Bell className="h-4 w-4 text-orange-600" />
+            <h3 className="font-display font-bold uppercase text-base text-[#111111] flex items-center gap-2 tracking-tight">
+              <Bell className="h-4 w-4 text-[#a05120]" />
               Broadcast History ({announcements.length})
             </h3>
-            <span className="text-xs text-slate-400">Real-time synchronized</span>
+            <span className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-400">Real-time synchronized</span>
           </div>
 
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-3">
-              <div className="w-8 h-8 border-3 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
-              <p className="text-xs font-medium">Loading notice history...</p>
+            <div className="py-20 flex flex-col items-center justify-center text-stone-400 gap-3">
+              <div className="w-8 h-8 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+              <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading notice history...</p>
             </div>
           ) : announcements.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center shadow-xl border border-slate-100 space-y-3">
-              <Megaphone className="h-10 w-10 text-slate-300 mx-auto" />
-              <h4 className="font-heading font-extrabold text-base text-slate-900">
+            <div className="studio-card p-12 text-center space-y-3">
+              <Megaphone className="h-10 w-10 text-stone-300 mx-auto" />
+              <h4 className="font-display font-bold uppercase text-base text-[#111111] tracking-tight">
                 No Broadcasts Sent Yet
               </h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              <p className="text-xs text-stone-400 max-w-sm mx-auto">
                 Use the broadcast console on the left to send notifications to enrolled batch students.
               </p>
             </div>
@@ -283,15 +283,15 @@ export default function TeacherAnnouncementsPage() {
               {announcements.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-3xl p-5 sm:p-6 shadow-xl border border-slate-100 hover:border-orange-200 transition-all space-y-3"
+                  className="studio-card p-5 sm:p-6 hover:border-stone-900 transition-all space-y-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-orange-50 text-orange-700 border-orange-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+                        <Badge variant="stone" className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
                           {item.courses?.code || 'ALL BATCHES'}
                         </Badge>
-                        <span className="text-[11px] font-semibold text-slate-400">
+                        <span className="text-[10px] font-semibold text-stone-400 font-condensed uppercase tracking-wider">
                           {new Date(item.posted_at).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -300,21 +300,21 @@ export default function TeacherAnnouncementsPage() {
                           })}
                         </span>
                       </div>
-                      <h4 className="font-heading font-extrabold text-base text-slate-900">
+                      <h4 className="font-display font-bold uppercase text-base text-[#111111] tracking-tight">
                         {item.title}
                       </h4>
                     </div>
 
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="p-1.5 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="p-1.5 rounded-pill text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Delete Announcement"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-slate-600 whitespace-pre-line leading-relaxed bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200/50">
+                  <p className="text-xs sm:text-sm text-stone-600 whitespace-pre-line leading-relaxed bg-[#fbfbfa] p-3.5 rounded-studio border border-stone-200">
                     {item.content}
                   </p>
                 </div>

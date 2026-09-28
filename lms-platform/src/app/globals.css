@@ -83,28 +83,46 @@
 }
 
 /* ============================================================
-   Component Utilities
+   Component Utilities — CIID Studio Design System
    ============================================================ */
 
 @layer utilities {
-  /* Floating card base */
+  /* Studio card base (architectural 1px border, crisp layout) */
+  .studio-card {
+    @apply rounded-none bg-white p-6 border border-stone-200/80 transition-all duration-200;
+  }
+
+  /* Floating card base (legacy backwards-compatibility) */
   .card-float {
-    @apply rounded-2xl bg-white p-6 shadow-card transition-all duration-300 hover:shadow-card-hover;
+    @apply rounded-studio bg-white p-6 border border-stone-200/80 shadow-studio transition-all duration-300;
   }
 
-  /* Pill button */
+  /* Pill button (CIID rounded-pill style) */
   .btn-pill {
-    @apply inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-200;
+    @apply inline-flex items-center justify-center rounded-pill px-6 py-2.5 text-sm font-medium transition-all duration-200;
   }
 
-  /* Primary CTA (orange/red) */
+  /* CIID Primary CTAs */
+  .btn-rust {
+    @apply btn-pill bg-[#a05120] text-white hover:bg-[#854218] active:scale-[0.98];
+  }
+
+  .btn-dark {
+    @apply btn-pill bg-[#111111] text-white hover:bg-[#262626] active:scale-[0.98];
+  }
+
+  .btn-studio-outline {
+    @apply btn-pill border border-[#988a79] bg-transparent text-[#111111] hover:bg-[#f3f1ec] active:scale-[0.98];
+  }
+
+  /* Primary CTA (mapped to CIID Rust) */
   .btn-primary {
-    @apply btn-pill bg-orange-600 text-white hover:bg-orange-700 active:scale-[0.98];
+    @apply btn-pill bg-[#a05120] text-white hover:bg-[#854218] active:scale-[0.98];
   }
 
   /* Outlined button */
   .btn-outline {
-    @apply btn-pill border-2 border-slate-200 bg-white text-slate-700 hover:border-emerald-500 hover:text-emerald-600 active:scale-[0.98];
+    @apply btn-pill border border-stone-300 bg-white text-stone-800 hover:border-[#a05120] hover:text-[#a05120] active:scale-[0.98];
   }
 
   /* Emerald accent button */
@@ -114,44 +132,48 @@
 
   /* Text gradient effect */
   .text-gradient-emerald {
-    @apply bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent;
   }
 
-  /* Headline styling */
+  .text-gradient-rust {
+    @apply bg-gradient-to-r from-[#a05120] to-[#63200c] bg-clip-text text-transparent;
+  }
+
+  /* Headline styling (Barlow Condensed, uppercase, editorial) */
   .headline-hero {
-    @apply font-display text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 md:text-6xl lg:text-7xl;
+    @apply font-display text-5xl font-bold uppercase tracking-tight text-[#111111] md:text-6xl lg:text-7xl leading-[1.05];
   }
 
   /* Section heading */
   .headline-section {
-    @apply font-display text-3xl font-bold tracking-tight text-slate-900 md:text-4xl;
+    @apply font-display text-3xl font-bold uppercase tracking-tight text-[#111111] md:text-4xl leading-tight;
   }
 
   /* Focus ring matching design system */
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a05120] focus-visible:ring-offset-2;
   }
 
   /* Glass effect for overlays */
   .glass {
-    @apply bg-white/80 backdrop-blur-xl;
+    @apply bg-white/80 backdrop-blur-xl border-b border-stone-200/80;
   }
 
   /* Subtle hover lift */
   .hover-lift {
-    @apply transition-transform duration-300 hover:-translate-y-1;
+    @apply transition-transform duration-300 hover:-translate-y-0.5;
   }
 }
 
 /* ============================================================
-   Sonner Toast Overrides (floating card style)
+   Sonner Toast Overrides (Studio pill & card style)
    ============================================================ */
 
 [data-sonner-toaster] [data-sonner-toast] {
-  --normal-bg: white;
-  --normal-text: #0f172a;
-  --normal-border: #e2e8f0;
-  border-radius: 1rem;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  --normal-bg: #111111;
+  --normal-text: #fbfbfa;
+  --normal-border: #333333;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  font-family: var(--font-barlow), system-ui, sans-serif;
 }

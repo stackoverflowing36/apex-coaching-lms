@@ -139,43 +139,43 @@ function LoginForm() {
   };
 
   return (
-    <div className="relative z-10 w-full max-w-md bg-white rounded-[2rem] p-8 sm:p-10 shadow-2xl shadow-slate-900/8 border border-slate-200/80">
+    <div className="relative z-10 w-full max-w-md bg-white border border-stone-200/90 p-8 sm:p-10 shadow-studio">
       
       <div className="text-center mb-6 space-y-2">
-        <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
+        <h1 className="font-display font-bold uppercase text-3xl sm:text-4xl text-[#111111] tracking-tight">
           Portal Access
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-stone-500 font-normal">
           Sign in to access your batch lectures, test series &amp; grades
         </p>
       </div>
 
       {/* Role Selection Toggle */}
       <div className="mb-5">
-        <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-full border border-slate-200/80">
+        <div className="grid grid-cols-2 gap-2 p-1 bg-[#f3f1ec] rounded-pill border border-stone-200">
           <button
             type="button"
             onClick={() => setRole('student')}
-            className={`flex items-center justify-center gap-2 py-2 px-3 rounded-full text-xs font-bold transition-all duration-200 ${
+            className={`flex items-center justify-center gap-2 py-2 px-3 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
               role === 'student'
-                ? 'bg-white text-emerald-700 shadow-md shadow-slate-900/5'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#111111] text-[#fbfbfa]'
+                : 'text-stone-600 hover:text-stone-900'
             }`}
           >
-            <BookOpen className={`h-3.5 w-3.5 ${role === 'student' ? 'text-emerald-600' : 'text-slate-400'}`} />
+            <BookOpen className={`h-3.5 w-3.5 ${role === 'student' ? 'text-[#a8f1e0]' : 'text-stone-400'}`} />
             Student Login
           </button>
 
           <button
             type="button"
             onClick={() => setRole('teacher')}
-            className={`flex items-center justify-center gap-2 py-2 px-3 rounded-full text-xs font-bold transition-all duration-200 ${
+            className={`flex items-center justify-center gap-2 py-2 px-3 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
               role === 'teacher'
-                ? 'bg-white text-orange-600 shadow-md shadow-slate-900/5'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#a05120] text-white'
+                : 'text-stone-600 hover:text-stone-900'
             }`}
           >
-            <Briefcase className={`h-3.5 w-3.5 ${role === 'teacher' ? 'text-orange-600' : 'text-slate-400'}`} />
+            <Briefcase className={`h-3.5 w-3.5 ${role === 'teacher' ? 'text-white' : 'text-stone-400'}`} />
             Faculty Login
           </button>
         </div>
@@ -183,9 +183,9 @@ function LoginForm() {
 
       {/* Error Alert Box */}
       {errorMessage && (
-        <div className="mb-5 p-3.5 rounded-2xl bg-red-50 border border-red-200/80 flex items-start gap-2.5 text-red-700 text-xs sm:text-sm animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="mb-5 p-3.5 bg-red-50 border border-red-200 flex items-start gap-2.5 text-red-700 text-xs sm:text-sm animate-in fade-in slide-in-from-top-2 duration-200">
           <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-500 mt-0.5" />
-          <div className="leading-snug">{errorMessage}</div>
+          <div className="leading-snug font-medium">{errorMessage}</div>
         </div>
       )}
 
@@ -196,15 +196,15 @@ function LoginForm() {
           variant="outline"
           onClick={handleGoogleLogin}
           disabled={isGoogleLoading || isLoading}
-          className="w-full h-11 rounded-full border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-semibold text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center"
+          className="w-full h-11 rounded-pill border-stone-300 text-[#111111] hover:bg-[#f3f1ec] hover:border-stone-400 font-medium text-xs sm:text-sm shadow-none transition-all flex items-center justify-center"
         >
           {isGoogleLoading ? (
             <span className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+              <Loader2 className="h-4 w-4 animate-spin text-stone-500" />
               Connecting to Google...
             </span>
           ) : (
-            <span className="flex items-center justify-center">
+            <span className="flex items-center justify-center font-medium">
               <GoogleIcon />
               Sign in with Google
             </span>
@@ -214,8 +214,8 @@ function LoginForm() {
 
       {/* Divider */}
       <div className="relative mb-5 flex items-center justify-center">
-        <div className="border-t border-slate-200 w-full absolute"></div>
-        <span className="bg-white px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 relative z-10">
+        <div className="border-t border-stone-200 w-full absolute"></div>
+        <span className="bg-white px-3 text-[11px] font-semibold uppercase tracking-wider text-stone-400 relative z-10">
           or continue with email
         </span>
       </div>
@@ -223,11 +223,11 @@ function LoginForm() {
       <form onSubmit={handleLogin} className="space-y-4">
         {/* Email Field */}
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+          <Label htmlFor="email" className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
             {role === 'student' ? 'Enrolled Student Email' : 'Faculty / Staff Email'}
           </Label>
           <div className="relative">
-            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
             <Input
               id="email"
               type="email"
@@ -235,7 +235,7 @@ function LoginForm() {
               placeholder={role === 'student' ? 'student@eduflow.edu' : 'faculty@eduflow.edu'}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-11 rounded-2xl border-slate-200 focus-visible:ring-emerald-500 text-sm"
+              className="pl-10 h-11 rounded-studio border-stone-300 focus-visible:ring-[#a05120] text-sm"
             />
           </div>
         </div>
@@ -243,15 +243,15 @@ function LoginForm() {
         {/* Password Field */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            <Label htmlFor="password" className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
               Password
             </Label>
-            <a href="#" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+            <a href="#" className="text-xs font-semibold text-[#a05120] hover:text-[#63200c]">
               Forgot password?
             </a>
           </div>
           <div className="relative">
-            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
             <Input
               id="password"
               type="password"
@@ -259,7 +259,7 @@ function LoginForm() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-11 rounded-2xl border-slate-200 focus-visible:ring-emerald-500 text-sm"
+              className="pl-10 h-11 rounded-studio border-stone-300 focus-visible:ring-[#a05120] text-sm"
             />
           </div>
         </div>
@@ -268,10 +268,10 @@ function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading || isGoogleLoading}
-          className={`w-full h-11 rounded-full text-white font-semibold text-sm shadow-lg transition-all mt-2 ${
+          className={`w-full h-11 rounded-pill text-white font-medium text-sm shadow-sm transition-all mt-2 ${
             role === 'student'
-              ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-600/25'
-              : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/25'
+              ? 'bg-[#111111] hover:bg-[#262626]'
+              : 'bg-[#a05120] hover:bg-[#854218]'
           }`}
         >
           {isLoading ? (
@@ -280,7 +280,7 @@ function LoginForm() {
               Authenticating...
             </span>
           ) : (
-            <span className="flex items-center justify-center gap-2">
+            <span className="flex items-center justify-center gap-2 uppercase tracking-wider font-display font-bold text-sm">
               Sign In to {role === 'student' ? 'Student Portal' : 'Faculty Console'}
               <ArrowRight className="h-4 w-4" />
             </span>
@@ -289,11 +289,11 @@ function LoginForm() {
       </form>
 
       {/* Card Footer */}
-      <div className="mt-6 pt-5 border-t border-slate-100 text-center text-xs sm:text-sm text-slate-600">
+      <div className="mt-6 pt-5 border-t border-stone-100 text-center text-xs sm:text-sm text-stone-600 font-normal">
         New Student / Not registered?{' '}
         <Link
           href="/signup"
-          className="font-bold text-orange-600 hover:text-orange-700 transition-colors"
+          className="font-bold text-[#a05120] hover:text-[#63200c] transition-colors"
         >
           Register Batch Enrolment
         </Link>
@@ -305,37 +305,37 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative selection:bg-emerald-100 selection:text-emerald-900 py-12">
+    <div className="min-h-screen bg-[#fbfbfa] flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative selection:bg-[#a05120]/20 selection:text-[#63200c] py-12">
       <BackgroundGrid />
 
       {/* Floating Logo Badge */}
       <div className="mb-6 z-10">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="h-11 w-11 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-emerald-600/30 group-hover:scale-105 transition-transform">
+          <div className="h-11 w-11 rounded-full bg-[#111111] flex items-center justify-center text-white shadow-sm group-hover:bg-[#a05120] transition-colors">
             <GraduationCap className="h-6 w-6" />
           </div>
           <div className="flex flex-col">
-            <span className="font-heading font-extrabold text-2xl text-slate-900 tracking-tight leading-none">
+            <span className="font-display font-bold uppercase text-2xl text-[#111111] tracking-tight leading-none">
               EduFlow
             </span>
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
-              Academic Portal
+            <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-widest mt-0.5">
+              Academic Studio
             </span>
           </div>
         </Link>
       </div>
 
       <Suspense fallback={
-        <div className="w-full max-w-md bg-white rounded-[2rem] p-10 shadow-2xl border border-slate-200 text-center text-slate-500">
+        <div className="w-full max-w-md bg-white border border-stone-200 p-10 shadow-studio text-center text-stone-500">
           Loading login portal...
         </div>
       }>
         <LoginForm />
       </Suspense>
 
-      {/* Trust verification */}
-      <div className="mt-6 z-10 flex items-center gap-2 text-xs text-slate-400">
-        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+      {/* Security Note */}
+      <div className="mt-6 z-10 flex items-center gap-2 text-xs text-stone-500 font-normal">
+        <CheckCircle2 className="h-4 w-4 text-[#a05120]" />
         <span>Secured via Institute Supabase RLS Policy</span>
       </div>
     </div>

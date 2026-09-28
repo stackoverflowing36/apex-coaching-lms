@@ -27,20 +27,20 @@ export function Navbar() {
 
   return (
     <header className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 sm:px-6 pointer-events-none">
-      <div className="w-full max-w-5xl bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-sm shadow-slate-900/5 rounded-full px-4 py-2 flex items-center justify-between pointer-events-auto transition-all duration-300">
+      <div className="w-full max-w-[1360px] bg-[#fbfbfa]/90 backdrop-blur-md border border-stone-200/80 shadow-studio rounded-pill px-5 py-2.5 flex items-center justify-between pointer-events-auto transition-all duration-300">
         
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 pl-2 group">
-          <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white shadow-sm shadow-emerald-600/30 group-hover:scale-105 transition-transform">
+        <Link href="/" className="flex items-center gap-3 pl-1 group">
+          <div className="h-9 w-9 rounded-full bg-[#111111] flex items-center justify-center text-[#fbfbfa] shadow-sm group-hover:bg-[#a05120] transition-colors">
             <GraduationCap className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-heading font-extrabold text-base text-slate-900 tracking-tight flex items-center gap-1.5 leading-none">
+            <span className="font-display font-bold uppercase text-lg text-[#111111] tracking-tight flex items-center gap-1.5 leading-none">
               EduFlow
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block"></span>
+              <span className="h-1.5 w-1.5 rounded-full bg-[#a05120] inline-block"></span>
             </span>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
-              Academic LMS
+            <span className="text-[10px] font-medium text-stone-500 uppercase tracking-widest mt-0.5">
+              Academic Studio
             </span>
           </div>
         </Link>
@@ -51,7 +51,7 @@ export function Navbar() {
             <Link
               key={link.label}
               href={link.href}
-              className="px-3.5 py-1.5 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 rounded-full transition-colors"
+              className="px-4 py-1.5 text-xs sm:text-sm font-medium text-stone-600 hover:text-[#111111] hover:bg-[#f3f1ec] rounded-pill transition-colors"
             >
               {link.label}
             </Link>
@@ -64,7 +64,7 @@ export function Navbar() {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-50 text-xs font-semibold px-4 h-9"
+              className="rounded-pill border-stone-300 bg-transparent text-stone-800 hover:border-[#a05120] hover:text-[#a05120] text-xs font-medium px-4 h-9"
             >
               Student Portal
             </Button>
@@ -72,7 +72,7 @@ export function Navbar() {
           <Link href="/login?role=teacher">
             <Button
               size="sm"
-              className="rounded-full bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-4.5 h-9 shadow-sm shadow-orange-600/20"
+              className="rounded-pill bg-[#a05120] hover:bg-[#854218] text-white text-xs font-medium px-5 h-9 shadow-sm"
             >
               Faculty Login
             </Button>
@@ -84,14 +84,14 @@ export function Navbar() {
           <Link href="/login">
             <Button
               size="sm"
-              className="rounded-full bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-3 h-8"
+              className="rounded-pill bg-[#a05120] hover:bg-[#854218] text-white text-xs font-medium px-3.5 h-8"
             >
               Login
             </Button>
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 text-slate-600 hover:text-slate-900 rounded-full hover:bg-slate-100"
+            className="p-1.5 text-stone-700 hover:text-stone-900 rounded-full hover:bg-stone-100"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

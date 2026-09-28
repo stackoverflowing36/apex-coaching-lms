@@ -143,39 +143,39 @@ export default function TeacherCoursesPage() {
       {/* Header with Title & Add Batch Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
-              <Layers className="h-5 w-5" />
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center">
+              <Layers className="h-4 w-4" />
             </div>
-            <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
               Course Builder &amp; Syllabi
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500">
             Structure video modules, upload syllabus documents and formula sheets for each classroom batch.
           </p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-10 px-5 shadow-lg shadow-orange-600/25">
-              <Plus className="h-4 w-4 mr-1.5" />
+            <button className="btn-pill btn-rust text-xs font-semibold uppercase tracking-wider py-2.5 px-5 flex items-center gap-1.5 shadow-sm">
+              <Plus className="h-4 w-4" />
               Add New Batch
-            </Button>
+            </button>
           </DialogTrigger>
-          <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-md">
+          <DialogContent className="rounded-studio p-6 sm:p-8 max-w-md border border-stone-200 bg-white shadow-studio">
             <DialogHeader className="space-y-1 text-left">
-              <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
+              <DialogTitle className="font-display font-bold uppercase text-xl text-[#111111] tracking-tight">
                 Create Classroom Batch
               </DialogTitle>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-stone-500 font-condensed">
                 Define the curriculum code and title for this batch.
               </p>
             </DialogHeader>
 
             <form onSubmit={handleCreateCourse} className="space-y-4 pt-3">
               <div className="space-y-1.5">
-                <Label htmlFor="title" className="text-xs font-bold text-slate-700">
+                <Label htmlFor="title" className="text-xs font-semibold uppercase tracking-wider text-stone-700 font-condensed">
                   Course Title
                 </Label>
                 <Input
@@ -183,13 +183,13 @@ export default function TeacherCoursesPage() {
                   placeholder="e.g. Physics - Mechanics & Waves"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="rounded-2xl h-11 text-xs"
+                  className="rounded-pill h-10 text-xs border-stone-200 bg-[#fbfbfa]"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="code" className="text-xs font-bold text-slate-700">
+                <Label htmlFor="code" className="text-xs font-semibold uppercase tracking-wider text-stone-700 font-condensed">
                   Batch Code (e.g. PHY-202)
                 </Label>
                 <Input
@@ -197,13 +197,13 @@ export default function TeacherCoursesPage() {
                   placeholder="e.g. PHY-202"
                   value={newCode}
                   onChange={(e) => setNewCode(e.target.value)}
-                  className="rounded-2xl h-11 text-xs uppercase"
+                  className="rounded-pill h-10 text-xs uppercase border-stone-200 bg-[#fbfbfa]"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="desc" className="text-xs font-bold text-slate-700">
+                <Label htmlFor="desc" className="text-xs font-semibold uppercase tracking-wider text-stone-700 font-condensed">
                   Description / Objective
                 </Label>
                 <Textarea
@@ -211,14 +211,14 @@ export default function TeacherCoursesPage() {
                   placeholder="Target exams: JEE Advanced 2026, NEET UG..."
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  className="rounded-2xl min-h-[80px] text-xs resize-none"
+                  className="rounded-studio min-h-[80px] text-xs resize-none border-stone-200 bg-[#fbfbfa]"
                 />
               </div>
 
-              <Button
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-11 shadow-lg shadow-orange-600/25"
+                className="w-full btn-pill btn-rust text-xs font-semibold uppercase tracking-wider py-3 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function TeacherCoursesPage() {
                 ) : (
                   'Create Classroom Batch'
                 )}
-              </Button>
+              </button>
             </form>
           </DialogContent>
         </Dialog>
@@ -236,15 +236,15 @@ export default function TeacherCoursesPage() {
 
       {/* Courses Grid */}
       {loading ? (
-        <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-3">
-          <div className="w-10 h-10 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
-          <p className="text-xs font-medium">Loading classroom batches...</p>
+        <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+          <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading classroom batches...</p>
         </div>
       ) : courses.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center shadow-xl border border-slate-100 space-y-4">
-          <BookOpen className="h-12 w-12 text-slate-300 mx-auto" />
-          <h3 className="font-heading font-extrabold text-lg text-slate-900">No Batches Created Yet</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
+        <div className="studio-card p-12 text-center space-y-4">
+          <BookOpen className="h-12 w-12 text-stone-300 mx-auto" />
+          <h3 className="font-display font-bold uppercase text-lg text-[#111111] tracking-tight">No Batches Created Yet</h3>
+          <p className="text-xs text-stone-500 max-w-md mx-auto">
             Click &quot;Add New Batch&quot; above to create your first classroom batch and start uploading modules and PDF study materials.
           </p>
         </div>
@@ -253,15 +253,15 @@ export default function TeacherCoursesPage() {
           {courses.map((course) => (
             <div
               key={course.id}
-              className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 hover:border-orange-200 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group"
+              className="studio-card p-6 hover:border-stone-900 transition-all duration-300 flex flex-col justify-between group"
             >
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge className="bg-orange-50 text-orange-700 border-orange-200/80 font-bold text-xs px-2.5 py-0.5 rounded-full">
+                    <Badge variant="stone" className="font-semibold uppercase tracking-wider text-[10px]">
                       {course.code}
                     </Badge>
-                    <span className="text-[11px] font-semibold text-slate-400">
+                    <span className="text-[10px] font-semibold text-stone-400 font-condensed uppercase tracking-wider">
                       {new Date(course.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -272,7 +272,7 @@ export default function TeacherCoursesPage() {
                       e.stopPropagation();
                       setCourseToDelete(course);
                     }}
-                    className="p-1.5 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    className="p-1.5 rounded-pill text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                     title="Delete classroom batch"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -280,29 +280,29 @@ export default function TeacherCoursesPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-heading font-extrabold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">
+                  <h3 className="font-display font-bold uppercase text-lg text-[#111111] group-hover:text-[#a05120] transition-colors tracking-tight">
                     {course.title}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">
                     {course.description || 'Comprehensive curriculum with video lectures and downloadable notes.'}
                   </p>
                 </div>
 
                 {/* Counts Summary */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                  <div className="flex items-center gap-2 p-2 rounded-2xl bg-slate-50">
-                    <Video className="h-4 w-4 text-emerald-600" />
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100">
+                  <div className="flex items-center gap-2 p-2 rounded-studio bg-[#fbfbfa] border border-stone-200">
+                    <Video className="h-4 w-4 text-stone-700" />
                     <div>
-                      <div className="font-bold text-xs text-slate-900">{course.lecturesCount}</div>
-                      <div className="text-[10px] text-slate-400 font-medium">Lectures</div>
+                      <div className="font-semibold text-xs text-stone-900">{course.lecturesCount}</div>
+                      <div className="text-[10px] text-stone-400 font-condensed uppercase tracking-wider font-semibold">Lectures</div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 p-2 rounded-2xl bg-slate-50">
-                    <FileText className="h-4 w-4 text-orange-600" />
+                  <div className="flex items-center gap-2 p-2 rounded-studio bg-[#fbfbfa] border border-stone-200">
+                    <FileText className="h-4 w-4 text-[#a05120]" />
                     <div>
-                      <div className="font-bold text-xs text-slate-900">{course.materialsCount}</div>
-                      <div className="text-[10px] text-slate-400 font-medium">PDF Notes</div>
+                      <div className="font-semibold text-xs text-stone-900">{course.materialsCount}</div>
+                      <div className="text-[10px] text-stone-400 font-condensed uppercase tracking-wider font-semibold">PDF Notes</div>
                     </div>
                   </div>
                 </div>
@@ -311,10 +311,10 @@ export default function TeacherCoursesPage() {
               {/* Action Button */}
               <div className="pt-5 mt-2">
                 <Link href={`/teacher/courses/${course.id}`}>
-                  <Button className="w-full rounded-full bg-slate-900 hover:bg-orange-600 text-white font-bold text-xs h-10 shadow-md transition-all group-hover:bg-orange-600 flex items-center justify-between px-4">
+                  <button className="w-full btn-pill btn-dark text-xs font-semibold uppercase tracking-wider py-2.5 px-4 flex items-center justify-between">
                     <span>Manage Curriculum &amp; Uploads</span>
                     <ChevronRight className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </Link>
               </div>
             </div>

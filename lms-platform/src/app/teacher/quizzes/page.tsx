@@ -300,15 +300,15 @@ export default function TeacherQuizEnginePage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
-              <HelpCircle className="h-5 w-5" />
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center">
+              <HelpCircle className="h-4 w-4" />
             </div>
-            <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
               Quiz &amp; MCQ Engine
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500">
             Author mock tests, daily practice quizzes (DPP), set correct answer keys, and configure timed assessments.
           </p>
         </div>
@@ -316,10 +316,10 @@ export default function TeacherQuizEnginePage() {
         {/* Create Quiz Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-10 px-5 shadow-lg shadow-orange-600/25">
-              <Plus className="h-4 w-4 mr-1.5" />
+            <button className="btn-pill btn-rust text-xs font-semibold uppercase tracking-wider py-2.5 px-5 flex items-center gap-1.5 shadow-sm">
+              <Plus className="h-4 w-4" />
               Create MCQ Quiz
-            </Button>
+            </button>
           </DialogTrigger>
           <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="space-y-1 text-left">
@@ -570,10 +570,10 @@ export default function TeacherQuizEnginePage() {
       <div className="flex flex-wrap items-center gap-2 pt-2">
         <button
           onClick={() => setSelectedCourseFilter('all')}
-          className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+          className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
             selectedCourseFilter === 'all'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+              ? 'bg-[#111111] text-[#fbfbfa] shadow-sm'
+              : 'bg-white text-stone-600 hover:border-stone-400 border border-stone-200'
           }`}
         >
           All Batches ({quizzes.length})
@@ -586,10 +586,10 @@ export default function TeacherQuizEnginePage() {
             <button
               key={course.id}
               onClick={() => setSelectedCourseFilter(course.id)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+              className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
                 isSelected
-                  ? 'bg-orange-600 text-white shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  ? 'bg-[#a05120] text-white shadow-sm'
+                  : 'bg-white text-stone-600 hover:border-[#a05120] border border-stone-200'
               }`}
             >
               {course.code} ({count})
@@ -600,17 +600,17 @@ export default function TeacherQuizEnginePage() {
 
       {/* Quizzes List */}
       {loading ? (
-        <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-3">
-          <div className="w-10 h-10 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
-          <p className="text-xs font-medium">Loading quizzes...</p>
+        <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+          <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading quizzes...</p>
         </div>
       ) : filteredQuizzes.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center shadow-xl border border-slate-100 space-y-4">
-          <HelpCircle className="h-12 w-12 text-slate-300 mx-auto" />
-          <h3 className="font-heading font-extrabold text-lg text-slate-900">
+        <div className="studio-card p-12 text-center space-y-4">
+          <HelpCircle className="h-12 w-12 text-stone-300 mx-auto" />
+          <h3 className="font-display font-bold uppercase text-lg text-[#111111] tracking-tight">
             No Quizzes Found
           </h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <p className="text-xs text-stone-500 max-w-sm mx-auto">
             Click &quot;Create MCQ Quiz&quot; to author timed mock tests with automated answer keys.
           </p>
         </div>
@@ -619,63 +619,61 @@ export default function TeacherQuizEnginePage() {
           {filteredQuizzes.map((quiz) => (
             <div
               key={quiz.id}
-              className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 hover:border-orange-200 transition-all flex flex-col justify-between space-y-5"
+              className="studio-card p-6 hover:border-stone-900 transition-all flex flex-col justify-between space-y-5"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Badge className="bg-orange-50 text-orange-700 border-orange-200 font-bold text-xs px-2.5 py-0.5 rounded-full">
+                  <Badge variant="stone" className="font-semibold uppercase tracking-wider text-[10px]">
                     {quiz.courses?.code || 'BATCH'}
                   </Badge>
 
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
-                    <Clock className="h-3.5 w-3.5 text-orange-600" />
+                  <div className="flex items-center gap-1.5 text-xs text-stone-500 font-condensed font-semibold">
+                    <Clock className="h-3.5 w-3.5 text-[#a05120]" />
                     <span>{quiz.time_limit_minutes || 30} mins</span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 flex flex-wrap items-center gap-2">
+                  <h3 className="font-display font-bold uppercase text-base sm:text-lg text-[#111111] flex flex-wrap items-center gap-2 tracking-tight">
                     {quiz.title}
                     {quiz.course_chapters?.title && (
-                      <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-[10px] px-1.5 py-0 border-orange-200 shadow-none font-bold">
+                      <Badge variant="rust" className="text-[10px] px-1.5 py-0 font-semibold uppercase">
                         {quiz.course_chapters.title}
                       </Badge>
                     )}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">
                     {quiz.description || 'Timed practice assessment with instant answer evaluation.'}
                   </p>
                 </div>
 
                 {/* Question and Marks Stats */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                  <div className="p-2.5 rounded-2xl bg-slate-50">
-                    <div className="font-extrabold text-base text-slate-900">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100">
+                  <div className="p-2.5 rounded-studio bg-[#fbfbfa] border border-stone-200">
+                    <div className="font-display font-bold uppercase text-base text-stone-900">
                       {quiz.questions_count || 0}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-semibold uppercase">Questions</div>
+                    <div className="text-[10px] text-stone-400 font-condensed uppercase tracking-wider font-semibold">Questions</div>
                   </div>
 
-                  <div className="p-2.5 rounded-2xl bg-slate-50">
-                    <div className="font-extrabold text-base text-emerald-600">
+                  <div className="p-2.5 rounded-studio bg-[#fbfbfa] border border-stone-200">
+                    <div className="font-display font-bold uppercase text-base text-[#a05120]">
                       {quiz.total_marks || 0}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-semibold uppercase">Total Marks</div>
+                    <div className="text-[10px] text-stone-400 font-condensed uppercase tracking-wider font-semibold">Total Marks</div>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex items-center gap-2 pt-2">
-                <Button
+                <button
                   onClick={() => handleOpenPreview(quiz.id)}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 rounded-full border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold h-9"
+                  className="btn-pill btn-studio-outline text-xs font-semibold uppercase tracking-wider py-2 px-4 flex-1 flex items-center justify-center gap-1.5"
                 >
-                  <Eye className="h-3.5 w-3.5 mr-1 text-slate-400" />
+                  <Eye className="h-3.5 w-3.5 text-stone-400" />
                   Preview Key
-                </Button>
+                </button>
 
                 <button
                   onClick={() => handleDeleteQuiz(quiz.id)}

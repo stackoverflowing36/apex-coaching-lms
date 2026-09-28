@@ -292,22 +292,22 @@ export default function SplitScreenGradingPage() {
 
   if (loading && !submission) {
     return (
-      <div className="py-28 flex flex-col items-center justify-center text-slate-400 gap-3">
-        <div className="w-10 h-10 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin" />
-        <p className="text-xs font-medium">Loading submission paper &amp; grading console...</p>
+      <div className="py-28 flex flex-col items-center justify-center text-stone-400 gap-3">
+        <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+        <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading submission paper &amp; grading console...</p>
       </div>
     );
   }
 
   if (!submission) {
     return (
-      <div className="bg-white rounded-3xl p-12 text-center shadow-xl border border-slate-100 space-y-4">
-        <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
-        <h2 className="font-heading font-extrabold text-xl text-slate-900">
+      <div className="studio-card p-12 text-center max-w-lg mx-auto space-y-4">
+        <AlertCircle className="h-10 w-10 text-[#a05120] mx-auto" />
+        <h2 className="font-display font-bold uppercase text-xl text-[#111111] tracking-tight">
           Submission Not Found
         </h2>
         <Link href="/teacher/grading">
-          <Button variant="outline" className="rounded-full text-xs">
+          <Button variant="outline" className="rounded-pill text-xs font-condensed uppercase tracking-wider">
             Return to Grading Station
           </Button>
         </Link>
@@ -340,34 +340,34 @@ export default function SplitScreenGradingPage() {
     <div className="space-y-5 animate-in fade-in duration-300">
       
       {/* Top Header Bar */}
-      <div className="bg-white rounded-3xl p-4 sm:p-5 shadow-xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="studio-card p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         
         <div className="flex items-center gap-3">
           <Link
             href="/teacher/grading"
-            className="p-2 rounded-full text-slate-400 hover:text-orange-600 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-pill text-stone-400 hover:text-stone-900 hover:bg-stone-100 transition-colors"
             title="Back to submissions"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
 
-          <Avatar className="h-10 w-10 border-2 border-orange-200">
+          <Avatar className="h-10 w-10 border border-stone-300">
             <AvatarImage src={submission.users?.avatar_url} />
-            <AvatarFallback className="bg-orange-100 text-orange-700 font-bold text-xs">
+            <AvatarFallback className="bg-[#111111] text-[#fbfbfa] font-bold text-xs">
               {initials}
             </AvatarFallback>
           </Avatar>
 
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <h1 className="font-heading font-extrabold text-base sm:text-lg text-slate-900 leading-tight">
+              <h1 className="font-display font-bold uppercase text-base sm:text-lg text-[#111111] leading-tight">
                 {studentName}
               </h1>
-              <Badge className="bg-orange-50 text-orange-700 border-orange-200 text-[10px] font-bold px-2 py-0">
+              <Badge className="bg-stone-100 text-stone-800 border border-stone-300 text-[10px] font-condensed font-bold uppercase tracking-wider px-2 py-0 rounded-pill">
                 {submission.assignments?.courses?.code}
               </Badge>
             </div>
-            <p className="text-xs text-slate-500 truncate max-w-sm sm:max-w-md">
+            <p className="text-xs font-condensed text-stone-500 truncate max-w-sm sm:max-w-md">
               {submission.assignments?.title} • {studentEmail}
             </p>
           </div>
@@ -375,19 +375,19 @@ export default function SplitScreenGradingPage() {
 
         <div className="flex items-center gap-3 text-xs">
           <div className="text-right hidden sm:block">
-            <div className="font-bold text-slate-800">
+            <div className="font-bold text-stone-800 uppercase tracking-wider font-condensed">
               Max Marks: {maxMarks}
             </div>
-            <div className="text-[11px] text-slate-400">
+            <div className="text-[11px] text-stone-400 font-condensed">
               Submitted on {new Date(submission.submitted_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </div>
           </div>
 
           <Badge
-            className={`text-xs px-3 py-1 font-bold border-0 ${
+            className={`text-[10px] px-3 py-1 font-condensed font-bold uppercase tracking-wider rounded-pill border ${
               submission.status === 'graded'
-                ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-orange-100 text-orange-700'
+                ? 'bg-[#a8f1e0]/40 text-stone-900 border-stone-300'
+                : 'bg-[#a05120]/10 text-[#a05120] border-[#a05120]/30'
             }`}
           >
             {submission.status === 'graded' ? 'Graded' : 'Pending Evaluation'}
@@ -399,11 +399,11 @@ export default function SplitScreenGradingPage() {
             variant="outline"
             size="sm"
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="rounded-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 h-8 px-3 text-xs font-bold flex items-center gap-1.5 transition-colors"
+            className="rounded-pill text-[#a05120] border-stone-300 hover:bg-[#a05120]/10 h-8 px-3 text-xs font-bold font-condensed uppercase tracking-wider flex items-center gap-1.5 transition-colors"
             title="Delete this student submission"
           >
             <Trash2 className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Delete Submission</span>
+            <span className="hidden sm:inline">Delete</span>
           </Button>
         </div>
 
@@ -411,15 +411,15 @@ export default function SplitScreenGradingPage() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="rounded-3xl p-6 max-w-sm">
+        <DialogContent className="rounded-studio p-6 max-w-sm border border-stone-200">
           <DialogHeader className="space-y-2 text-left">
-            <DialogTitle className="font-heading font-extrabold text-lg text-slate-900 flex items-center gap-2 text-red-600">
-              <Trash2 className="h-5 w-5" />
+            <DialogTitle className="font-display font-bold uppercase text-lg text-[#111111] flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-[#a05120]" />
               Delete Submission?
             </DialogTitle>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-stone-600 leading-relaxed font-condensed uppercase tracking-wider">
               Are you sure you want to permanently delete this submission by{' '}
-              <strong className="text-slate-800">{studentName}</strong>? All marks, feedback remarks, and checked copies will be deleted. This action cannot be undone.
+              <strong className="text-stone-900">{studentName}</strong>? All marks, feedback remarks, and checked copies will be deleted. This action cannot be undone.
             </p>
           </DialogHeader>
           <div className="flex items-center justify-end gap-2 pt-4">
@@ -428,7 +428,7 @@ export default function SplitScreenGradingPage() {
               size="sm"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isDeleting}
-              className="rounded-full text-xs font-bold"
+              className="rounded-pill text-xs font-condensed font-bold uppercase tracking-wider"
             >
               Cancel
             </Button>
@@ -437,7 +437,7 @@ export default function SplitScreenGradingPage() {
               size="sm"
               onClick={handleDeleteSubmission}
               disabled={isDeleting}
-              className="rounded-full text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-600/20"
+              className="rounded-pill text-xs font-condensed font-bold uppercase tracking-wider bg-[#a05120] hover:bg-[#864319] text-white shadow-sm"
             >
               {isDeleting ? (
                 <span className="flex items-center gap-1.5">
@@ -458,18 +458,18 @@ export default function SplitScreenGradingPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column: Digital Correction Canvas / Document Viewer (60% width -> 7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden flex flex-col h-[520px] sm:h-[650px] lg:h-[780px]">
+        <div className="lg:col-span-7 studio-card overflow-hidden flex flex-col h-[520px] sm:h-[650px] lg:h-[780px]">
           
           {/* Viewer Mode Selector Header */}
-          <div className="p-3 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 bg-white p-1 rounded-full border border-slate-200 shadow-sm overflow-x-auto max-w-[80%]">
+          <div className="p-3 bg-[#fbfbfa] border-b border-stone-200 flex items-center justify-between">
+            <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-pill border border-stone-200 overflow-x-auto max-w-[80%]">
               <button
                 type="button"
                 onClick={() => setActiveViewerTab('canvas')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-condensed font-bold uppercase tracking-wider transition-all shrink-0 ${
                   activeViewerTab === 'canvas'
-                    ? 'bg-orange-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#111111] text-white shadow-sm'
+                    : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
                 <PenTool className="h-3.5 w-3.5" />
@@ -480,29 +480,29 @@ export default function SplitScreenGradingPage() {
                 type="button"
                 onClick={() => setActiveViewerTab('checked_copy')}
                 disabled={!submission?.checked_copy_url}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-condensed font-bold uppercase tracking-wider transition-all shrink-0 ${
                   activeViewerTab === 'checked_copy'
-                    ? 'bg-emerald-600 text-white shadow-sm'
+                    ? 'bg-[#a8f1e0] text-stone-900 shadow-sm'
                     : submission?.checked_copy_url
-                    ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
-                    : 'text-slate-300 opacity-40 cursor-not-allowed'
+                    ? 'text-stone-800 bg-[#a8f1e0]/30 hover:bg-[#a8f1e0]/60'
+                    : 'text-stone-400 opacity-40 cursor-not-allowed'
                 }`}
                 title={submission?.checked_copy_url ? 'View evaluated checked copy' : 'No checked copy saved yet'}
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 <span>Evaluated Copy</span>
                 {submission?.checked_copy_url && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-stone-900 animate-pulse" />
                 )}
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveViewerTab('original')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-condensed font-bold uppercase tracking-wider transition-all shrink-0 ${
                   activeViewerTab === 'original'
-                    ? 'bg-orange-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#111111] text-white shadow-sm'
+                    : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
                 <FileText className="h-3.5 w-3.5" />
@@ -515,7 +515,7 @@ export default function SplitScreenGradingPage() {
                 href={fileUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-orange-600 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm"
+                className="inline-flex items-center gap-1 text-xs font-condensed font-bold uppercase tracking-wider text-stone-700 hover:text-stone-900 bg-white border border-stone-200 px-3 py-1 rounded-pill shadow-sm"
               >
                 <span>Raw</span>
                 <ExternalLink className="h-3 w-3" />
@@ -524,7 +524,7 @@ export default function SplitScreenGradingPage() {
               <a
                 href={submission?.checked_copy_url || fileUrl}
                 download
-                className="p-1.5 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors"
+                className="p-1.5 rounded-pill text-stone-500 hover:text-stone-900 hover:bg-stone-200 transition-colors"
                 title="Download file"
               >
                 <Download className="h-3.5 w-3.5" />
@@ -533,7 +533,7 @@ export default function SplitScreenGradingPage() {
           </div>
 
           {/* Viewer Body */}
-          <div className="flex-1 overflow-hidden p-2 bg-slate-100">
+          <div className="flex-1 overflow-hidden p-2 bg-stone-100">
             {activeViewerTab === 'canvas' ? (
               <HandwrittenAnnotationCanvas
                 ref={canvasHandleRef}
@@ -546,18 +546,18 @@ export default function SplitScreenGradingPage() {
                 isSavingAnnotations={isSavingAnnotations}
               />
             ) : activeViewerTab === 'checked_copy' ? (
-              <div className="w-full h-full flex flex-col overflow-hidden bg-slate-950 rounded-2xl">
-                <div className="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs text-slate-300">
+              <div className="w-full h-full flex flex-col overflow-hidden bg-[#111111] rounded-studio">
+                <div className="p-3 bg-stone-900 border-b border-stone-800 flex items-center justify-between text-xs text-stone-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                    <span className="font-bold text-emerald-300">Evaluated Copy with Handwritten Corrections</span>
+                    <CheckCircle2 className="h-4 w-4 text-[#a8f1e0]" />
+                    <span className="font-bold text-[#a8f1e0] uppercase font-condensed tracking-wider">Evaluated Copy with Handwritten Corrections</span>
                   </div>
                   <a
                     href={submission.checked_copy_url}
                     download
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-[#a05120] hover:bg-[#864319] text-white font-condensed font-bold uppercase tracking-wider rounded-pill shadow-sm text-xs"
                   >
                     <Download className="h-3.5 w-3.5" />
                     Download Copy
@@ -568,23 +568,23 @@ export default function SplitScreenGradingPage() {
                   <img
                     src={submission.checked_copy_url}
                     alt="Evaluated checked copy"
-                    className="max-w-full object-contain rounded-xl shadow-2xl border border-slate-700"
+                    className="max-w-full object-contain rounded-studio shadow-2xl border border-stone-800"
                   />
                 </div>
               </div>
             ) : isPdf ? (
               <iframe
                 src={`${fileUrl}#toolbar=1`}
-                className="w-full h-full rounded-2xl bg-white border border-slate-200"
+                className="w-full h-full rounded-studio bg-white border border-stone-200"
                 title="Student PDF Submission"
               />
             ) : (
-              <div className="w-full h-full overflow-auto flex items-center justify-center p-4 bg-white rounded-2xl">
+              <div className="w-full h-full overflow-auto flex items-center justify-center p-4 bg-white rounded-studio">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={fileUrl}
                   alt="Student handwritten answer sheet"
-                  className="max-w-full max-h-full object-contain rounded-xl shadow-lg border border-slate-200"
+                  className="max-w-full max-h-full object-contain rounded-studio shadow-lg border border-stone-200"
                 />
               </div>
             )}
@@ -595,25 +595,25 @@ export default function SplitScreenGradingPage() {
         {/* Right Column: Grading Console & Return Panel (40% width -> 5 cols) */}
         <div className="lg:col-span-5 space-y-5">
           
-          <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-xl border border-slate-100 space-y-6">
+          <div className="studio-card p-6 sm:p-7 space-y-6">
             
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+            <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-pill bg-[#a05120]/10 flex items-center justify-center text-[#a05120]">
                   <Award className="h-4 w-4" />
                 </div>
                 <div>
-                  <h2 className="font-heading font-extrabold text-base text-slate-900">
+                  <h2 className="font-display font-bold uppercase text-base text-[#111111]">
                     Evaluation &amp; Feedback
                   </h2>
-                  <p className="text-[11px] text-slate-400">
-                    Assign numerical score &amp; return annotated copy
+                  <p className="text-[11px] font-condensed uppercase tracking-wider text-stone-500">
+                    Assign score &amp; return annotated copy
                   </p>
                 </div>
               </div>
 
               {submission.checked_copy_url && (
-                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
+                <Badge className="bg-[#a8f1e0]/40 text-stone-900 border-stone-300 text-[10px] font-condensed font-bold uppercase tracking-wider rounded-pill">
                   ✓ Checked Copy Attached
                 </Badge>
               )}
@@ -624,10 +624,10 @@ export default function SplitScreenGradingPage() {
               {/* Numerical Marks Input */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="marks" className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  <Label htmlFor="marks" className="text-[10px] font-bold text-stone-700 uppercase tracking-wider font-condensed">
                     Score Awarded
                   </Label>
-                  <span className="text-xs font-bold text-slate-500">
+                  <span className="text-xs font-bold text-stone-500 font-condensed uppercase tracking-wider">
                     out of {maxMarks} marks
                   </span>
                 </div>
@@ -643,16 +643,16 @@ export default function SplitScreenGradingPage() {
                     placeholder={`0 - ${maxMarks}`}
                     value={marks}
                     onChange={(e) => setMarks(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="h-12 text-lg font-bold rounded-2xl border-slate-200 focus-visible:ring-orange-500 pr-16"
+                    className="h-11 text-lg font-bold rounded-pill border-stone-200 bg-[#fbfbfa] focus:border-stone-900 pr-16"
                   />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400 font-condensed">
                     / {maxMarks}
                   </div>
                 </div>
 
                 {/* Score Preset Percentage Chips */}
                 <div className="flex items-center gap-1.5 pt-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+                  <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-condensed mr-1">
                     Presets:
                   </span>
                   {[100, 90, 75, 50, 0].map((p) => (
@@ -660,7 +660,7 @@ export default function SplitScreenGradingPage() {
                       key={p}
                       type="button"
                       onClick={() => handleApplyPreset(p)}
-                      className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 hover:bg-orange-50 hover:text-orange-600 text-slate-600 transition-colors border border-slate-200/60"
+                      className="px-2.5 py-1 rounded-pill text-[11px] font-condensed font-bold uppercase tracking-wider bg-stone-100 hover:bg-[#a05120]/10 hover:text-[#a05120] text-stone-700 transition-colors border border-stone-200"
                     >
                       {p}%
                     </button>
@@ -670,33 +670,33 @@ export default function SplitScreenGradingPage() {
 
               {/* Evaluation Status Toggle */}
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <Label className="text-[10px] font-bold text-stone-700 uppercase tracking-wider font-condensed">
                   Evaluation Verdict
                 </Label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setStatus('graded')}
-                    className={`py-2.5 px-3 rounded-2xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 ${
+                    className={`py-2 px-3 rounded-pill text-xs font-condensed font-bold uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
                       status === 'graded'
-                        ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                        ? 'bg-[#a8f1e0]/40 border-stone-400 text-stone-900 shadow-sm'
+                        : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
                     }`}
                   >
-                    <CheckCircle2 className={`h-4 w-4 ${status === 'graded' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                    <CheckCircle2 className={`h-4 w-4 ${status === 'graded' ? 'text-stone-900' : 'text-stone-400'}`} />
                     Approved / Graded
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setStatus('needs_resubmission')}
-                    className={`py-2.5 px-3 rounded-2xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 ${
+                    className={`py-2 px-3 rounded-pill text-xs font-condensed font-bold uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
                       status === 'needs_resubmission'
-                        ? 'bg-red-50 border-red-300 text-red-700 shadow-sm'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                        ? 'bg-[#e2bcc2]/40 border-stone-400 text-stone-900 shadow-sm'
+                        : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
                     }`}
                   >
-                    <AlertCircle className={`h-4 w-4 ${status === 'needs_resubmission' ? 'text-red-500' : 'text-slate-400'}`} />
+                    <AlertCircle className={`h-4 w-4 ${status === 'needs_resubmission' ? 'text-[#a05120]' : 'text-stone-400'}`} />
                     Needs Revision
                   </button>
                 </div>
@@ -705,11 +705,11 @@ export default function SplitScreenGradingPage() {
               {/* Rich Feedback Textarea */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="feedback" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <MessageSquare className="h-3.5 w-3.5 text-orange-600" />
+                  <Label htmlFor="feedback" className="text-[10px] font-bold text-stone-700 uppercase tracking-wider font-condensed flex items-center gap-1.5">
+                    <MessageSquare className="h-3.5 w-3.5 text-[#a05120]" />
                     Teacher&apos;s Feedback &amp; Remarks
                   </Label>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[10px] text-stone-400 font-condensed uppercase tracking-wider">
                     Visible to student
                   </span>
                 </div>
@@ -720,13 +720,13 @@ export default function SplitScreenGradingPage() {
                   placeholder="Provide step-by-step constructive feedback, formula corrections, and praise..."
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  className="rounded-2xl border-slate-200 focus-visible:ring-orange-500 text-sm leading-relaxed p-3.5"
+                  className="rounded-studio border-stone-200 bg-[#fbfbfa] focus:border-stone-900 text-xs leading-relaxed p-3.5"
                 />
 
                 {/* Quick Feedback Snippet Pills */}
                 <div className="space-y-1.5 pt-1">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Quick Suggestions (Click to append):
+                  <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-condensed">
+                    Quick Suggestions:
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {feedbackQuickTags.map((tag) => (
@@ -734,7 +734,7 @@ export default function SplitScreenGradingPage() {
                         key={tag}
                         type="button"
                         onClick={() => handleAppendTag(tag)}
-                        className="text-[11px] text-slate-600 bg-slate-100 hover:bg-orange-100 hover:text-orange-700 px-2.5 py-1 rounded-full border border-slate-200/60 transition-colors text-left"
+                        className="text-[11px] text-stone-700 bg-stone-100 hover:bg-[#a05120]/10 hover:text-[#a05120] px-2.5 py-1 rounded-pill border border-stone-200 transition-colors text-left font-condensed"
                       >
                         + {tag}
                       </button>
@@ -748,7 +748,7 @@ export default function SplitScreenGradingPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full h-12 rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm shadow-xl shadow-orange-600/25 transition-all flex items-center justify-center gap-2"
+                  className="w-full h-11 rounded-pill bg-[#a05120] hover:bg-[#864319] text-white font-condensed font-bold uppercase tracking-wider text-xs shadow-sm transition-all flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
@@ -769,24 +769,24 @@ export default function SplitScreenGradingPage() {
           </div>
 
           {/* Student Info Card */}
-          <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 text-xs space-y-3">
-            <h3 className="font-heading font-bold text-slate-800">
+          <div className="studio-card p-5 text-xs space-y-3">
+            <h3 className="font-display font-bold uppercase text-stone-900 tracking-tight">
               Batch &amp; Assignment Context
             </h3>
-            <div className="space-y-2 text-slate-600">
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Target Batch:</span>
-                <span className="font-semibold text-slate-800">{submission.assignments?.courses?.title}</span>
+            <div className="space-y-2 text-stone-600 font-condensed">
+              <div className="flex justify-between py-1 border-b border-stone-100">
+                <span className="text-stone-400 uppercase tracking-wider">Target Batch:</span>
+                <span className="font-semibold text-stone-900">{submission.assignments?.courses?.title}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-400">Due Date:</span>
-                <span className="font-medium text-slate-700">
+              <div className="flex justify-between py-1 border-b border-stone-100">
+                <span className="text-stone-400 uppercase tracking-wider">Due Date:</span>
+                <span className="font-medium text-stone-800">
                   {new Date(submission.assignments?.due_date).toLocaleDateString()}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-slate-400">Uploaded File Format:</span>
-                <span className="font-mono text-slate-700 font-bold">{submission.file_type || 'scanned copy'}</span>
+                <span className="text-stone-400 uppercase tracking-wider">Uploaded File Format:</span>
+                <span className="font-mono text-stone-800 font-bold">{submission.file_type || 'scanned copy'}</span>
               </div>
             </div>
           </div>

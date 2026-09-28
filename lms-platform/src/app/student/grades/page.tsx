@@ -131,61 +131,61 @@ export default function GradesPage() {
     <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
       <div>
-        <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="font-display uppercase text-3xl sm:text-4xl font-bold text-[#111111] tracking-tight">
           Grades, Feedback &amp; Attendance
         </h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500 mt-1">
           {submissions.length} submission{submissions.length !== 1 ? 's' : ''} ·{' '}
           {gradedSubmissions.length} graded · Attendance Rate: {attendance.percentage}%
         </p>
       </div>
 
-      {/* ========== OVERVIEW CARDS ========== */}
+      {/* ========== OVERVIEW CARDS (Architectural 1px Studio Grid) ========== */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
-        <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100/80">
+        <div className="studio-card p-5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-emerald-600" />
+            <div className="w-10 h-10 rounded-pill bg-[#a8f1e0]/30 text-stone-800 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5" />
             </div>
-            <span className="text-xs text-slate-500 font-bold uppercase">Average Score</span>
+            <span className="text-[10px] text-stone-500 font-bold uppercase font-condensed tracking-wider">Average Score</span>
           </div>
-          <p className="font-display text-3xl font-extrabold text-slate-900">
+          <p className="font-display uppercase text-3xl font-bold text-[#111111]">
             {gradedSubmissions.length > 0 ? `${averageScore}%` : '—'}
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100/80">
+        <div className="studio-card p-5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Award className="h-5 w-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-pill bg-stone-100 text-stone-800 flex items-center justify-center">
+              <Award className="h-5 w-5" />
             </div>
-            <span className="text-xs text-slate-500 font-bold uppercase">Highest Score</span>
+            <span className="text-[10px] text-stone-500 font-bold uppercase font-condensed tracking-wider">Highest Score</span>
           </div>
-          <p className="font-display text-3xl font-extrabold text-slate-900">
+          <p className="font-display uppercase text-3xl font-bold text-[#111111]">
             {gradedSubmissions.length > 0 ? highestScore : '—'}
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100/80">
+        <div className="studio-card p-5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-              <CalendarCheck className="h-5 w-5 text-purple-600" />
+            <div className="w-10 h-10 rounded-pill bg-stone-100 text-stone-800 flex items-center justify-center">
+              <CalendarCheck className="h-5 w-5" />
             </div>
-            <span className="text-xs text-slate-500 font-bold uppercase">Attendance</span>
+            <span className="text-[10px] text-stone-500 font-bold uppercase font-condensed tracking-wider">Attendance</span>
           </div>
-          <p className="font-display text-3xl font-extrabold text-purple-700">
+          <p className="font-display uppercase text-3xl font-bold text-[#111111]">
             {attendance.percentage}%
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100/80">
+        <div className="studio-card p-5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-amber-600" />
+            <div className="w-10 h-10 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center">
+              <Clock className="h-5 w-5" />
             </div>
-            <span className="text-xs text-slate-500 font-bold uppercase">Pending Review</span>
+            <span className="text-[10px] text-stone-500 font-bold uppercase font-condensed tracking-wider">Pending Review</span>
           </div>
-          <p className="font-display text-3xl font-extrabold text-slate-900">
+          <p className="font-display uppercase text-3xl font-bold text-[#111111]">
             {pendingSubmissions.length}
           </p>
         </div>
@@ -194,20 +194,20 @@ export default function GradesPage() {
       {/* ========== TABS: ASSIGNMENT GRADES VS ATTENDANCE REGISTER ========== */}
       <Tabs defaultValue="grades" className="space-y-6">
         <div className="overflow-x-auto pb-1 -mb-1">
-          <TabsList className="bg-slate-100 p-1 rounded-full border border-slate-200/80 inline-flex flex-nowrap min-w-max">
+          <TabsList className="bg-[#f3f1ec] p-1 rounded-pill border border-stone-200 inline-flex flex-nowrap min-w-max">
             <TabsTrigger
               value="grades"
-              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm"
+              className="rounded-pill text-xs font-semibold uppercase tracking-wider px-4 sm:px-5 py-2 data-[state=active]:bg-[#111111] data-[state=active]:text-[#fbfbfa] data-[state=active]:shadow-sm text-stone-600"
             >
               <Award className="h-3.5 w-3.5 mr-1.5" />
-              Assignment Evaluations ({submissions.length})
+              Evaluations ({submissions.length})
             </TabsTrigger>
             <TabsTrigger
               value="attendance"
-              className="rounded-full text-xs font-bold px-4 sm:px-5 py-2 data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm"
+              className="rounded-pill text-xs font-semibold uppercase tracking-wider px-4 sm:px-5 py-2 data-[state=active]:bg-[#111111] data-[state=active]:text-[#fbfbfa] data-[state=active]:shadow-sm text-stone-600"
             >
               <CalendarCheck className="h-3.5 w-3.5 mr-1.5" />
-              My Attendance History ({attendance.records.length})
+              Attendance Record ({attendance.records.length})
             </TabsTrigger>
           </TabsList>
         </div>
@@ -233,55 +233,50 @@ export default function GradesPage() {
                 return (
                   <div
                     key={s.id}
-                    className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-200"
+                    className="studio-card overflow-hidden transition-all duration-200"
                   >
                     {/* Row Header */}
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : s.id)}
-                      className="w-full px-6 py-5 flex items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors text-left"
+                      className="w-full px-6 py-5 flex items-center justify-between gap-4 hover:bg-stone-50 transition-colors text-left"
                     >
                       <div className="flex items-center gap-4 flex-1 min-w-0">
                         {/* Score Circle */}
                         <div
-                          className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center border ${
+                          className={`shrink-0 w-12 h-12 rounded-studio flex items-center justify-center border border-stone-200 ${
                             isGraded
-                              ? getScoreBg(s.marks_obtained ?? 0, maxMarks)
+                              ? 'bg-stone-100 text-stone-900'
                               : isNeedsResubmit
-                              ? 'bg-rose-50 border-rose-200'
-                              : 'bg-slate-50 border-slate-200'
+                              ? 'bg-[#e2bcc2]/30 text-rose-700'
+                              : 'bg-stone-50 text-stone-400'
                           }`}
                         >
                           {isGraded ? (
-                            <span
-                              className={`font-heading text-lg font-extrabold ${getScoreColor(
-                                s.marks_obtained ?? 0,
-                                maxMarks
-                              )}`}
-                            >
+                            <span className="font-display text-xl font-bold uppercase text-[#111111]">
                               {s.marks_obtained}
                             </span>
                           ) : isNeedsResubmit ? (
                             <AlertCircle className="h-5 w-5 text-rose-500" />
                           ) : (
-                            <Clock className="h-5 w-5 text-slate-400" />
+                            <Clock className="h-5 w-5 text-stone-400" />
                           )}
                         </div>
 
                         <div className="min-w-0">
-                          <p className="font-bold text-slate-900 truncate text-sm sm:text-base">
+                          <p className="font-semibold text-stone-900 truncate text-sm sm:text-base">
                             {s.assignments?.title || 'Assignment'}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                            <span className="text-xs text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider bg-stone-200/70 px-2 py-0.5 rounded-pill font-condensed">
                               {s.assignments?.courses?.code}
                             </span>
                             {s.assignments?.course_chapters?.title && (
-                              <Badge className="bg-orange-100 text-orange-800 border border-orange-200 text-[10px] px-1.5 py-0 font-bold shadow-none">
+                              <Badge variant="stone" className="text-[10px] px-1.5 py-0 uppercase font-semibold">
                                 {s.assignments.course_chapters.title}
                               </Badge>
                             )}
-                            <span className="text-slate-300">·</span>
-                            <span className="text-xs text-slate-400">
+                            <span className="text-stone-300">·</span>
+                            <span className="text-xs text-stone-500 font-condensed">
                               Submitted {new Date(s.submitted_at).toLocaleDateString(undefined, {
                                 day: 'numeric',
                                 month: 'short',
@@ -293,25 +288,25 @@ export default function GradesPage() {
 
                       <div className="flex items-center gap-3 shrink-0">
                         {isGraded ? (
-                          <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 font-bold text-xs">
+                          <Badge variant="mint" className="text-xs uppercase font-semibold">
                             <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
                             {s.marks_obtained}/{maxMarks}
                           </Badge>
                         ) : isNeedsResubmit ? (
-                          <Badge className="bg-rose-50 text-rose-700 border-rose-200 font-bold text-xs">
+                          <Badge variant="rose" className="text-xs uppercase font-semibold">
                             <AlertCircle className="h-3.5 w-3.5 mr-1" />
-                            Resubmission Required
+                            Resubmit
                           </Badge>
                         ) : (
-                          <Badge className="bg-amber-50 text-amber-700 border-amber-200 font-bold text-xs">
+                          <Badge variant="gold" className="text-xs uppercase font-semibold">
                             <Clock className="h-3.5 w-3.5 mr-1" />
                             Awaiting Grade
                           </Badge>
                         )}
                         {isExpanded ? (
-                          <ChevronUp className="h-4 w-4 text-slate-400" />
+                          <ChevronUp className="h-4 w-4 text-stone-400" />
                         ) : (
-                          <ChevronDown className="h-4 w-4 text-slate-400" />
+                          <ChevronDown className="h-4 w-4 text-stone-400" />
                         )}
                       </div>
                     </button>

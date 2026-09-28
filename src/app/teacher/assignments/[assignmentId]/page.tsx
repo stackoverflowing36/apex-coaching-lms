@@ -210,52 +210,50 @@ export default function TeacherAssignmentDetailsPage() {
       <div>
         <Link
           href={`/teacher/courses/${assignment.course_id}`}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-orange-600 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-500 hover:text-[#a05120] transition-colors font-condensed"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Course
         </Link>
       </div>
 
-      {/* Header Section */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 relative overflow-hidden">
+      {/* Header Section (CIID Studio Card) */}
+      <div className="studio-card p-6 sm:p-8 relative overflow-hidden bg-white">
         <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-          <FileCheck className="w-64 h-64 text-slate-900 rotate-12" />
+          <FileCheck className="w-64 h-64 text-stone-900 rotate-12" />
         </div>
         
         <div className="relative z-10 space-y-4">
           <div className="flex flex-wrap items-center gap-3 justify-between">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-slate-900">
+              <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
                 {assignment.title}
               </h1>
-              <Badge variant="outline" className="border-orange-200 text-orange-700 bg-orange-50 font-bold">
+              <Badge variant="stone" className="font-semibold uppercase tracking-wider text-[10px]">
                 {assignment.courses?.title || 'Unknown Batch'}
               </Badge>
               {assignment.course_chapters?.title && (
-                <Badge className="bg-orange-100 text-orange-800 border-orange-200 font-bold shadow-none">
+                <Badge variant="rust" className="font-semibold uppercase tracking-wider text-[10px]">
                   Chapter: {assignment.course_chapters.title}
                 </Badge>
               )}
             </div>
-            <Button
-              variant="outline"
-              size="sm"
+            <button
               onClick={handleEditOpen}
-              className="rounded-full gap-1.5 font-bold text-xs"
+              className="btn-pill btn-studio-outline text-xs font-semibold uppercase tracking-wider py-1.5 px-4 flex items-center gap-1.5"
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit
-            </Button>
+            </button>
           </div>
           
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-slate-600 font-medium">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs uppercase tracking-wider font-condensed text-stone-600 font-semibold">
             <span className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-slate-400" />
+              <Calendar className="h-4 w-4 text-stone-400" />
               Due: {new Date(assignment.due_date).toLocaleDateString()}
             </span>
             <span className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-orange-400" />
+              <Award className="h-4 w-4 text-[#a05120]" />
               {assignment.max_marks} Max Marks
             </span>
           </div>
@@ -408,31 +406,31 @@ export default function TeacherAssignmentDetailsPage() {
         
         {/* Left Column: Details & Attachment */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 space-y-4">
-            <h2 className="font-heading font-bold text-lg text-slate-900 border-b border-slate-100 pb-3">
+          <div className="studio-card p-6 space-y-4">
+            <h2 className="font-display font-bold uppercase text-base text-[#111111] border-b border-stone-100 pb-3 tracking-tight">
               Instructions
             </h2>
-            <div className="prose prose-sm max-w-none text-slate-600 whitespace-pre-wrap font-medium">
+            <div className="prose prose-sm max-w-none text-stone-600 whitespace-pre-wrap font-sans leading-relaxed">
               {descriptionText || 'No additional instructions provided.'}
             </div>
             
             {attachmentUrl && (
-              <div className="pt-4 border-t border-slate-100 space-y-3">
+              <div className="pt-4 border-t border-stone-100 space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                    <ExternalLink className="h-4 w-4" /> Attached Resource
+                  <h3 className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-700 flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4 text-[#a05120]" /> Attached Resource
                   </h3>
                   <a
                     href={attachmentUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1"
+                    className="text-xs font-semibold uppercase tracking-wider text-[#a05120] hover:underline flex items-center gap-1 font-condensed"
                   >
                     Open in new tab <ChevronRight className="h-3 w-3" />
                   </a>
                 </div>
                 
-                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 h-[400px]">
+                <div className="rounded-studio overflow-hidden border border-stone-200 bg-[#fbfbfa] h-[400px]">
                   {attachmentUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
                     <img 
                       src={attachmentUrl} 
@@ -454,51 +452,51 @@ export default function TeacherAssignmentDetailsPage() {
 
         {/* Right Column: Stats & Submissions */}
         <div className="space-y-6">
-          {/* Stats Cards */}
+          {/* Stats Cards (Architectural 1px Studio Grid) */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100">
-              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
-                <Users className="h-5 w-5" />
+            <div className="studio-card p-5">
+              <div className="w-9 h-9 rounded-pill bg-stone-100 text-stone-800 flex items-center justify-center mb-3">
+                <Users className="h-4 w-4" />
               </div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total</p>
-              <p className="text-2xl font-extrabold text-slate-900">{totalSubmissions}</p>
+              <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1 font-condensed">Total</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{totalSubmissions}</p>
             </div>
-            <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100">
-              <div className="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center mb-3">
-                <Clock className="h-5 w-5" />
+            <div className="studio-card p-5">
+              <div className="w-9 h-9 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center mb-3">
+                <Clock className="h-4 w-4" />
               </div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Pending</p>
-              <p className="text-2xl font-extrabold text-slate-900">{pendingSubmissions}</p>
+              <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1 font-condensed">Pending</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{pendingSubmissions}</p>
             </div>
-            <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
-                <CheckCircle2 className="h-5 w-5" />
+            <div className="studio-card p-5">
+              <div className="w-9 h-9 rounded-pill bg-[#a8f1e0]/30 text-stone-800 flex items-center justify-center mb-3">
+                <CheckCircle2 className="h-4 w-4" />
               </div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Graded</p>
-              <p className="text-2xl font-extrabold text-slate-900">{gradedSubmissions.length}</p>
+              <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1 font-condensed">Graded</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{gradedSubmissions.length}</p>
             </div>
-            <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100">
-              <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
-                <Award className="h-5 w-5" />
+            <div className="studio-card p-5">
+              <div className="w-9 h-9 rounded-pill bg-[#ffb956]/20 text-stone-800 flex items-center justify-center mb-3">
+                <Award className="h-4 w-4" />
               </div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Avg Score</p>
-              <p className="text-2xl font-extrabold text-slate-900">{averageScore}</p>
+              <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1 font-condensed">Avg Score</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{averageScore}</p>
             </div>
           </div>
 
           {/* Submissions List */}
-          <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100">
-            <h3 className="font-heading font-bold text-base text-slate-900 mb-4 flex items-center justify-between">
+          <div className="studio-card p-6">
+            <h3 className="font-display font-bold uppercase text-base text-[#111111] mb-4 flex items-center justify-between tracking-tight">
               Submissions
-              <Badge variant="secondary" className="font-bold">
+              <Badge variant="stone" className="font-semibold uppercase tracking-wider text-[10px]">
                 {submissions.length}
               </Badge>
             </h3>
             
             {submissions.length === 0 ? (
-              <div className="text-center py-6 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
-                <FileCheck className="h-6 w-6 text-slate-300 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-slate-500">No submissions yet.</p>
+              <div className="text-center py-8 bg-[#fbfbfa] rounded-studio border border-stone-200 border-dashed">
+                <FileCheck className="h-6 w-6 text-stone-300 mx-auto mb-2" />
+                <p className="text-xs uppercase tracking-wider font-semibold text-stone-500 font-condensed">No submissions yet.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -508,26 +506,26 @@ export default function TeacherAssignmentDetailsPage() {
                     href={`/teacher/grading/${sub.id}`}
                     className="block group"
                   >
-                    <div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all">
-                      <Avatar className="h-10 w-10 border-2 border-white shadow-sm shrink-0">
+                    <div className="flex items-center gap-3 p-3 rounded-studio bg-[#fbfbfa] hover:border-stone-900 border border-stone-200 transition-all">
+                      <Avatar className="h-9 w-9 border border-stone-300 shrink-0">
                         <AvatarImage src={sub.users?.avatar_url || ''} alt={sub.users?.full_name || 'Student'} />
-                        <AvatarFallback className="bg-orange-100 text-orange-700 font-bold text-xs">
+                        <AvatarFallback className="bg-[#111111] text-[#fbfbfa] font-bold text-xs">
                           {sub.users?.full_name?.charAt(0) || 'S'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-slate-900 truncate">
+                        <h4 className="text-xs sm:text-sm font-semibold text-[#111111] truncate group-hover:text-[#a05120] transition-colors">
                           {sub.users?.full_name || 'Unknown Student'}
                         </h4>
                         <div className="flex items-center gap-2 mt-0.5">
                           {sub.status === 'graded' ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-sm">
-                              <CheckCircle2 className="h-3 w-3" /> Graded ({sub.marks_obtained})
-                            </span>
+                            <Badge variant="mint" className="text-[10px] px-1.5 py-0 uppercase font-semibold">
+                              Graded ({sub.marks_obtained})
+                            </Badge>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded-sm">
-                              <Clock className="h-3 w-3" /> Pending Evaluation
-                            </span>
+                            <Badge variant="gold" className="text-[10px] px-1.5 py-0 uppercase font-semibold">
+                              Pending Evaluation
+                            </Badge>
                           )}
                         </div>
                       </div>
@@ -539,12 +537,12 @@ export default function TeacherAssignmentDetailsPage() {
                             e.stopPropagation();
                             setSubmissionToDelete(sub);
                           }}
-                          className="p-1.5 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors"
+                          className="p-1.5 rounded-pill text-stone-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors"
                           title="Delete submission"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <div className="text-slate-400 group-hover:text-orange-500 transition-colors">
+                        <div className="text-stone-400 group-hover:text-[#111111] transition-colors">
                           <ChevronRight className="h-4 w-4" />
                         </div>
                       </div>

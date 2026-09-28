@@ -1,7 +1,21 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Outfit } from 'next/font/google';
+import { Barlow, Barlow_Condensed, Inter, Outfit } from 'next/font/google';
 import { Toaster } from 'sonner';
 import './globals.css';
+
+const barlow = Barlow({
+  subsets: ['latin'],
+  variable: '--font-barlow',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  variable: '--font-barlow-condensed',
+  display: 'swap',
+  weight: ['600', '700'],
+});
 
 const inter = Inter({
   subsets: ['latin'],
@@ -36,8 +50,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="min-h-screen font-sans">
+    <html
+      lang="en"
+      className={`${barlow.variable} ${barlowCondensed.variable} ${inter.variable} ${outfit.variable}`}
+    >
+      <body className="min-h-screen font-sans bg-[#fbfbfa] text-[#111111]">
         {children}
 
         {/* Global toast notifications — floating card style */}
