@@ -102,7 +102,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   const bgCanvasRef = useRef<HTMLCanvasElement>(null);
   const annotCanvasRef = useRef<HTMLCanvasElement>(null);
   const activeCanvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | HTMLCanvasElement | null>(null);
 
   // Document dimensions (natural pixel space). Canvas buffers are sized * DPR.
   const [docWidth, setDocWidth] = useState(800);
@@ -110,7 +110,7 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   const [imageLoaded, setImageLoaded] = useState(false);
 
   // ── High-DPI ──
-  const dprRef = useRef(Math.min(window.devicePixelRatio || 1, 2));
+  const dprRef = useRef(typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1);
 
   // ── Pan / Zoom ──
   const [zoom, setZoom] = useState(1);
@@ -201,8 +201,12 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     const dpr = dprRef.current;
     [bgCanvasRef, annotCanvasRef, activeCanvasRef].forEach(({ current }) => {
       if (!current) return;
-      current.width = Math.round(docWidth * dpr);
-      current.height = Math.round(docHeight * dpr);
+      const targetW = Math.round(docWidth * dpr);
+      const targetH = Math.round(docHeight * dpr);
+      if (current.width !== targetW || current.height !== targetH) {
+        current.width = targetW;
+        current.height = targetH;
+      }
       current.style.width = `${docWidth}px`;
       current.style.height = `${docHeight}px`;
       const ctx = current.getContext('2d');
@@ -364,8 +368,16 @@ export const HandwrittenAnnotationCanvas = forwardRef<
     if (!ctx) return;
     ctx.setTransform(dprRef.current, 0, 0, dprRef.current, 0, 0);
     ctx.clearRect(0, 0, docWidth, docHeight);
-    if (imageRef.current && imageRef.current.naturalWidth > 0) {
-      ctx.drawImage(imageRef.current, 0, 0, docWidth, docHeight);
+
+    const img = imageRef.current;
+    const hasImage =
+      img &&
+      (((img as HTMLImageElement).naturalWidth !== undefined &&
+        (img as HTMLImageElement).naturalWidth > 0) ||
+        (img.width !== undefined && img.width > 0));
+
+    if (hasImage) {
+      ctx.drawImage(img, 0, 0, docWidth, docHeight);
     } else {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, docWidth, docHeight);
@@ -441,23 +453,48 @@ export const HandwrittenAnnotationCanvas = forwardRef<
   }, []);
 
   // ── PDF ──
-  const loadPdfJs = async () => {
+  const loadPdfJs = async (): Promise<any> => {
     if (typeof window === 'undefined') return null;
     if ((window as any).pdfjsLib) return (window as any).pdfjsLib;
-    return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-      script.onload = () => {
-        const lib = (window as any).pdfjsLib;
-        if (lib) {
-          lib.GlobalWorkerOptions.workerSrc =
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-          resolve(lib);
-        } else resolve(null);
-      };
-      script.onerror = () => resolve(null);
-      document.head.appendChild(script);
-    });
+
+    const cdnSources = [
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+    ];
+
+    for (const src of cdnSources) {
+      try {
+        const loaded = await new Promise<boolean>((resolve) => {
+          if ((window as any).pdfjsLib) return resolve(true);
+          const script = document.createElement('script');
+          script.src = src;
+          script.crossOrigin = 'anonymous';
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.head.appendChild(script);
+        });
+
+        if (loaded && (window as any).pdfjsLib) {
+          const lib = (window as any).pdfjsLib;
+          const workerUrl = src.includes('cdnjs')
+            ? 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+            : 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+          try {
+            const workerBlob = new Blob([`importScripts('${workerUrl}');`], {
+              type: 'application/javascript',
+            });
+            lib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(workerBlob);
+          } catch {
+            lib.GlobalWorkerOptions.workerSrc = workerUrl;
+          }
+          return lib;
+        }
+      } catch (e) {
+        console.warn('PDF.js CDN load warning for', src, e);
+      }
+    }
+    return null;
   };
 
   const renderPdfPageToCanvas = useCallback(
@@ -472,18 +509,27 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         const offscreenCtx = offscreenCanvas.getContext('2d');
         if (offscreenCtx) {
           await page.render({ canvasContext: offscreenCtx, viewport }).promise;
-          const dataUrl = offscreenCanvas.toDataURL('image/png');
-          const img = new Image();
-          img.onload = () => {
-            imageRef.current = img;
-            const w = img.naturalWidth || viewport.width;
-            const h = img.naturalHeight || viewport.height;
-            setDocWidth(w);
-            setDocHeight(h);
-            setImageLoaded(true);
-            setIsProcessingPdf(false);
-          };
-          img.src = dataUrl;
+          imageRef.current = offscreenCanvas;
+          setDocWidth(viewport.width);
+          setDocHeight(viewport.height);
+          setImageLoaded(true);
+          setIsProcessingPdf(false);
+
+          // Direct render to background canvas immediately
+          const bgCanvas = bgCanvasRef.current;
+          if (bgCanvas) {
+            const dpr = dprRef.current;
+            bgCanvas.width = Math.round(viewport.width * dpr);
+            bgCanvas.height = Math.round(viewport.height * dpr);
+            bgCanvas.style.width = `${viewport.width}px`;
+            bgCanvas.style.height = `${viewport.height}px`;
+            const bgCtx = bgCanvas.getContext('2d');
+            if (bgCtx) {
+              bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              bgCtx.clearRect(0, 0, viewport.width, viewport.height);
+              bgCtx.drawImage(offscreenCanvas, 0, 0, viewport.width, viewport.height);
+            }
+          }
         }
       } catch (pdfErr) {
         console.warn('PDF page rendering error:', pdfErr);
@@ -501,66 +547,104 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
     const setupDocument = async () => {
       const isPdfFile =
-        isPdf || targetUrl.toLowerCase().endsWith('.pdf') || targetUrl.toLowerCase().includes('.pdf');
+        isPdf ||
+        targetUrl.toLowerCase().endsWith('.pdf') ||
+        targetUrl.toLowerCase().includes('.pdf');
+
       if (isPdfFile) {
         setIsProcessingPdf(true);
         try {
           const pdfjs = await loadPdfJs();
           if (pdfjs && isMounted) {
-            const proxyUrl = `/api/proxy-file?url=${encodeURIComponent(targetUrl)}`;
-            const loadingTask = pdfjs.getDocument(proxyUrl);
-            const loadedPdf = await loadingTask.promise;
-            if (isMounted) {
+            let loadedPdf: any = null;
+
+            // Strategy 1: Direct URL fetch (Supabase storage returns Access-Control-Allow-Origin: *)
+            try {
+              const loadingTask = pdfjs.getDocument({
+                url: targetUrl,
+                withCredentials: false,
+              });
+              loadedPdf = await loadingTask.promise;
+            } catch (directErr) {
+              console.warn('Direct PDF load failed, trying proxy route:', directErr);
+              // Strategy 2: Local proxy route
+              try {
+                const proxyUrl = `/api/proxy-file?url=${encodeURIComponent(targetUrl)}`;
+                const proxyTask = pdfjs.getDocument(proxyUrl);
+                loadedPdf = await proxyTask.promise;
+              } catch (proxyPdfErr) {
+                console.warn('Proxy PDF load failed:', proxyPdfErr);
+              }
+            }
+
+            if (isMounted && loadedPdf) {
               pdfDocRef.current = loadedPdf;
               setPdfTotalPages(loadedPdf.numPages);
               setPdfPage(1);
               await renderPdfPageToCanvas(loadedPdf, 1);
+              return;
             }
-            return;
           }
         } catch (pdfLoadErr) {
           console.warn('PDF.js setup warning, falling back to image handler:', pdfLoadErr);
         }
       }
 
-      let resolvedSrc = targetUrl;
-      try {
-        const proxyUrl = targetUrl.startsWith('http')
-          ? `/api/proxy-file?url=${encodeURIComponent(targetUrl)}`
-          : targetUrl;
-        const res = await fetch(proxyUrl);
-        if (res.ok) {
-          const blob = await res.blob();
-          resolvedSrc = URL.createObjectURL(blob);
-          objectUrlToRevoke = resolvedSrc;
-        }
-      } catch (e) {
-        console.warn('Taint-proof proxy fetch warning, using direct URL:', e);
-      }
+      // Standard Image setup
+      const tryLoadImage = (src: string, isAnonymous: boolean): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          if (isAnonymous) img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      };
 
-      if (!isMounted) return;
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
+      try {
+        // Strategy 1: Direct load with crossOrigin='anonymous'
+        const img = await tryLoadImage(targetUrl, true);
         if (!isMounted) return;
         imageRef.current = img;
-        setDocWidth(img.naturalWidth);
-        setDocHeight(img.naturalHeight);
+        setDocWidth(img.naturalWidth || 800);
+        setDocHeight(img.naturalHeight || 1100);
         setImageLoaded(true);
-      };
-      img.onerror = () => {
-        if (!isMounted) return;
-        const fallback = new Image();
-        fallback.onload = () => {
+        return;
+      } catch {
+        // Strategy 2: Local proxy fetch
+        try {
+          const proxyUrl = targetUrl.startsWith('http')
+            ? `/api/proxy-file?url=${encodeURIComponent(targetUrl)}`
+            : targetUrl;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            objectUrlToRevoke = blobUrl;
+            const img = await tryLoadImage(blobUrl, false);
+            if (!isMounted) return;
+            imageRef.current = img;
+            setDocWidth(img.naturalWidth || 800);
+            setDocHeight(img.naturalHeight || 1100);
+            setImageLoaded(true);
+            return;
+          }
+        } catch (proxyErr) {
+          console.warn('Proxy fetch failed:', proxyErr);
+        }
+
+        // Strategy 3: Direct fallback without crossOrigin
+        try {
+          const fallback = await tryLoadImage(targetUrl, false);
           if (!isMounted) return;
           imageRef.current = fallback;
-          setDocWidth(fallback.naturalWidth);
-          setDocHeight(fallback.naturalHeight);
+          setDocWidth(fallback.naturalWidth || 800);
+          setDocHeight(fallback.naturalHeight || 1100);
           setImageLoaded(true);
-        };
-        fallback.src = targetUrl;
-      };
-      img.src = resolvedSrc;
+        } catch (finalErr) {
+          console.error('All image loading strategies failed:', finalErr);
+        }
+      }
     };
 
     setupDocument();
@@ -572,9 +656,10 @@ export const HandwrittenAnnotationCanvas = forwardRef<
 
   // ── Layer rendering when deps change ──
   useEffect(() => {
+    syncCanvases();
     drawBackground();
     drawAnnotations();
-  }, [drawBackground, drawAnnotations]);
+  }, [syncCanvases, drawBackground, drawAnnotations, imageLoaded, docWidth, docHeight, pdfPage]);
 
   const handlePageChange = (newPage: number) => {
     if (!pdfDocRef.current || newPage < 1 || newPage > pdfTotalPages) return;
@@ -921,8 +1006,15 @@ export const HandwrittenAnnotationCanvas = forwardRef<
         ctx.setTransform(dprRef.current, 0, 0, dprRef.current, 0, 0);
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, docWidth, docHeight);
-        if (imageRef.current && imageRef.current.naturalWidth > 0) {
-          ctx.drawImage(imageRef.current, 0, 0, docWidth, docHeight);
+        const img = imageRef.current;
+        const hasImage =
+          img &&
+          (((img as HTMLImageElement).naturalWidth !== undefined &&
+            (img as HTMLImageElement).naturalWidth > 0) ||
+            (img.width !== undefined && img.width > 0));
+
+        if (hasImage) {
+          ctx.drawImage(img, 0, 0, docWidth, docHeight);
         }
         pageStrokes(pdfPage).forEach((stroke) => drawStroke(ctx, stroke));
         exportCanvas.toBlob((blob) => resolve(blob), 'image/png', 0.95);
@@ -1488,21 +1580,28 @@ export const HandwrittenAnnotationCanvas = forwardRef<
               >
                 <canvas
                   ref={bgCanvasRef}
-                  style={{ pointerEvents: 'none' }}
+                  width={Math.round(docWidth * dprRef.current)}
+                  height={Math.round(docHeight * dprRef.current)}
+                  style={{ width: `${docWidth}px`, height: `${docHeight}px`, pointerEvents: 'none' }}
                   className="absolute inset-0 block bg-white touch-none"
                 />
                 <canvas
                   ref={annotCanvasRef}
-                  style={{ pointerEvents: 'none' }}
-                  className="absolute inset-0 block bg-white touch-none"
+                  width={Math.round(docWidth * dprRef.current)}
+                  height={Math.round(docHeight * dprRef.current)}
+                  style={{ width: `${docWidth}px`, height: `${docHeight}px`, pointerEvents: 'none' }}
+                  className="absolute inset-0 block bg-transparent touch-none"
                 />
                 <canvas
                   ref={activeCanvasRef}
+                  width={Math.round(docWidth * dprRef.current)}
+                  height={Math.round(docHeight * dprRef.current)}
+                  style={{ width: `${docWidth}px`, height: `${docHeight}px` }}
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   onPointerCancel={handlePointerUp}
-                  className="block bg-white touch-none"
+                  className="absolute inset-0 block bg-transparent touch-none"
                 />
 
                 {/* Instant Click Ripple Feedback */}

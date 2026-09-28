@@ -538,7 +538,7 @@ export default function SplitScreenGradingPage() {
               <HandwrittenAnnotationCanvas
                 ref={canvasHandleRef}
                 imageUrl={fileUrl}
-                isPdf={canvasIsPdf}
+                isPdf={isPdf}
                 checkedCopyUrl={submission.checked_copy_url}
                 persistenceKey={submissionId}
                 onExportBlob={(blob) => setPendingBlob(blob)}
