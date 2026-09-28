@@ -83,7 +83,7 @@
 }
 
 /* ============================================================
-   Component Utilities — CIID Studio Design System
+   Component Utilities — Studio Design System
    ============================================================ */
 
 @layer utilities {
@@ -97,12 +97,12 @@
     @apply rounded-studio bg-white p-6 border border-stone-200/80 shadow-studio transition-all duration-300;
   }
 
-  /* Pill button (CIID rounded-pill style) */
+  /* Pill button (rounded-pill style) */
   .btn-pill {
     @apply inline-flex items-center justify-center rounded-pill px-6 py-2.5 text-sm font-medium transition-all duration-200;
   }
 
-  /* CIID Primary CTAs */
+  /* Primary CTAs */
   .btn-rust {
     @apply btn-pill bg-[#a05120] text-white hover:bg-[#854218] active:scale-[0.98];
   }
@@ -115,7 +115,7 @@
     @apply btn-pill border border-[#988a79] bg-transparent text-[#111111] hover:bg-[#f3f1ec] active:scale-[0.98];
   }
 
-  /* Primary CTA (mapped to CIID Rust) */
+  /* Primary CTA (mapped to Rust) */
   .btn-primary {
     @apply btn-pill bg-[#a05120] text-white hover:bg-[#854218] active:scale-[0.98];
   }

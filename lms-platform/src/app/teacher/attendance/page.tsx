@@ -387,7 +387,7 @@ export default function TeacherAttendancePage() {
                     </div>
                   </div>
 
-                  {/* Status Selection Pills (CIID Pastel Tokens) */}
+                  {/* Status Selection Pills */}
                   <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-pill border border-stone-200">
                     {(['present', 'absent', 'late', 'excused'] as AttendanceStatus[]).map(
                       (st) => {

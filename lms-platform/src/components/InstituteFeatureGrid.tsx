@@ -45,7 +45,7 @@ export function InstituteFeatureGrid() {
         </p>
       </div>
 
-      {/* 3-Column Visual Showcase Cards (CIID Split Studio style) */}
+      {/* 3-Column Visual Showcase Cards (Split Studio style) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* ============================================================

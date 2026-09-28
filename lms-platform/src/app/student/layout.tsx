@@ -102,7 +102,7 @@ export default function StudentLayout({
   return (
     <UserContext.Provider value={user}>
       <div className="min-h-screen bg-[#fbfbfa] text-[#111111]">
-        {/* ========== TOP NAVIGATION (CIID Studio Shell) ========== */}
+        {/* ========== TOP NAVIGATION (Studio Shell) ========== */}
         <nav className="sticky top-0 z-50 bg-[#fbfbfa]/90 backdrop-blur-xl border-b border-stone-200">
           <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -122,7 +122,7 @@ export default function StudentLayout({
                 </div>
               </div>
 
-              {/* Desktop Nav Tabs (CIID Capsule) */}
+              {/* Desktop Nav Tabs (Capsule) */}
               <div className="hidden md:flex items-center gap-1 bg-[#f3f1ec] rounded-pill p-1 border border-stone-200">
                 {navLinks.map((link) => {
                   const isActive =

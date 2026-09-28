@@ -136,7 +136,7 @@ export default function AssignmentsPage() {
         </p>
       </div>
 
-      {/* Filters (CIID Capsule & Pills) */}
+      {/* Filters (Capsule & Pills) */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
@@ -174,7 +174,7 @@ export default function AssignmentsPage() {
         </div>
       </div>
 
-      {/* Assignment Cards (CIID Studio Cards) */}
+      {/* Assignment Cards (Studio Cards) */}
       {filtered.length === 0 ? (
         <div className="studio-card p-16 text-center">
           <FileText className="h-12 w-12 text-stone-300 mx-auto mb-4" />

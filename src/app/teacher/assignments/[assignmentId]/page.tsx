@@ -217,7 +217,7 @@ export default function TeacherAssignmentDetailsPage() {
         </Link>
       </div>
 
-      {/* Header Section (CIID Studio Card) */}
+      {/* Header Section (Studio Card) */}
       <div className="studio-card p-6 sm:p-8 relative overflow-hidden bg-white">
         <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
           <FileCheck className="w-64 h-64 text-stone-900 rotate-12" />

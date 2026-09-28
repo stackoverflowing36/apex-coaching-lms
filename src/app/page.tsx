@@ -21,8 +21,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Navbar } from '@/components/layout/Navbar';
-import { BackgroundGrid } from '@/components/layout/BackgroundGrid';
-import { HeroWorkflowCards } from '@/components/HeroWorkflowCards';
+import { HeroSlider } from '@/components/HeroSlider';
 import { InstituteFeatureGrid } from '@/components/InstituteFeatureGrid';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -105,107 +104,160 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#fbfbfa] text-[#111111] selection:bg-[#a05120]/20 selection:text-[#63200c] relative overflow-x-hidden font-sans">
-      {/* Subtle Intersecting Grid Background */}
-      <BackgroundGrid />
-
-      {/* Centered Floating Pill Navbar */}
+      
+      {/* Editorial Floating Navbar */}
       <Navbar />
 
       {/* ============================================================
-          HERO SECTION (CIID Split Studio Architecture)
+          HERO CAROUSEL SLIDER (Full Bleed with Photographic Slides)
+          Stating the app features with high-impact bold typography
           ============================================================ */}
-      <section className="relative pt-32 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-[1360px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      <HeroSlider />
+
+      {/* ============================================================
+          EDITORIAL FEATURE OVERVIEW SECTION
+          (Directly inspired by the 2-column layout in the example website)
+          ============================================================ */}
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-[1360px] mx-auto border-b border-stone-200">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
           
-          {/* Hero Left Column */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            
-            {/* Small Top Pill Badge (CIID Mint & Studio Capsule) */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-pill bg-[#a8f1e0] text-[#111111] text-xs sm:text-sm font-medium border border-[#a8f1e0]/80 shadow-studio animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <span className="flex h-2 w-2 rounded-full bg-[#111111] animate-ping"></span>
-              <Sparkles className="h-4 w-4 text-[#111111]" />
-              <span className="font-semibold tracking-wide">CIID ACADEMIC STUDIO 2026</span>
+          {/* Left Column: Editorial Announcement & Mission Statement */}
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-pill bg-[#a8f1e0] text-[#111111] text-xs font-condensed font-bold uppercase tracking-wider">
+                <Sparkles className="h-3.5 w-3.5 text-[#111111]" />
+                <span>Next-Gen Academic Coaching Architecture</span>
+              </div>
+
+              <h2 className="font-display font-black uppercase text-3xl sm:text-5xl lg:text-[46px] text-[#111111] tracking-tight leading-[1.06]">
+                Structured Classroom Delivery &amp; Continuous Digital Evaluation
+              </h2>
+
+              <p className="text-stone-600 text-sm sm:text-base leading-relaxed font-sans">
+                EduFlow is built on the rigorous philosophy of continuous evaluation, active problem derivation, and structured mentoring. Every lecture is recorded in high definition, every homework submission receives line-by-line handwritten feedback, and every mock test mirrors real competitive exam pressures.
+              </p>
             </div>
 
-            {/* Headline with tight tracking and Rust Terracotta accent */}
-            <h1 className="font-display font-bold uppercase text-5xl sm:text-6xl lg:text-[76px] tracking-tight leading-[1.02] text-[#111111]">
-              Master the Syllabus.
-              <span className="block text-[#a05120] mt-1">
-                Excel in Every Exam.
-              </span>
-            </h1>
-
-            {/* Subtext */}
-            <p className="text-base sm:text-lg lg:text-xl text-stone-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              Access daily live lectures, submitted assignment feedback, batch schedules, and curated study materials in one centralized studio portal.
-            </p>
-
             {/* CTAs */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5">
-              <Link href="/login?role=student" className="w-full sm:w-auto">
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Link href="/login?role=student">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto rounded-pill bg-[#a05120] hover:bg-[#854218] text-white font-medium px-8 h-12 text-sm shadow-sm transition-all group"
+                  className="rounded-pill bg-[#a05120] hover:bg-[#864319] text-white font-condensed font-bold uppercase tracking-wider text-xs px-8 h-12 shadow-sm transition-all"
                 >
                   Enter Student Portal
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               
-              <Link href="/login?role=teacher" className="w-full sm:w-auto">
+              <Link href="/login?role=teacher">
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto rounded-pill border border-[#988a79] bg-transparent text-[#111111] hover:bg-[#f3f1ec] font-medium px-7 h-12 text-sm"
+                  className="rounded-pill border-stone-300 bg-white hover:bg-stone-100 text-stone-800 font-condensed font-bold uppercase tracking-wider text-xs px-7 h-12 transition-all"
                 >
-                  Faculty Dashboard
+                  Faculty Evaluation Hub
                 </Button>
               </Link>
             </div>
 
-            {/* Live Real-time Academic Counters (Studio 1px architectural grid) */}
-            <div className="pt-6 border-t border-stone-200/80 grid grid-cols-3 gap-3 text-left">
-              <div className="p-3.5 border border-stone-200/90 bg-white">
+            {/* Live Real-time Academic Counters (1px Architectural Grid) */}
+            <div className="pt-6 border-t border-stone-200 grid grid-cols-3 gap-3 text-left">
+              <div className="p-3.5 border border-stone-200 bg-white rounded-studio">
                 <div className="font-display font-bold text-2xl sm:text-3xl text-[#111111] leading-none">
                   {isLoaded ? `${stats.batchesCount} ACTIVE` : '—'}
                 </div>
-                <div className="text-[11px] text-stone-500 font-medium uppercase tracking-wider mt-1">Classroom Batches</div>
+                <div className="text-[10px] text-stone-500 font-condensed font-bold uppercase tracking-wider mt-1.5">Classroom Batches</div>
               </div>
-              <div className="p-3.5 border border-stone-200/90 bg-white">
+              <div className="p-3.5 border border-stone-200 bg-white rounded-studio">
                 <div className="font-display font-bold text-2xl sm:text-3xl text-[#a05120] leading-none">
                   {isLoaded ? recordedHoursLabel.toUpperCase() : '—'}
                 </div>
-                <div className="text-[11px] text-stone-500 font-medium uppercase tracking-wider mt-1">Recorded Archives</div>
+                <div className="text-[10px] text-stone-500 font-condensed font-bold uppercase tracking-wider mt-1.5">Recorded Archives</div>
               </div>
-              <div className="p-3.5 border border-stone-200/90 bg-white">
-                <div className="font-display font-bold text-2xl sm:text-3xl text-[#63200c] leading-none">
+              <div className="p-3.5 border border-stone-200 bg-white rounded-studio">
+                <div className="font-display font-bold text-2xl sm:text-3xl text-stone-900 leading-none">
                   {isLoaded ? `${stats.assignmentsCount} ACTIVE` : '—'}
                 </div>
-                <div className="text-[11px] text-stone-500 font-medium uppercase tracking-wider mt-1">Live DPPs &amp; Tasks</div>
+                <div className="text-[10px] text-stone-500 font-condensed font-bold uppercase tracking-wider mt-1.5">Live DPPs &amp; Tasks</div>
               </div>
             </div>
 
           </div>
 
-          {/* Hero Right Column: Floating Stacked Coaching Cards */}
-          <div className="lg:col-span-5 relative">
-            <HeroWorkflowCards />
+          {/* Right Column: High-Impact Promo Card (Inspired by example website's graphic card) */}
+          <div className="lg:col-span-5 relative group">
+            <div className="relative h-full min-h-[380px] rounded-studio overflow-hidden border border-stone-800 shadow-2xl p-8 sm:p-10 flex flex-col justify-between bg-stone-950 text-white">
+              
+              {/* Background Photography with Warm Tone */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700 ease-out"
+                style={{
+                  backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80')`,
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/80 to-stone-950/50" />
+
+              {/* Card Header Content */}
+              <div className="relative z-10 space-y-4">
+                <Badge className="bg-[#ffb956] text-[#111111] border-none font-condensed font-extrabold uppercase tracking-widest text-[11px] px-3 py-1 rounded-pill">
+                  Admissions Open
+                </Badge>
+                
+                <h3 className="font-display font-black uppercase text-3xl sm:text-4xl text-white tracking-tight leading-[0.98]">
+                  SUMMER 2026-27 FOUNDATION BATCHES
+                </h3>
+                
+                <p className="text-stone-300 text-xs sm:text-sm leading-relaxed font-sans">
+                  Comprehensive academic curriculum for JEE Advanced, NEET-UG, and Olympiads. Starting April 23rd. Limited to 35 students per batch for personalized mentoring.
+                </p>
+
+                <div className="space-y-1.5 text-xs font-condensed uppercase tracking-wider text-stone-300 pt-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-[#a8f1e0]" />
+                    <span>Printed Daily Practice Problem (DPP) Books</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-[#a8f1e0]" />
+                    <span>Line-by-line Handwritten Digital Corrections</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-[#a8f1e0]" />
+                    <span>Weekly All-India Computer Based Tests (CBT)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Footer Button */}
+              <div className="relative z-10 pt-6">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    className="w-full rounded-pill bg-[#a05120] hover:bg-[#864319] text-white font-condensed font-bold uppercase tracking-wider text-xs h-11 shadow-lg transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>Reserve Your Seat Online</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+
+            </div>
           </div>
 
         </div>
       </section>
 
       {/* ============================================================
-          UPCOMING BATCH SCHEDULE & LIVE REAL-TIME NOTICE TICKER
+          LIVE REAL-TIME NOTICE TICKER
           ============================================================ */}
       {stats.announcements && stats.announcements.length > 0 && (
-        <section id="curriculum" className="py-4 border-y border-stone-200 bg-[#f3f1ec]/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <section id="curriculum" className="py-3.5 border-b border-stone-200 bg-[#f3f1ec]/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               
               <div className="flex items-center gap-3">
                 <span className="flex h-2.5 w-2.5 rounded-full bg-[#a05120] animate-pulse"></span>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#111111] flex items-center gap-1.5 font-display">
+                <span className="text-xs font-condensed font-bold uppercase tracking-wider text-[#111111] flex items-center gap-1.5 font-display">
                   <Bell className="h-4 w-4 text-[#a05120]" />
                   Live Academic Notice:
                 </span>
@@ -218,17 +270,17 @@ export default function LandingPage() {
                     className="flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-pill border border-stone-200 shadow-sm"
                   >
                     <span className="font-bold text-[#111111]">
-                      {announcement.courses?.code || 'Studio'}:
+                      {announcement.courses?.code || 'Notice'}:
                     </span>
-                    <span className="truncate max-w-[280px] sm:max-w-md">
+                    <span className="truncate max-w-[280px] sm:max-w-md text-stone-600">
                       {announcement.title}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <Link href="/login?role=student" className="text-xs font-bold text-[#a05120] hover:text-[#63200c] flex items-center gap-1 uppercase tracking-wider font-display">
-                Full Schedule <ChevronRight className="h-3.5 w-3.5" />
+              <Link href="/login?role=student" className="text-xs font-condensed font-bold text-[#a05120] hover:text-[#864319] flex items-center gap-1 uppercase tracking-wider">
+                Full Bulletin <ChevronRight className="h-3.5 w-3.5" />
               </Link>
 
             </div>
@@ -242,26 +294,26 @@ export default function LandingPage() {
       <InstituteFeatureGrid />
 
       {/* ============================================================
-          STUDENT & FACULTY PORTAL ACCESS BANNER (CIID Studio Dark)
+          STUDENT & FACULTY PORTAL ACCESS BANNER
           ============================================================ */}
       <section id="announcements" className="py-16 px-4 sm:px-6 lg:px-8 max-w-[1360px] mx-auto">
-        <div className="relative bg-[#111111] border border-stone-800 p-8 sm:p-12 text-[#fbfbfa] overflow-hidden">
+        <div className="relative rounded-studio bg-[#111111] border border-stone-800 p-8 sm:p-12 text-[#fbfbfa] overflow-hidden">
           
-          <div className="relative z-10 max-w-2xl space-y-6 text-center sm:text-left">
-            <Badge className="bg-[#a8f1e0] text-[#111111] border-none rounded-pill px-4 py-1 font-semibold text-xs tracking-wider uppercase">
+          <div className="relative z-10 max-w-2xl space-y-5 text-center sm:text-left">
+            <Badge className="bg-[#a8f1e0] text-[#111111] border-none rounded-pill px-4 py-1 font-condensed font-bold text-xs tracking-wider uppercase">
               Enrolled Institute Members
             </Badge>
-            <h2 className="font-display font-bold uppercase text-3xl sm:text-5xl tracking-tight leading-tight">
+            <h2 className="font-display font-black uppercase text-3xl sm:text-5xl tracking-tight leading-tight">
               Ready to access your batch lectures and test series?
             </h2>
-            <p className="text-stone-300 text-sm sm:text-base leading-relaxed">
-              Login with your institute email to view your personalized classroom feed, submit homework sheets, and track your AIR mock test percentiles.
+            <p className="text-stone-300 text-xs sm:text-sm leading-relaxed">
+              Login with your institute account to view your personalized classroom feed, submit homework sheets, and track your AIR mock test percentiles.
             </p>
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-4">
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
               <Link href="/login?role=student" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto rounded-pill bg-[#a05120] hover:bg-[#854218] text-white font-medium px-8 h-12 text-sm shadow-sm"
+                  className="w-full sm:w-auto rounded-pill bg-[#a05120] hover:bg-[#864319] text-white font-condensed font-bold uppercase tracking-wider text-xs px-8 h-12 shadow-sm"
                 >
                   Student Portal Login
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -271,7 +323,7 @@ export default function LandingPage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto rounded-pill border-stone-600 bg-transparent text-[#fbfbfa] hover:bg-stone-900 font-medium px-7 h-12 text-sm"
+                  className="w-full sm:w-auto rounded-pill border-stone-700 bg-transparent text-[#fbfbfa] hover:bg-stone-900 font-condensed font-bold uppercase tracking-wider text-xs px-7 h-12"
                 >
                   Register New Enrolment
                 </Button>
@@ -287,14 +339,14 @@ export default function LandingPage() {
       <footer className="py-10 border-t border-stone-200 bg-white">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-[#111111] flex items-center justify-center text-white">
-              <GraduationCap className="h-4 w-4" />
+            <div className="h-8 w-8 rounded-pill bg-[#111111] flex items-center justify-center text-white font-display font-extrabold text-sm">
+              E
             </div>
             <span className="font-display font-bold uppercase text-lg text-[#111111]">EduFlow LMS</span>
-            <span className="text-xs text-stone-500 pl-2">© 2026 EduFlow Academic Studio. All rights reserved.</span>
+            <span className="text-xs text-stone-500 pl-2">© 2026 EduFlow Coaching Academy. All rights reserved.</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 font-condensed text-xs font-semibold uppercase tracking-wider">
             <Link href="/login?role=student">
               <Button variant="ghost" size="sm" className="rounded-pill text-stone-700 hover:text-stone-900 text-xs">
                 Student Access
@@ -306,7 +358,7 @@ export default function LandingPage() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="sm" className="rounded-pill bg-[#a05120] hover:bg-[#854218] text-white text-xs px-4">
+              <Button size="sm" className="rounded-pill bg-[#a05120] hover:bg-[#864319] text-white text-xs px-4">
                 Register
               </Button>
             </Link>
