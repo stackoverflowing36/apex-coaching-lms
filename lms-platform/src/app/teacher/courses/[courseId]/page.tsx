@@ -26,6 +26,7 @@ import {
   Link2,
   CheckCircle2,
   AlertTriangle,
+  Pencil,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
@@ -1448,6 +1449,14 @@ export default function CourseBuilderDetailPage() {
                     >
                       <Eye className="h-3.5 w-3.5" />
                       View Details
+                    </Link>
+                    <Link
+                      href={`/teacher/assignments/${assignment.id}`}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-orange-600 hover:bg-orange-50 hover:text-orange-700 transition-colors"
+                      title="Edit Assignment"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
                     </Link>
                     <button
                       onClick={() => handleDeleteAssignment(assignment.id)}

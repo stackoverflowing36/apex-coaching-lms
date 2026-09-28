@@ -70,11 +70,12 @@
   2. `Element implicitly has an 'any' type because index expression is not of type 'number'` (line 431): Cast `out[Number(page)] = ...` since `page` from `Object.entries(data)` is a `string`.
 - **Verification**: `npx tsc --noEmit` exits with 0 errors across both `src/` and `lms-platform/src/`.
 
-### F. Faculty Assignment Editing (Due Date & Parameters)
+### F. Faculty Assignment Editing (Due Date & Parameters) — COMPLETED
 - **Component / Pages**:
-  - `src/lib/supabase/queries.ts` (and mirror in `lms-platform/`): Added `updateAssignment(supabase, assignmentId, updates)`.
+  - `src/lib/supabase/queries.ts` (and mirror in `lms-platform/`): Added `updateAssignment(supabase, assignmentId, updates)` supporting `title`, `description`, `due_date`, `max_marks`, `chapter_id`, `course_id`.
   - `src/app/teacher/assignments/[assignmentId]/page.tsx` (and mirror in `lms-platform/`): Added "Edit Assignment" button and full modal dialog allowing faculty to edit title, due date, max marks, chapter, instructions, and attachments.
-- **Verification**: Mirrored to `lms-platform/`.
+  - `src/app/teacher/courses/[courseId]/page.tsx` (and mirror in `lms-platform/`): Added "Edit" button in the assignments list next to "View Details" and "Delete", linking to the assignment details page where the Edit modal lives.
+- **Verification**: `npx tsc --noEmit` passes with 0 errors; `npm run build` in `lms-platform/` passes with 0 errors across all 20+ routes.
 
 
 ---
