@@ -89,12 +89,12 @@
 @layer utilities {
   /* Studio card base (architectural 1px border, crisp layout) */
   .studio-card {
-    @apply rounded-none bg-white p-6 border border-stone-200/80 transition-all duration-200;
+    @apply rounded-[20px] bg-[#141414] p-6 border border-[#262626] text-white transition-all duration-200;
   }
 
   /* Floating card base (legacy backwards-compatibility) */
   .card-float {
-    @apply rounded-studio bg-white p-6 border border-stone-200/80 shadow-studio transition-all duration-300;
+    @apply rounded-[20px] bg-[#141414] p-6 border border-[#2a2a2a] text-white shadow-2xl transition-all duration-300;
   }
 
   /* Pill button (rounded-pill style) */
@@ -112,7 +112,7 @@
   }
 
   .btn-studio-outline {
-    @apply btn-pill border border-[#988a79] bg-transparent text-[#111111] hover:bg-[#f3f1ec] active:scale-[0.98];
+    @apply btn-pill border border-[#383838] bg-[#181818] text-white hover:border-[#a8f1e0] hover:text-[#a8f1e0] active:scale-[0.98];
   }
 
   /* Primary CTA (mapped to Rust) */

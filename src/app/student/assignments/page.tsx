@@ -75,31 +75,31 @@ export default function AssignmentsPage() {
     switch (status) {
       case 'graded':
         return (
-          <Badge variant="mint" className="text-xs uppercase font-semibold">
+          <span className="bg-[#9ee4a0] text-[#0c0c0c] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
             <Award className="h-3 w-3 mr-1" />
             {sub?.marks_obtained}/{sub?.assignments?.max_marks || '—'}
-          </Badge>
+          </span>
         );
       case 'submitted':
         return (
-          <Badge variant="stone" className="text-xs uppercase font-semibold">
-            <CheckCircle2 className="h-3 w-3 mr-1" />
+          <span className="bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
+            <CheckCircle2 className="h-3 w-3 mr-1 text-[#a8f1e0]" />
             Submitted
-          </Badge>
+          </span>
         );
       case 'overdue':
         return (
-          <Badge variant="rust" className="text-xs uppercase font-semibold">
+          <span className="bg-[#e2bcc2] text-[#0c0c0c] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
             <AlertCircle className="h-3 w-3 mr-1" />
             Overdue
-          </Badge>
+          </span>
         );
       default:
         return (
-          <Badge variant="gold" className="text-xs uppercase font-semibold">
+          <span className="bg-[#ffb956] text-[#0c0c0c] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
             <Clock className="h-3 w-3 mr-1" />
             Pending
-          </Badge>
+          </span>
         );
     }
   }
@@ -118,20 +118,20 @@ export default function AssignmentsPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-28 rounded-studio bg-stone-100 animate-pulse border border-stone-200" />
+          <div key={i} className="h-28 rounded-[20px] bg-[#141414] animate-pulse border border-[#2a2a2a]" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="max-w-[1360px] mx-auto space-y-6 animate-in fade-in duration-300">
       {/* Header */}
       <div>
-        <h1 className="font-display uppercase text-3xl sm:text-4xl font-bold text-[#111111] tracking-tight">
+        <h1 className="font-display uppercase text-3xl sm:text-4xl font-bold text-white tracking-tight">
           Assignments
         </h1>
-        <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500 mt-1">
+        <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#b7b7b5] mt-1">
           {assignments.length} total · {filtered.filter((a) => getStatus(a) === 'pending').length} pending evaluation
         </p>
       </div>
@@ -139,21 +139,21 @@ export default function AssignmentsPage() {
       {/* Filters (Capsule & Pills) */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-          <Input
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8e8e8e]" />
+          <input
             placeholder="Search assignments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 rounded-pill border-stone-200 bg-white focus:border-stone-900 focus:ring-0 text-xs"
+            className="w-full pl-10 pr-4 rounded-[20px] border border-[#383838] bg-[#181818] text-white placeholder:text-[#737373] focus:border-[#a8f1e0] focus:outline-none h-11 text-xs"
           />
         </div>
         <div className="flex gap-2 flex-wrap items-center">
           <button
             onClick={() => setSelectedCourse(null)}
-            className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
+            className={`px-4 py-2 rounded-[20px] text-xs font-semibold uppercase tracking-wider transition-all ${
               !selectedCourse
-                ? 'bg-[#111111] text-[#fbfbfa] shadow-sm'
-                : 'bg-white text-stone-600 border border-stone-200 hover:border-stone-400'
+                ? 'bg-[#a8f1e0] text-[#0c0c0c] font-bold shadow-md'
+                : 'bg-[#181818] text-[#b7b7b5] border border-[#2e2e2e] hover:border-[#a8f1e0] hover:text-white'
             }`}
           >
             All Batches
@@ -162,10 +162,10 @@ export default function AssignmentsPage() {
             <button
               key={c.id}
               onClick={() => setSelectedCourse(c.id === selectedCourse ? null : c.id)}
-              className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
+              className={`px-4 py-2 rounded-[20px] text-xs font-semibold uppercase tracking-wider transition-all ${
                 selectedCourse === c.id
-                  ? 'bg-[#a05120] text-white shadow-sm'
-                  : 'bg-white text-stone-600 border border-stone-200 hover:border-[#a05120]'
+                  ? 'bg-[#a8f1e0] text-[#0c0c0c] font-bold shadow-md'
+                  : 'bg-[#181818] text-[#b7b7b5] border border-[#2e2e2e] hover:border-[#a8f1e0] hover:text-white'
               }`}
             >
               {c.code}
@@ -176,9 +176,9 @@ export default function AssignmentsPage() {
 
       {/* Assignment Cards (Studio Cards) */}
       {filtered.length === 0 ? (
-        <div className="studio-card p-16 text-center">
-          <FileText className="h-12 w-12 text-stone-300 mx-auto mb-4" />
-          <p className="text-xs uppercase tracking-wider font-semibold text-stone-500 font-condensed">No assignments found</p>
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-[20px] p-16 text-center shadow-xl">
+          <FileText className="h-12 w-12 text-[#8e8e8e] mx-auto mb-4" />
+          <p className="text-xs uppercase tracking-wider font-semibold text-white font-condensed">No assignments found</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -191,29 +191,29 @@ export default function AssignmentsPage() {
                 href={`/student/assignments/${a.id}`}
                 className="group block"
               >
-                <div className="studio-card p-5 sm:p-6 hover:border-stone-900 transition-all duration-300">
+                <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-5 sm:p-6 transition-all duration-300 shadow-xl">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider bg-stone-200/70 px-2 py-0.5 rounded-pill font-condensed">
+                        <span className="text-[10px] font-bold text-[#a8f1e0] uppercase tracking-wider bg-[#1c1c1c] border border-[#333] px-2.5 py-0.5 rounded-[20px] font-condensed">
                           {a.courses?.code}
                         </span>
                         {a.course_chapters?.title && (
-                          <Badge variant="stone" className="text-[10px] px-1.5 py-0 uppercase font-semibold">
+                          <span className="text-[10px] px-2 py-0.5 uppercase font-bold bg-[#242424] text-white border border-[#383838] rounded-[20px]">
                             Chapter: {a.course_chapters.title}
-                          </Badge>
+                          </span>
                         )}
-                        <span className="text-stone-300">·</span>
-                        <span className="text-[11px] text-stone-500 font-condensed uppercase tracking-wider font-semibold">
+                        <span className="text-[#383838]">·</span>
+                        <span className="text-[11px] text-[#8e8e8e] font-condensed uppercase tracking-wider font-semibold">
                           Max {a.max_marks} marks
                         </span>
                       </div>
-                      <p className="font-semibold text-sm sm:text-base text-[#111111] group-hover:text-[#a05120] transition-colors truncate">
+                      <p className="font-semibold text-sm sm:text-base text-white group-hover:text-[#a8f1e0] transition-colors truncate">
                         {a.title}
                       </p>
                       <div className="flex items-center gap-4 mt-2">
-                        <span className="flex items-center gap-1.5 text-xs text-stone-500 font-condensed">
-                          <Calendar className="h-3.5 w-3.5 text-stone-400" />
+                        <span className="flex items-center gap-1.5 text-xs text-[#8e8e8e] font-condensed">
+                          <Calendar className="h-3.5 w-3.5 text-[#a8f1e0]" />
                           Due{' '}
                           {new Date(a.due_date).toLocaleDateString('en-IN', {
                             day: 'numeric',
@@ -222,16 +222,16 @@ export default function AssignmentsPage() {
                           })}
                         </span>
                         {status === 'pending' && (
-                          <Badge variant="gold" className="text-[10px] px-2 py-0 uppercase">
+                          <span className="bg-[#ffb956] text-[#0c0c0c] text-[10px] px-2.5 py-0.5 uppercase font-bold rounded-[20px]">
                             {getTimeUntil(a.due_date)}
-                          </Badge>
+                          </span>
                         )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
                       {getStatusBadge(status, sub)}
-                      <ArrowRight className="h-4 w-4 text-stone-300 group-hover:text-[#111111] group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="h-4 w-4 text-[#8e8e8e] group-hover:text-[#a8f1e0] group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
                 </div>

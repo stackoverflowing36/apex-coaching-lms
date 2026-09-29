@@ -37,18 +37,18 @@ export function EmptyState({
       className={cn(
         'flex flex-col items-center justify-center text-center',
         variant === 'default'
-          ? 'rounded-2xl bg-white/80 p-12 shadow-card backdrop-blur-sm'
+          ? 'rounded-[20px] bg-[#141414] border border-[#262626] p-12 shadow-card'
           : 'py-8',
         className
       )}
     >
       {/* Icon circle */}
-      <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50">
+      <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#181818] border border-[#383838]">
         {icon || defaultIcons.courses}
       </div>
 
-      <h3 className="mb-2 text-lg font-semibold text-slate-900">{title}</h3>
-      <p className="mb-6 max-w-sm text-sm text-gray-500">{description}</p>
+      <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
+      <p className="mb-6 max-w-sm text-sm text-[#b7b7b5]">{description}</p>
 
       {action && <div>{action}</div>}
     </div>

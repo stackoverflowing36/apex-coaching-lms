@@ -5,21 +5,22 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-[20px] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a8f1e0] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
   {
     variants: {
       variant: {
-        default: 'bg-[#a05120] text-white hover:bg-[#854218] shadow-sm',
-        rust: 'bg-[#a05120] text-white hover:bg-[#854218] shadow-sm',
-        dark: 'bg-[#111111] text-[#fbfbfa] hover:bg-[#262626] shadow-sm',
-        studioOutline: 'border border-[#988a79] bg-transparent text-[#111111] hover:bg-[#f3f1ec]',
-        destructive: 'bg-[#63200c] text-white hover:bg-[#4a1708] shadow-sm',
+        default: 'bg-[#a8f1e0] text-[#0c0c0c] hover:bg-[#9ee4a0] font-bold shadow-sm',
+        mint: 'bg-[#a8f1e0] text-[#0c0c0c] hover:bg-[#9ee4a0] font-bold shadow-sm',
+        rust: 'bg-[#a05120] text-white hover:bg-[#854218] font-bold shadow-sm',
+        dark: 'bg-[#141414] text-white border border-[#262626] hover:bg-[#1f1f1f] shadow-sm',
+        studioOutline: 'border border-[#383838] bg-[#181818] text-white hover:bg-[#222222] hover:text-[#a8f1e0]',
+        destructive: 'bg-[#63200c] text-white hover:bg-[#4a1708] font-bold shadow-sm',
         outline:
-          'border border-stone-300 bg-white text-stone-800 hover:border-[#a05120] hover:text-[#a05120]',
+          'border border-[#383838] bg-[#181818] text-white hover:bg-[#222222] hover:text-[#a8f1e0] hover:border-[#a8f1e0]',
         secondary:
-          'bg-[#f3f1ec] text-[#111111] hover:bg-[#eae6df]',
-        ghost: 'hover:bg-stone-100 text-stone-700',
-        link: 'text-[#a05120] underline-offset-4 hover:underline',
+          'bg-[#262626] text-white hover:bg-[#333333]',
+        ghost: 'text-[#b7b7b5] hover:text-white hover:bg-[#1f1f1f]',
+        link: 'text-[#a8f1e0] underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-6 py-2',

@@ -97,28 +97,28 @@ export default function StudentDashboard() {
     return (
       <div className="space-y-6">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-32 rounded-studio bg-stone-100 animate-pulse border border-stone-200" />
+          <div key={i} className="h-32 rounded-[20px] bg-[#141414] animate-pulse border border-[#2a2a2a]" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
+    <div className="max-w-[1360px] mx-auto space-y-8 animate-in fade-in duration-300">
       {/* ========== HERO GREETING (Split Studio Banner) ========== */}
-      <div className="relative overflow-hidden rounded-studio bg-[#1c1b18] p-8 sm:p-10 text-[#fbfbfa] border border-stone-800 shadow-sm">
+      <div className="relative overflow-hidden rounded-[20px] bg-[#141414] p-8 sm:p-10 text-white border border-[#2a2a2a] shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-[#a8f1e0] text-[#111111] text-xs font-semibold uppercase tracking-wider">
-              <Sparkles className="h-3.5 w-3.5" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#333333] text-xs font-semibold uppercase tracking-widest">
+              <Sparkles className="h-3.5 w-3.5 text-[#a8f1e0]" />
               <span>Academic Session 2026–27 • Student Studio</span>
             </div>
-            <h1 className="font-display text-3xl sm:text-5xl font-bold uppercase tracking-tight text-[#fbfbfa]">
+            <h1 className="font-display text-3xl sm:text-5xl font-bold uppercase tracking-tight text-white">
               Welcome back, {firstName}
             </h1>
-            <p className="text-stone-300 text-sm sm:text-base leading-relaxed">
+            <p className="text-[#b7b7b5] text-sm sm:text-base leading-relaxed">
               You have{' '}
-              <span className="font-semibold text-white underline decoration-[#a05120] decoration-2 underline-offset-4">
+              <span className="font-semibold text-white underline decoration-[#a8f1e0] decoration-2 underline-offset-4">
                 {stats.pendingAssignments} pending assignment{stats.pendingAssignments !== 1 ? 's' : ''}
               </span>{' '}
               and{' '}
@@ -129,12 +129,12 @@ export default function StudentDashboard() {
 
           <div className="flex flex-wrap items-center gap-3">
             <Link href="/student/assignments">
-              <button className="btn-pill btn-rust text-xs font-semibold uppercase tracking-wider py-2.5 px-5">
+              <button className="bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] text-xs font-bold uppercase tracking-wider py-3 px-6 rounded-[20px] shadow-md transition-all">
                 View Assignments
               </button>
             </Link>
             <Link href="/student/lectures">
-              <button className="btn-pill btn-studio-outline border-stone-700 text-stone-200 hover:bg-stone-800 text-xs font-semibold uppercase tracking-wider py-2.5 px-5">
+              <button className="bg-[#181818] hover:bg-[#222222] border border-[#383838] text-white hover:text-[#a8f1e0] hover:border-[#a8f1e0] text-xs font-semibold uppercase tracking-wider py-3 px-6 rounded-[20px] transition-all">
                 Lecture Vault
               </button>
             </Link>
@@ -143,65 +143,65 @@ export default function StudentDashboard() {
       </div>
 
       {/* ========== METRIC CARDS (Architectural 1px Studio Grid) ========== */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {/* Lectures */}
-        <div className="studio-card p-6 hover:border-stone-400 transition-all duration-300">
+        <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-6 transition-all duration-300 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-pill bg-stone-100 flex items-center justify-center text-stone-800">
-              <Video className="h-5 w-5" />
+            <div className="w-12 h-12 rounded-[16px] bg-[#1c1c1c] border border-[#2a2a2a] flex items-center justify-center text-[#a8f1e0]">
+              <Video className="h-6 w-6" />
             </div>
-            <Badge variant="stone" className="text-[10px] uppercase font-semibold">
+            <span className="bg-[#1c1c1c] text-[#a8f1e0] border border-[#333] text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-[20px]">
               Live Vault
-            </Badge>
+            </span>
           </div>
-          <p className="font-display text-4xl sm:text-5xl font-bold uppercase text-[#111111] tracking-tight">
+          <p className="font-display text-4xl sm:text-5xl font-bold uppercase text-white tracking-tight">
             {stats.totalLectures}
           </p>
-          <p className="text-xs uppercase tracking-wider text-stone-500 font-semibold font-condensed mt-2">
+          <p className="text-xs uppercase tracking-wider text-[#b7b7b5] font-semibold font-condensed mt-2">
             Lectures Available
           </p>
         </div>
 
         {/* Pending Assignments */}
-        <div className="studio-card p-6 hover:border-stone-400 transition-all duration-300">
+        <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-6 transition-all duration-300 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-pill bg-[#a05120]/10 flex items-center justify-center text-[#a05120]">
-              <FileText className="h-5 w-5" />
+            <div className="w-12 h-12 rounded-[16px] bg-[#ffb956]/15 text-[#ffb956] border border-[#ffb956]/30 flex items-center justify-center">
+              <FileText className="h-6 w-6" />
             </div>
             {stats.pendingAssignments > 0 ? (
-              <Badge variant="rust" className="text-[10px] uppercase font-semibold">
+              <span className="bg-[#ffb956] text-[#0c0c0c] text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-[20px]">
                 Action Required
-              </Badge>
+              </span>
             ) : (
-              <Badge variant="mint" className="text-[10px] uppercase font-semibold">
+              <span className="bg-[#9ee4a0] text-[#0c0c0c] text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-[20px]">
                 Up to Date
-              </Badge>
+              </span>
             )}
           </div>
-          <p className="font-display text-4xl sm:text-5xl font-bold uppercase text-[#111111] tracking-tight">
+          <p className="font-display text-4xl sm:text-5xl font-bold uppercase text-white tracking-tight">
             {stats.pendingAssignments}
           </p>
-          <p className="text-xs uppercase tracking-wider text-stone-500 font-semibold font-condensed mt-2">
+          <p className="text-xs uppercase tracking-wider text-[#b7b7b5] font-semibold font-condensed mt-2">
             Pending Tasks
           </p>
         </div>
 
         {/* Average Score */}
-        <div className="studio-card p-6 hover:border-stone-400 transition-all duration-300">
+        <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-6 transition-all duration-300 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-pill bg-[#a8f1e0]/30 flex items-center justify-center text-stone-800">
-              <Award className="h-5 w-5" />
+            <div className="w-12 h-12 rounded-[16px] bg-[#9ee4a0]/15 text-[#9ee4a0] border border-[#9ee4a0]/30 flex items-center justify-center">
+              <Award className="h-6 w-6" />
             </div>
             {stats.gradedCount > 0 && (
-              <Badge variant="mint" className="text-[10px] uppercase font-semibold">
-                {stats.gradedCount} graded
-              </Badge>
+              <span className="bg-[#9ee4a0] text-[#0c0c0c] text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-[20px]">
+                {stats.gradedCount} Graded
+              </span>
             )}
           </div>
-          <p className="font-display text-4xl sm:text-5xl font-bold uppercase text-[#111111] tracking-tight">
+          <p className="font-display text-4xl sm:text-5xl font-bold uppercase text-white tracking-tight">
             {stats.averageScore > 0 ? `${stats.averageScore}%` : '—'}
           </p>
-          <p className="text-xs uppercase tracking-wider text-stone-500 font-semibold font-condensed mt-2">
+          <p className="text-xs uppercase tracking-wider text-[#b7b7b5] font-semibold font-condensed mt-2">
             Average Score
           </p>
         </div>
@@ -210,40 +210,40 @@ export default function StudentDashboard() {
       {/* ========== TWO COLUMN: ANNOUNCEMENTS + DEADLINES ========== */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Announcements Feed */}
-        <div className="lg:col-span-3 studio-card overflow-hidden">
-          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-stone-100">
+        <div className="lg:col-span-3 bg-[#141414] border border-[#2a2a2a] rounded-[20px] overflow-hidden shadow-xl">
+          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#262626]">
             <div className="flex items-center gap-2.5">
-              <Megaphone className="h-4 w-4 text-[#a05120]" />
-              <h2 className="font-display uppercase text-lg font-bold text-[#111111] tracking-tight">
-                Dispatches & Notices
+              <Megaphone className="h-4 w-4 text-[#a8f1e0]" />
+              <h2 className="font-display uppercase text-lg font-bold text-white tracking-tight">
+                Dispatches &amp; Notices
               </h2>
             </div>
-            <Badge variant="rust" className="text-[10px] uppercase tracking-wider font-semibold">
+            <span className="bg-[#1c1c1c] text-[#a8f1e0] border border-[#333] text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-[20px]">
               {announcements.length} active
-            </Badge>
+            </span>
           </div>
 
-          <div className="divide-y divide-stone-100">
+          <div className="divide-y divide-[#222222]">
             {announcements.length === 0 ? (
-              <div className="px-6 py-12 text-center text-xs uppercase tracking-wider text-stone-400 font-condensed font-semibold">
+              <div className="px-6 py-12 text-center text-xs uppercase tracking-wider text-[#8e8e8e] font-condensed font-semibold">
                 No active announcements.
               </div>
             ) : (
               announcements.map((a) => (
                 <div
                   key={a.id}
-                  className="px-6 py-4 hover:bg-stone-50 transition-colors"
+                  className="px-6 py-4 hover:bg-[#181818] transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-[#111111] truncate">{a.title}</p>
-                      <p className="text-xs text-stone-600 mt-1 line-clamp-2 leading-relaxed">{a.content}</p>
+                      <p className="font-semibold text-sm text-white truncate">{a.title}</p>
+                      <p className="text-xs text-[#b7b7b5] mt-1 line-clamp-2 leading-relaxed">{a.content}</p>
                     </div>
-                    <Badge variant="stone" className="shrink-0 text-[10px] uppercase font-semibold">
+                    <span className="shrink-0 text-[10px] uppercase font-bold bg-[#1c1c1c] text-[#a8f1e0] border border-[#333] px-2 py-0.5 rounded-[20px]">
                       {a.courses?.code}
-                    </Badge>
+                    </span>
                   </div>
-                  <p className="text-[11px] text-stone-400 font-condensed uppercase tracking-wider mt-2.5">
+                  <p className="text-[11px] text-[#8e8e8e] font-condensed uppercase tracking-wider mt-2.5">
                     {new Date(a.posted_at).toLocaleDateString('en-IN', {
                       day: 'numeric',
                       month: 'short',
@@ -257,11 +257,11 @@ export default function StudentDashboard() {
         </div>
 
         {/* Upcoming Deadlines */}
-        <div className="lg:col-span-2 studio-card overflow-hidden">
-          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-stone-100">
+        <div className="lg:col-span-2 bg-[#141414] border border-[#2a2a2a] rounded-[20px] overflow-hidden shadow-xl">
+          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#262626]">
             <div className="flex items-center gap-2.5">
-              <Calendar className="h-4 w-4 text-stone-700" />
-              <h2 className="font-display uppercase text-lg font-bold text-[#111111] tracking-tight">
+              <Calendar className="h-4 w-4 text-[#a8f1e0]" />
+              <h2 className="font-display uppercase text-lg font-bold text-white tracking-tight">
                 Deadlines
               </h2>
             </div>
@@ -269,7 +269,7 @@ export default function StudentDashboard() {
 
           <div className="px-6 py-5 space-y-3">
             {upcomingAssignments.length === 0 ? (
-              <div className="py-12 text-center text-xs uppercase tracking-wider text-stone-400 font-condensed font-semibold">
+              <div className="py-12 text-center text-xs uppercase tracking-wider text-[#8e8e8e] font-condensed font-semibold">
                 All submissions up to date.
               </div>
             ) : (
@@ -279,26 +279,26 @@ export default function StudentDashboard() {
                   href={`/student/assignments/${a.id}`}
                   className="block group"
                 >
-                  <div className="rounded-studio border border-stone-200 p-4 hover:border-stone-900 transition-all duration-200 bg-[#fbfbfa]">
+                  <div className="rounded-[20px] border border-[#2e2e2e] p-4 hover:border-[#a8f1e0]/40 transition-all duration-200 bg-[#181818]">
                     <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider bg-stone-200/70 px-2 py-0.5 rounded-pill font-condensed">
+                        <span className="text-[10px] font-bold text-[#a8f1e0] uppercase tracking-wider bg-[#1c1c1c] border border-[#333] px-2 py-0.5 rounded-[20px] font-condensed">
                           {a.courses?.code}
                         </span>
                         {a.course_chapters?.title && (
-                          <Badge variant="stone" className="text-[10px] px-1.5 py-0">
+                          <span className="text-[10px] px-2 py-0.5 font-bold uppercase rounded-[20px] bg-[#242424] text-white border border-[#383838]">
                             {a.course_chapters.title}
-                          </Badge>
+                          </span>
                         )}
                       </div>
-                      <Badge variant="gold" className="text-[10px] px-2 py-0.5 uppercase tracking-wider">
+                      <span className="bg-[#ffb956] text-[#0c0c0c] text-[10px] px-2.5 py-0.5 uppercase tracking-wider font-bold rounded-[20px]">
                         {getTimeUntil(a.due_date)}
-                      </Badge>
+                      </span>
                     </div>
-                    <p className="font-semibold text-sm text-[#111111] group-hover:text-[#a05120] transition-colors">
+                    <p className="font-semibold text-sm text-white group-hover:text-[#a8f1e0] transition-colors">
                       {a.title}
                     </p>
-                    <div className="flex items-center gap-1.5 mt-2.5 text-xs text-stone-500 font-condensed">
+                    <div className="flex items-center gap-1.5 mt-2.5 text-xs text-[#8e8e8e] font-condensed">
                       <Clock className="h-3 w-3" />
                       <span>
                         Due{' '}
@@ -307,7 +307,7 @@ export default function StudentDashboard() {
                           month: 'short',
                         })}
                       </span>
-                      <span className="ml-auto text-[#a05120] font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity uppercase text-[10px] tracking-wider">
+                      <span className="ml-auto text-[#a8f1e0] font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity uppercase text-[10px] tracking-wider">
                         Submit <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>
@@ -320,47 +320,47 @@ export default function StudentDashboard() {
       </div>
 
       {/* ========== QUICK LINKS ========== */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <Link
           href="/student/lectures"
-          className="group flex items-center gap-4 studio-card p-5 hover:border-stone-900 transition-all duration-300"
+          className="group flex items-center gap-4 bg-[#141414] border border-[#2a2a2a] hover:border-[#a8f1e0]/40 rounded-[20px] p-5 shadow-lg transition-all duration-300"
         >
-          <div className="w-11 h-11 rounded-studio bg-stone-100 flex items-center justify-center text-stone-900 group-hover:bg-[#111111] group-hover:text-white transition-colors">
-            <BookOpen className="h-5 w-5" />
+          <div className="w-12 h-12 rounded-[16px] bg-[#1c1c1c] border border-[#2e2e2e] flex items-center justify-center text-[#a8f1e0] group-hover:scale-105 transition-transform">
+            <BookOpen className="h-6 w-6" />
           </div>
           <div>
-            <p className="font-semibold text-sm text-[#111111]">Lecture Vault</p>
-            <p className="text-xs text-stone-500">Recordings & study notes</p>
+            <p className="font-semibold text-sm text-white group-hover:text-[#a8f1e0] transition-colors">Lecture Vault</p>
+            <p className="text-xs text-[#8e8e8e]">Recordings &amp; study notes</p>
           </div>
-          <ArrowRight className="h-4 w-4 text-stone-300 ml-auto group-hover:text-[#111111] group-hover:translate-x-1 transition-all" />
+          <ArrowRight className="h-4 w-4 text-[#8e8e8e] ml-auto group-hover:text-[#a8f1e0] group-hover:translate-x-1 transition-all" />
         </Link>
 
         <Link
           href="/student/assignments"
-          className="group flex items-center gap-4 studio-card p-5 hover:border-stone-900 transition-all duration-300"
+          className="group flex items-center gap-4 bg-[#141414] border border-[#2a2a2a] hover:border-[#a8f1e0]/40 rounded-[20px] p-5 shadow-lg transition-all duration-300"
         >
-          <div className="w-11 h-11 rounded-studio bg-stone-100 flex items-center justify-center text-stone-900 group-hover:bg-[#111111] group-hover:text-white transition-colors">
-            <FileText className="h-5 w-5" />
+          <div className="w-12 h-12 rounded-[16px] bg-[#1c1c1c] border border-[#2e2e2e] flex items-center justify-center text-[#ffb956] group-hover:scale-105 transition-transform">
+            <FileText className="h-6 w-6" />
           </div>
           <div>
-            <p className="font-semibold text-sm text-[#111111]">Assignments</p>
-            <p className="text-xs text-stone-500">Submit work & feedback</p>
+            <p className="font-semibold text-sm text-white group-hover:text-[#a8f1e0] transition-colors">Assignments</p>
+            <p className="text-xs text-[#8e8e8e]">Submit work &amp; feedback</p>
           </div>
-          <ArrowRight className="h-4 w-4 text-stone-300 ml-auto group-hover:text-[#111111] group-hover:translate-x-1 transition-all" />
+          <ArrowRight className="h-4 w-4 text-[#8e8e8e] ml-auto group-hover:text-[#a8f1e0] group-hover:translate-x-1 transition-all" />
         </Link>
 
         <Link
           href="/student/grades"
-          className="group flex items-center gap-4 studio-card p-5 hover:border-stone-900 transition-all duration-300"
+          className="group flex items-center gap-4 bg-[#141414] border border-[#2a2a2a] hover:border-[#a8f1e0]/40 rounded-[20px] p-5 shadow-lg transition-all duration-300"
         >
-          <div className="w-11 h-11 rounded-studio bg-stone-100 flex items-center justify-center text-stone-900 group-hover:bg-[#111111] group-hover:text-white transition-colors">
-            <Award className="h-5 w-5" />
+          <div className="w-12 h-12 rounded-[16px] bg-[#1c1c1c] border border-[#2e2e2e] flex items-center justify-center text-[#9ee4a0] group-hover:scale-105 transition-transform">
+            <Award className="h-6 w-6" />
           </div>
           <div>
-            <p className="font-semibold text-sm text-[#111111]">Studio Grades</p>
-            <p className="text-xs text-stone-500">Performance & marks</p>
+            <p className="font-semibold text-sm text-white group-hover:text-[#a8f1e0] transition-colors">Studio Grades</p>
+            <p className="text-xs text-[#8e8e8e]">Performance &amp; marks</p>
           </div>
-          <ArrowRight className="h-4 w-4 text-stone-300 ml-auto group-hover:text-[#111111] group-hover:translate-x-1 transition-all" />
+          <ArrowRight className="h-4 w-4 text-[#8e8e8e] ml-auto group-hover:text-[#a8f1e0] group-hover:translate-x-1 transition-all" />
         </Link>
       </div>
     </div>

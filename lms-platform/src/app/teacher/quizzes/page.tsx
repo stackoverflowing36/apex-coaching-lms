@@ -301,14 +301,14 @@ export default function TeacherQuizEnginePage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center">
+            <div className="h-8 w-8 rounded-[12px] bg-[#1c1c1c] border border-[#2a2a2a] text-[#a8f1e0] flex items-center justify-center">
               <HelpCircle className="h-4 w-4" />
             </div>
-            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-white tracking-tight">
               Quiz &amp; MCQ Engine
             </h1>
           </div>
-          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#b7b7b5]">
             Author mock tests, daily practice quizzes (DPP), set correct answer keys, and configure timed assessments.
           </p>
         </div>
@@ -316,18 +316,18 @@ export default function TeacherQuizEnginePage() {
         {/* Create Quiz Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <button className="btn-pill btn-rust text-xs font-semibold uppercase tracking-wider py-2.5 px-5 flex items-center gap-1.5 shadow-sm">
-              <Plus className="h-4 w-4" />
+            <button className="bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-[20px] flex items-center gap-2 shadow-md transition-all">
+              <Plus className="h-4 w-4 text-[#0c0c0c]" />
               Create MCQ Quiz
             </button>
           </DialogTrigger>
-          <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="rounded-[20px] p-6 sm:p-8 max-w-2xl max-h-[90vh] overflow-y-auto bg-[#141414] border border-[#383838] text-white shadow-2xl">
             <DialogHeader className="space-y-1 text-left">
-              <DialogTitle className="font-heading font-extrabold text-xl text-slate-900 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-orange-600" />
+              <DialogTitle className="font-heading font-extrabold text-xl text-white flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-[#a8f1e0]" />
                 Build Timed MCQ Quiz
               </DialogTitle>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#8e8e8e]">
                 Configure quiz parameters, add questions, set options, and specify the correct answer keys.
               </p>
             </DialogHeader>
@@ -337,18 +337,18 @@ export default function TeacherQuizEnginePage() {
               {/* Batch & Quiz Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="batchSelect" className="text-xs font-bold text-slate-700">
+                  <Label htmlFor="batchSelect" className="text-xs font-bold text-[#e2bcc2]">
                     Target Classroom Batch
                   </Label>
                   <select
                     id="batchSelect"
                     value={selectedCourseId}
                     onChange={(e) => setSelectedCourseId(e.target.value)}
-                    className="w-full h-11 rounded-2xl border border-slate-200 bg-white px-3 text-base sm:text-xs font-medium focus:ring-2 focus:ring-orange-500"
+                    className="w-full h-11 bg-[#181818] text-white placeholder:text-[#737373] border border-[#383838] focus:border-[#a8f1e0] focus:outline-none rounded-[20px] px-3.5 text-xs font-medium"
                     required
                   >
                     {courses.map((c) => (
-                      <option key={c.id} value={c.id}>
+                      <option key={c.id} value={c.id} className="bg-[#181818] text-white">
                         {c.code} — {c.title}
                       </option>
                     ))}
@@ -356,17 +356,17 @@ export default function TeacherQuizEnginePage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="timeLimit" className="text-xs font-bold text-slate-700">
+                  <Label htmlFor="timeLimit" className="text-xs font-bold text-[#e2bcc2]">
                     Time Limit (Minutes)
                   </Label>
-                  <Input
+                  <input
                     id="timeLimit"
                     type="number"
                     min="5"
                     max="180"
                     value={timeLimitMinutes}
                     onChange={(e) => setTimeLimitMinutes(Number(e.target.value))}
-                    className="rounded-2xl h-11 text-base sm:text-xs"
+                    className="w-full h-11 bg-[#181818] text-white placeholder:text-[#737373] border border-[#383838] focus:border-[#a8f1e0] focus:outline-none rounded-[20px] px-3.5 text-xs font-medium"
                     required
                   />
                 </div>
@@ -374,21 +374,21 @@ export default function TeacherQuizEnginePage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="qTitle" className="text-xs font-bold text-slate-700">
+                  <Label htmlFor="qTitle" className="text-xs font-bold text-[#e2bcc2]">
                     Quiz Title
                   </Label>
-                  <Input
+                  <input
                     id="qTitle"
                     placeholder="e.g. Weekly Speed Mock #4: Electrostatics & Potential"
                     value={quizTitle}
                     onChange={(e) => setQuizTitle(e.target.value)}
-                    className="rounded-2xl h-11 text-base sm:text-xs font-medium"
+                    className="w-full h-11 bg-[#181818] text-white placeholder:text-[#737373] border border-[#383838] focus:border-[#a8f1e0] focus:outline-none rounded-[20px] px-3.5 text-xs font-medium"
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-bold text-slate-700">
+                  <Label className="text-xs font-bold text-[#e2bcc2]">
                     Chapter / Module
                   </Label>
                   {selectedCourseId ? (
@@ -399,7 +399,7 @@ export default function TeacherQuizEnginePage() {
                       onChange={setQuizChapterId}
                     />
                   ) : (
-                    <div className="h-11 border border-slate-200 rounded-xl bg-slate-50 flex items-center px-3 text-xs text-slate-400">
+                    <div className="h-11 border border-[#383838] rounded-[20px] bg-[#181818] flex items-center px-3.5 text-xs text-[#8e8e8e]">
                       Select a batch first...
                     </div>
                   )}
@@ -407,15 +407,15 @@ export default function TeacherQuizEnginePage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="qDesc" className="text-xs font-bold text-slate-700">
+                <Label htmlFor="qDesc" className="text-xs font-bold text-[#e2bcc2]">
                   Instructions / Description
                 </Label>
-                <Textarea
+                <textarea
                   id="qDesc"
                   placeholder="Instructions for students: +4 for correct, -1 for incorrect..."
                   value={quizDescription}
                   onChange={(e) => setQuizDescription(e.target.value)}
-                  className="rounded-2xl min-h-[60px] text-base sm:text-xs resize-none"
+                  className="w-full bg-[#181818] text-white placeholder:text-[#737373] border border-[#383838] focus:border-[#a8f1e0] focus:outline-none rounded-[20px] p-3 text-xs min-h-[60px] resize-none"
                 />
               </div>
 
@@ -425,42 +425,40 @@ export default function TeacherQuizEnginePage() {
                   id="allowReattempt"
                   checked={allowReattempt}
                   onChange={(e) => setAllowReattempt(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                  className="w-4 h-4 rounded border-[#383838] bg-[#181818] text-[#a8f1e0] focus:ring-[#a8f1e0] cursor-pointer"
                 />
-                <Label htmlFor="allowReattempt" className="text-xs font-bold text-slate-700 cursor-pointer">
+                <Label htmlFor="allowReattempt" className="text-xs font-bold text-white cursor-pointer">
                   Allow students to re-attempt this quiz multiple times
                 </Label>
               </div>
 
               {/* Dynamic Questions Builder */}
-              <div className="space-y-4 pt-2 border-t border-slate-100">
+              <div className="space-y-4 pt-3 border-t border-[#262626]">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-heading font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
+                  <h3 className="font-heading font-extrabold text-sm text-white flex items-center gap-2">
                     <span>Question Bank</span>
-                    <Badge className="bg-orange-100 text-orange-700 text-[10px] px-2 py-0 border-0">
+                    <span className="bg-[#1c1c1c] text-[#a8f1e0] border border-[#333] text-[10px] px-2 py-0.5 rounded-[20px] font-bold">
                       {questions.length} Questions
-                    </Badge>
+                    </span>
                   </h3>
 
-                  <Button
+                  <button
                     type="button"
                     onClick={handleAddQuestion}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full border-orange-300 text-orange-700 hover:bg-orange-50 text-xs font-bold h-8"
+                    className="border border-[#444] bg-[#1f1f1f] text-white hover:border-[#a8f1e0] hover:text-[#a8f1e0] rounded-[20px] px-4 py-1.5 text-xs font-bold flex items-center gap-1.5 transition-colors"
                   >
-                    <Plus className="h-3 w-3 mr-1" />
+                    <Plus className="h-3.5 w-3.5" />
                     Add Question
-                  </Button>
+                  </button>
                 </div>
 
                 <div className="space-y-4">
                   {questions.map((q, qIndex) => (
                     <div
                       key={qIndex}
-                      className="p-4 rounded-3xl bg-slate-50 border border-slate-200/80 space-y-3"
+                      className="p-4 rounded-[20px] bg-[#181818] border border-[#2e2e2e] space-y-3"
                     >
-                      {/* Rich Question Editor with Google Forms-like formatting toolbar & attachments */}
+                      {/* Rich Question Editor */}
                       <QuestionRichEditor
                         value={q.question_text}
                         onChange={(text) => handleQuestionTextChange(qIndex, text)}
@@ -474,7 +472,7 @@ export default function TeacherQuizEnginePage() {
 
                       {/* Options List */}
                       <div className="space-y-2 pt-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#8e8e8e]">
                           Options (Select the radio button for the correct answer)
                         </span>
 
@@ -484,10 +482,10 @@ export default function TeacherQuizEnginePage() {
                             return (
                               <div
                                 key={optIndex}
-                                className={`flex items-center gap-2 p-2 rounded-2xl border transition-all ${
+                                className={`flex items-center gap-2 p-2 rounded-[16px] border transition-all ${
                                   isCorrect
-                                    ? 'bg-emerald-50/80 border-emerald-300'
-                                    : 'bg-white border-slate-200'
+                                    ? 'bg-[#1a2d24] border-[#a8f1e0]'
+                                    : 'bg-[#141414] border-[#383838]'
                                 }`}
                               >
                                 <input
@@ -495,32 +493,32 @@ export default function TeacherQuizEnginePage() {
                                   name={`correct_opt_${qIndex}`}
                                   checked={isCorrect}
                                   onChange={() => handleSetCorrectOption(qIndex, optIndex)}
-                                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 cursor-pointer ml-1"
+                                  className="h-4 w-4 text-[#a8f1e0] focus:ring-[#a8f1e0] cursor-pointer ml-1"
                                 />
 
-                                <span className="text-xs font-bold text-slate-400 w-4">
+                                <span className="text-xs font-bold text-[#b7b7b5] w-4">
                                   {String.fromCharCode(65 + optIndex)}.
                                 </span>
 
-                                <Input
+                                <input
                                   value={opt}
                                   onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
                                   placeholder={`Option ${String.fromCharCode(65 + optIndex)}`}
-                                  className="rounded-xl h-8 text-xs bg-transparent border-0 focus-visible:ring-0 px-1"
+                                  className="rounded-[12px] h-8 text-xs bg-transparent text-white placeholder:text-[#737373] border-0 focus:outline-none flex-1 px-1"
                                   required
                                 />
 
                                 {isCorrect && (
-                                  <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0 border-0 flex-shrink-0">
-                                    Correct Answer Key
-                                  </Badge>
+                                  <span className="bg-[#a8f1e0] text-[#0c0c0c] text-[10px] font-bold px-2 py-0.5 rounded-[20px] flex-shrink-0">
+                                    Correct Answer
+                                  </span>
                                 )}
 
                                 {q.options.length > 2 && (
                                   <button
                                     type="button"
                                     onClick={() => handleRemoveOption(qIndex, optIndex)}
-                                    className="p-1 text-slate-300 hover:text-red-500"
+                                    className="p-1 text-[#8e8e8e] hover:text-red-400 transition-colors"
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </button>
@@ -534,10 +532,10 @@ export default function TeacherQuizEnginePage() {
                           <button
                             type="button"
                             onClick={() => handleAddOption(qIndex)}
-                            className="text-[11px] font-bold text-orange-600 hover:underline pt-1 inline-flex items-center gap-1"
+                            className="border border-[#444] bg-[#1f1f1f] text-white hover:border-[#a8f1e0] hover:text-[#a8f1e0] text-[11px] font-bold px-3 py-1.5 rounded-[20px] inline-flex items-center gap-1 transition-colors mt-1"
                           >
                             <Plus className="h-3 w-3" />
-                            Add Another Option
+                            Add Option
                           </button>
                         )}
                       </div>
@@ -547,20 +545,20 @@ export default function TeacherQuizEnginePage() {
               </div>
 
               {/* Submit CTA */}
-              <Button
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs h-11 shadow-lg shadow-orange-600/25"
+                className="w-full rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-bold text-xs h-12 shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin text-[#0c0c0c]" />
                     Saving Quiz to Supabase...
                   </span>
                 ) : (
                   `Publish Quiz (${questions.length} Questions)`
                 )}
-              </Button>
+              </button>
             </form>
           </DialogContent>
         </Dialog>
@@ -570,10 +568,10 @@ export default function TeacherQuizEnginePage() {
       <div className="flex flex-wrap items-center gap-2 pt-2">
         <button
           onClick={() => setSelectedCourseFilter('all')}
-          className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
+          className={`px-4 py-2 rounded-[20px] text-xs font-semibold uppercase tracking-wider transition-all ${
             selectedCourseFilter === 'all'
-              ? 'bg-[#111111] text-[#fbfbfa] shadow-sm'
-              : 'bg-white text-stone-600 hover:border-stone-400 border border-stone-200'
+              ? 'bg-[#a8f1e0] text-[#0c0c0c] font-bold shadow-md'
+              : 'bg-[#181818] text-[#b7b7b5] hover:text-white hover:border-[#a8f1e0] border border-[#2e2e2e]'
           }`}
         >
           All Batches ({quizzes.length})
@@ -586,10 +584,10 @@ export default function TeacherQuizEnginePage() {
             <button
               key={course.id}
               onClick={() => setSelectedCourseFilter(course.id)}
-              className={`px-4 py-2 rounded-pill text-xs font-semibold uppercase tracking-wider transition-all ${
+              className={`px-4 py-2 rounded-[20px] text-xs font-semibold uppercase tracking-wider transition-all ${
                 isSelected
-                  ? 'bg-[#a05120] text-white shadow-sm'
-                  : 'bg-white text-stone-600 hover:border-[#a05120] border border-stone-200'
+                  ? 'bg-[#a8f1e0] text-[#0c0c0c] font-bold shadow-md'
+                  : 'bg-[#181818] text-[#b7b7b5] hover:text-white hover:border-[#a8f1e0] border border-[#2e2e2e]'
               }`}
             >
               {course.code} ({count})
@@ -600,17 +598,17 @@ export default function TeacherQuizEnginePage() {
 
       {/* Quizzes List */}
       {loading ? (
-        <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
-          <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+        <div className="py-24 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
+          <div className="w-10 h-10 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
           <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading quizzes...</p>
         </div>
       ) : filteredQuizzes.length === 0 ? (
-        <div className="studio-card p-12 text-center space-y-4">
-          <HelpCircle className="h-12 w-12 text-stone-300 mx-auto" />
-          <h3 className="font-display font-bold uppercase text-lg text-[#111111] tracking-tight">
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-[20px] p-12 text-center space-y-4 shadow-xl">
+          <HelpCircle className="h-12 w-12 text-[#8e8e8e] mx-auto" />
+          <h3 className="font-display font-bold uppercase text-lg text-white tracking-tight">
             No Quizzes Found
           </h3>
-          <p className="text-xs text-stone-500 max-w-sm mx-auto">
+          <p className="text-xs text-[#8e8e8e] max-w-sm mx-auto">
             Click &quot;Create MCQ Quiz&quot; to author timed mock tests with automated answer keys.
           </p>
         </div>
@@ -619,48 +617,48 @@ export default function TeacherQuizEnginePage() {
           {filteredQuizzes.map((quiz) => (
             <div
               key={quiz.id}
-              className="studio-card p-6 hover:border-stone-900 transition-all flex flex-col justify-between space-y-5"
+              className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-6 transition-all flex flex-col justify-between space-y-5 shadow-xl"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Badge variant="stone" className="font-semibold uppercase tracking-wider text-[10px]">
+                  <span className="bg-[#1c1c1c] text-[#a8f1e0] border border-[#333] font-semibold uppercase tracking-wider text-[10px] px-2.5 py-0.5 rounded-[20px]">
                     {quiz.courses?.code || 'BATCH'}
-                  </Badge>
+                  </span>
 
-                  <div className="flex items-center gap-1.5 text-xs text-stone-500 font-condensed font-semibold">
-                    <Clock className="h-3.5 w-3.5 text-[#a05120]" />
+                  <div className="flex items-center gap-1.5 text-xs text-[#b7b7b5] font-condensed font-semibold">
+                    <Clock className="h-3.5 w-3.5 text-[#a8f1e0]" />
                     <span>{quiz.time_limit_minutes || 30} mins</span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-display font-bold uppercase text-base sm:text-lg text-[#111111] flex flex-wrap items-center gap-2 tracking-tight">
+                  <h3 className="font-display font-bold uppercase text-base sm:text-lg text-white flex flex-wrap items-center gap-2 tracking-tight">
                     {quiz.title}
                     {quiz.course_chapters?.title && (
-                      <Badge variant="rust" className="text-[10px] px-1.5 py-0 font-semibold uppercase">
+                      <span className="bg-[#ffb956] text-[#0c0c0c] text-[10px] px-2 py-0.5 font-bold uppercase rounded-[20px]">
                         {quiz.course_chapters.title}
-                      </Badge>
+                      </span>
                     )}
                   </h3>
-                  <p className="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#b7b7b5] mt-1 line-clamp-2 leading-relaxed">
                     {quiz.description || 'Timed practice assessment with instant answer evaluation.'}
                   </p>
                 </div>
 
                 {/* Question and Marks Stats */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100">
-                  <div className="p-2.5 rounded-studio bg-[#fbfbfa] border border-stone-200">
-                    <div className="font-display font-bold uppercase text-base text-stone-900">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#262626]">
+                  <div className="p-3 rounded-[16px] bg-[#181818] border border-[#2e2e2e]">
+                    <div className="font-display font-bold uppercase text-xl text-white">
                       {quiz.questions_count || 0}
                     </div>
-                    <div className="text-[10px] text-stone-400 font-condensed uppercase tracking-wider font-semibold">Questions</div>
+                    <div className="text-[10px] text-[#8e8e8e] font-condensed uppercase tracking-wider font-semibold">Questions</div>
                   </div>
 
-                  <div className="p-2.5 rounded-studio bg-[#fbfbfa] border border-stone-200">
-                    <div className="font-display font-bold uppercase text-base text-[#a05120]">
+                  <div className="p-3 rounded-[16px] bg-[#181818] border border-[#2e2e2e]">
+                    <div className="font-display font-bold uppercase text-xl text-[#a8f1e0]">
                       {quiz.total_marks || 0}
                     </div>
-                    <div className="text-[10px] text-stone-400 font-condensed uppercase tracking-wider font-semibold">Total Marks</div>
+                    <div className="text-[10px] text-[#8e8e8e] font-condensed uppercase tracking-wider font-semibold">Total Marks</div>
                   </div>
                 </div>
               </div>
@@ -669,15 +667,15 @@ export default function TeacherQuizEnginePage() {
               <div className="flex items-center gap-2 pt-2">
                 <button
                   onClick={() => handleOpenPreview(quiz.id)}
-                  className="btn-pill btn-studio-outline text-xs font-semibold uppercase tracking-wider py-2 px-4 flex-1 flex items-center justify-center gap-1.5"
+                  className="bg-[#1f1f1f] hover:bg-[#282828] text-white border border-[#383838] hover:border-[#a8f1e0] text-xs font-semibold uppercase tracking-wider py-2.5 px-4 rounded-[20px] flex-1 flex items-center justify-center gap-1.5 transition-all"
                 >
-                  <Eye className="h-3.5 w-3.5 text-stone-400" />
+                  <Eye className="h-3.5 w-3.5 text-[#a8f1e0]" />
                   Preview Key
                 </button>
 
                 <button
                   onClick={() => handleDeleteQuiz(quiz.id)}
-                  className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  className="p-2.5 rounded-full text-[#8e8e8e] hover:text-red-400 hover:bg-[#262626] transition-colors"
                   title="Delete Quiz"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -690,39 +688,39 @@ export default function TeacherQuizEnginePage() {
 
       {/* Quiz Preview Modal */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="rounded-3xl p-6 sm:p-8 max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="rounded-[20px] p-6 sm:p-8 max-w-2xl max-h-[85vh] overflow-y-auto bg-[#141414] border border-[#383838] text-white shadow-2xl">
           <DialogHeader className="space-y-1 text-left">
-            <DialogTitle className="font-heading font-extrabold text-xl text-slate-900">
+            <DialogTitle className="font-heading font-extrabold text-xl text-white">
               {previewQuiz?.title || 'Quiz Preview'}
             </DialogTitle>
-            <div className="flex items-center gap-3 text-xs text-slate-500">
-              <span>{previewQuiz?.courses?.code}</span>
+            <div className="flex items-center gap-3 text-xs text-[#8e8e8e]">
+              <span className="text-[#a8f1e0] font-semibold">{previewQuiz?.courses?.code}</span>
               <span>•</span>
               <span>{previewQuiz?.time_limit_minutes} minutes</span>
             </div>
           </DialogHeader>
 
           {loadingPreview ? (
-            <div className="py-12 flex justify-center text-slate-400">
-              <Loader2 className="h-6 w-6 animate-spin" />
+            <div className="py-12 flex justify-center text-[#8e8e8e]">
+              <Loader2 className="h-6 w-6 animate-spin text-[#a8f1e0]" />
             </div>
           ) : (
             <div className="space-y-4 pt-4">
               {previewQuiz?.quiz_questions?.map((q: any, idx: number) => (
-                <div key={q.id || idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                <div key={q.id || idx} className="p-4 rounded-[20px] bg-[#181818] border border-[#2e2e2e] space-y-3">
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1 flex-1">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#a8f1e0]">
                         Question #{idx + 1}
                       </span>
                       <FormattedQuestionText
                         text={q.question_text}
-                        textClassName="text-sm font-semibold text-slate-900 leading-relaxed"
+                        textClassName="text-sm font-semibold text-white leading-relaxed"
                       />
                     </div>
-                    <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0 border-0 shrink-0">
+                    <span className="bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] text-[10px] font-bold px-2 py-0.5 rounded-[20px] shrink-0">
                       {q.marks} Mark{q.marks > 1 ? 's' : ''}
-                    </Badge>
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
@@ -731,17 +729,17 @@ export default function TeacherQuizEnginePage() {
                       return (
                         <div
                           key={optIdx}
-                          className={`p-2 rounded-xl text-xs font-medium border flex items-center gap-2 ${
+                          className={`p-2.5 rounded-[14px] text-xs font-medium border flex items-center gap-2 ${
                             isCorrect
-                              ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold'
-                              : 'bg-white border-slate-200 text-slate-700'
+                              ? 'bg-[#1a2d24] border-[#a8f1e0] text-[#a8f1e0] font-bold'
+                              : 'bg-[#141414] border-[#383838] text-[#d4d4d4]'
                           }`}
                         >
-                          <span className="text-[10px] font-bold opacity-60">
+                          <span className="text-[10px] font-bold opacity-70">
                             {String.fromCharCode(65 + optIdx)}.
                           </span>
-                          <span>{opt}</span>
-                          {isCorrect && <Check className="h-3.5 w-3.5 ml-auto text-emerald-600" />}
+                          <span className="flex-1">{opt}</span>
+                          {isCorrect && <Check className="h-3.5 w-3.5 text-[#a8f1e0]" />}
                         </div>
                       );
                     })}

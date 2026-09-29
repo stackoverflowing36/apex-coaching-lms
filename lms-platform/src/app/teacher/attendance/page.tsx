@@ -189,14 +189,14 @@ export default function TeacherAttendancePage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center">
+            <div className="h-8 w-8 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center">
               <CalendarCheck className="h-4 w-4" />
             </div>
-            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-white tracking-tight">
               Classroom Attendance Register
             </h1>
           </div>
-          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#b7b7b5]">
             Log daily batch attendance, record leaves/absences, and synchronize records across student profiles.
           </p>
         </div>
@@ -205,7 +205,7 @@ export default function TeacherAttendancePage() {
           <Button
             onClick={handleSaveAttendance}
             disabled={isSaving || loading || roster.length === 0}
-            className="rounded-pill bg-[#a05120] hover:bg-[#864319] text-white font-condensed font-bold uppercase tracking-wider text-xs h-10 px-6 shadow-sm transition-all"
+            className="rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-condensed font-bold uppercase tracking-wider text-xs h-10 px-6 shadow-sm transition-all"
           >
             {isSaving ? (
               <span className="flex items-center gap-2">
@@ -223,22 +223,22 @@ export default function TeacherAttendancePage() {
       </div>
 
       {/* Control Filters Bar (Batch Selector + Date Picker) */}
-      <div className="studio-card p-5 space-y-4">
+      <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px] space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
           
           {/* Batch Selector */}
           <div className="sm:col-span-6 space-y-1.5">
-            <Label htmlFor="batchSelect" className="text-[10px] font-bold uppercase tracking-wider font-condensed text-stone-700">
+            <Label htmlFor="batchSelect" className="text-[10px] font-bold uppercase tracking-wider font-condensed text-[#e2bcc2]">
               Classroom Batch
             </Label>
             <select
               id="batchSelect"
               value={selectedCourseId}
               onChange={(e) => setSelectedCourseId(e.target.value)}
-              className="w-full h-10 rounded-pill border border-stone-200 bg-[#fbfbfa] px-3.5 text-xs font-semibold uppercase tracking-wider text-stone-800 focus:border-stone-900"
+              className="w-full h-10 rounded-[20px] border border-[#383838] bg-[#181818] px-3.5 text-xs font-semibold uppercase tracking-wider text-white focus:border-[#a8f1e0] focus:outline-none"
             >
               {courses.map((c) => (
-                <option key={c.id} value={c.id}>
+                <option key={c.id} value={c.id} className="bg-[#181818] text-white">
                   {c.code} — {c.title}
                 </option>
               ))}
@@ -247,17 +247,17 @@ export default function TeacherAttendancePage() {
 
           {/* Date Picker */}
           <div className="sm:col-span-4 space-y-1.5">
-            <Label htmlFor="dateSelect" className="text-[10px] font-bold uppercase tracking-wider font-condensed text-stone-700">
+            <Label htmlFor="dateSelect" className="text-[10px] font-bold uppercase tracking-wider font-condensed text-[#e2bcc2]">
               Session Date
             </Label>
             <div className="relative">
-              <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+              <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8e8e8e]" />
               <Input
                 id="dateSelect"
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="pl-10 h-10 rounded-pill text-xs font-medium bg-[#fbfbfa] border-stone-200 focus:border-stone-900"
+                className="pl-10 h-10 rounded-[20px] text-xs font-medium bg-[#181818] border-[#383838] text-white focus:border-[#a8f1e0]"
               />
             </div>
           </div>
@@ -268,9 +268,9 @@ export default function TeacherAttendancePage() {
               type="button"
               variant="outline"
               onClick={() => handleMarkAll('present')}
-              className="w-full h-10 rounded-pill border-stone-300 bg-[#a8f1e0]/40 text-stone-900 hover:bg-[#a8f1e0]/70 text-xs font-bold font-condensed uppercase tracking-wider"
+              className="w-full h-10 rounded-[20px] border-[#383838] bg-[#181818] text-[#a8f1e0] hover:bg-[#a8f1e0] hover:text-[#0c0c0c] text-xs font-bold font-condensed uppercase tracking-wider transition-all"
             >
-              <CheckCheck className="h-4 w-4 mr-1.5 text-stone-800" />
+              <CheckCheck className="h-4 w-4 mr-1.5" />
               All Present
             </Button>
           </div>
@@ -280,49 +280,49 @@ export default function TeacherAttendancePage() {
 
       {/* KPI Stats Bar (Architectural 1px Studio Grid) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="studio-card p-4">
-          <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-condensed">Enrolled Students</div>
-          <div className="font-display font-bold uppercase text-3xl text-[#111111] mt-1">
+        <div className="studio-card p-4 bg-[#141414] border border-[#262626] rounded-[20px]">
+          <div className="text-[10px] font-bold text-[#8e8e8e] uppercase tracking-wider font-condensed">Enrolled Students</div>
+          <div className="font-display font-bold uppercase text-3xl text-white mt-1">
             {totalStudents}
           </div>
         </div>
 
-        <div className="studio-card p-4">
-          <div className="text-[10px] font-bold text-stone-600 uppercase tracking-wider font-condensed">Present Today</div>
-          <div className="font-display font-bold uppercase text-3xl text-stone-900 mt-1">
+        <div className="studio-card p-4 bg-[#141414] border border-[#262626] rounded-[20px]">
+          <div className="text-[10px] font-bold text-[#a8f1e0] uppercase tracking-wider font-condensed">Present Today</div>
+          <div className="font-display font-bold uppercase text-3xl text-white mt-1">
             {presentCount}
           </div>
         </div>
 
-        <div className="studio-card p-4">
-          <div className="text-[10px] font-bold text-[#a05120] uppercase tracking-wider font-condensed">Absent</div>
-          <div className="font-display font-bold uppercase text-3xl text-[#a05120] mt-1">
+        <div className="studio-card p-4 bg-[#141414] border border-[#262626] rounded-[20px]">
+          <div className="text-[10px] font-bold text-[#e2bcc2] uppercase tracking-wider font-condensed">Absent</div>
+          <div className="font-display font-bold uppercase text-3xl text-white mt-1">
             {absentCount}
           </div>
         </div>
 
-        <div className="studio-card p-4">
-          <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-condensed">Batch Attendance Rate</div>
-          <div className="font-display font-bold uppercase text-3xl text-[#111111] mt-1">
+        <div className="studio-card p-4 bg-[#141414] border border-[#262626] rounded-[20px]">
+          <div className="text-[10px] font-bold text-[#ffb956] uppercase tracking-wider font-condensed">Batch Attendance Rate</div>
+          <div className="font-display font-bold uppercase text-3xl text-white mt-1">
             {attendanceRate}%
           </div>
         </div>
       </div>
 
       {/* Student Attendance Roster Table */}
-      <div className="studio-card overflow-hidden space-y-4 p-5 sm:p-6">
+      <div className="studio-card overflow-hidden space-y-4 p-5 sm:p-6 bg-[#141414] border border-[#262626] rounded-[20px]">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#262626] pb-4">
           <div className="space-y-0.5">
-            <h3 className="font-display font-bold uppercase text-base text-[#111111] tracking-tight">
+            <h3 className="font-display font-bold uppercase text-base text-white tracking-tight">
               Student Register — {currentCourse?.code || 'Batch'}
             </h3>
-            <p className="text-xs uppercase tracking-wider font-condensed text-stone-500">
-              Date: <span className="font-bold text-stone-800">{new Date(selectedDate).toDateString()}</span>
+            <p className="text-xs uppercase tracking-wider font-condensed text-[#b7b7b5]">
+              Date: <span className="font-bold text-white">{new Date(selectedDate).toDateString()}</span>
               {isSavedPreviously && (
-                <span className="ml-2 inline-flex items-center gap-1 text-stone-900 font-bold text-[10px] bg-[#a8f1e0] px-2 py-0.5 rounded-pill uppercase tracking-wider font-condensed">
+                <span className="ml-2 inline-flex items-center gap-1 text-[#0c0c0c] font-bold text-[10px] bg-[#a8f1e0] px-2 py-0.5 rounded-[20px] uppercase tracking-wider font-condensed">
                   <CheckCircle2 className="h-3 w-3" />
-                  Saved in Supabase
+                  Saved in Database
                 </span>
               )}
             </p>
@@ -334,7 +334,7 @@ export default function TeacherAttendancePage() {
               variant="ghost"
               size="sm"
               onClick={() => handleMarkAll('absent')}
-              className="text-[11px] text-stone-500 hover:text-[#a05120] h-7 px-3 rounded-pill uppercase tracking-wider font-condensed font-bold"
+              className="text-[11px] text-[#8e8e8e] hover:text-[#ff6b6b] h-7 px-3 rounded-[20px] uppercase tracking-wider font-condensed font-bold"
             >
               Reset to Absent
             </Button>
@@ -342,14 +342,14 @@ export default function TeacherAttendancePage() {
         </div>
 
         {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center text-stone-400 gap-3">
-            <div className="w-8 h-8 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+          <div className="py-20 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
+            <div className="w-8 h-8 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
             <p className="text-xs font-semibold uppercase tracking-wider font-condensed">Loading batch roster...</p>
           </div>
         ) : roster.length === 0 ? (
-          <div className="py-12 text-center text-stone-400 space-y-2">
-            <Users className="h-8 w-8 mx-auto text-stone-300" />
-            <p className="text-xs font-semibold uppercase tracking-wider font-condensed text-stone-600">No students registered yet</p>
+          <div className="py-12 text-center text-[#8e8e8e] space-y-2">
+            <Users className="h-8 w-8 mx-auto text-[#8e8e8e]" />
+            <p className="text-xs font-semibold uppercase tracking-wider font-condensed text-[#b7b7b5]">No students registered yet</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -364,53 +364,53 @@ export default function TeacherAttendancePage() {
               return (
                 <div
                   key={student.id}
-                  className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3.5 rounded-studio bg-[#fbfbfa] border border-stone-200 hover:border-stone-400 transition-colors"
+                  className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3.5 rounded-[16px] bg-[#181818] border border-[#383838] hover:border-[#a8f1e0]/40 transition-colors"
                 >
                   {/* Student Info */}
                   <div className="flex items-center gap-3 min-w-[200px]">
-                    <span className="text-xs font-bold font-condensed text-stone-400 w-5 text-center">
+                    <span className="text-xs font-bold font-condensed text-[#8e8e8e] w-5 text-center">
                       {idx + 1}
                     </span>
-                    <Avatar className="h-9 w-9 border border-stone-300">
+                    <Avatar className="h-9 w-9 border border-[#383838]">
                       <AvatarImage src={student.avatar_url ?? undefined} />
-                      <AvatarFallback className="bg-[#111111] text-[#fbfbfa] font-bold text-xs">
+                      <AvatarFallback className="bg-[#1c1c1c] text-[#a8f1e0] font-bold text-xs">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
                     <div className="space-y-0.5 overflow-hidden">
-                      <div className="font-semibold text-xs sm:text-sm text-stone-900 truncate">
+                      <div className="font-semibold text-xs sm:text-sm text-white truncate">
                         {student.full_name}
                       </div>
-                      <div className="text-[10px] text-stone-400 truncate font-condensed">
+                      <div className="text-[10px] text-[#8e8e8e] truncate font-condensed">
                         {student.email}
                       </div>
                     </div>
                   </div>
 
                   {/* Status Selection Pills */}
-                  <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-pill border border-stone-200">
+                  <div className="flex items-center gap-1.5 bg-[#141414] p-1 rounded-[20px] border border-[#383838]">
                     {(['present', 'absent', 'late', 'excused'] as AttendanceStatus[]).map(
                       (st) => {
                         const isCurrent = student.status === st;
                         let activeStyles = '';
                         if (st === 'present')
-                          activeStyles = 'bg-[#a8f1e0] text-stone-900 shadow-sm';
+                          activeStyles = 'bg-[#a8f1e0] text-[#0c0c0c] shadow-sm';
                         if (st === 'absent')
-                          activeStyles = 'bg-[#e2bcc2] text-stone-900 shadow-sm';
+                          activeStyles = 'bg-[#e2bcc2] text-[#0c0c0c] shadow-sm';
                         if (st === 'late')
-                          activeStyles = 'bg-[#ffb956] text-stone-900 shadow-sm';
+                          activeStyles = 'bg-[#ffb956] text-[#0c0c0c] shadow-sm';
                         if (st === 'excused')
-                          activeStyles = 'bg-[#b39dff] text-stone-900 shadow-sm';
+                          activeStyles = 'bg-[#9dc1ff] text-[#0c0c0c] shadow-sm';
 
                         return (
                           <button
                             key={st}
                             type="button"
                             onClick={() => handleStatusChange(student.id, st)}
-                            className={`px-3 py-1 rounded-pill text-[11px] font-bold uppercase tracking-wider font-condensed transition-all ${
+                            className={`px-3 py-1 rounded-[20px] text-[11px] font-bold uppercase tracking-wider font-condensed transition-all ${
                               isCurrent
                                 ? activeStyles
-                                : 'text-stone-500 hover:text-stone-900 hover:bg-stone-200/50'
+                                : 'text-[#8e8e8e] hover:text-white hover:bg-[#202020]'
                             }`}
                           >
                             {st}
@@ -426,7 +426,7 @@ export default function TeacherAttendancePage() {
                       placeholder="Remarks (e.g. medical, leave)..."
                       value={student.remarks}
                       onChange={(e) => handleRemarksChange(student.id, e.target.value)}
-                      className="h-8 rounded-pill text-xs bg-white border-stone-200 focus:border-stone-900"
+                      className="h-8 rounded-[20px] text-xs bg-[#141414] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
                     />
                   </div>
                 </div>
@@ -436,14 +436,14 @@ export default function TeacherAttendancePage() {
         )}
 
         {/* Bottom Save Trigger */}
-        <div className="pt-4 border-t border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <span className="text-xs uppercase tracking-wider font-condensed text-stone-400">
+        <div className="pt-4 border-t border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span className="text-xs uppercase tracking-wider font-condensed text-[#8e8e8e]">
             Records update immediately in students&apos; attendance portal.
           </span>
           <Button
             onClick={handleSaveAttendance}
             disabled={isSaving || loading || roster.length === 0}
-            className="rounded-pill bg-[#a05120] hover:bg-[#864319] text-white font-condensed font-bold uppercase tracking-wider text-xs h-10 px-6 shadow-sm"
+            className="rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-condensed font-bold uppercase tracking-wider text-xs h-10 px-6 shadow-sm"
           >
             {isSaving ? 'Saving...' : 'Save & Synchronize Attendance'}
           </Button>

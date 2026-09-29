@@ -206,23 +206,23 @@ export function QuestionRichEditor({
       {/* Question Header & Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-extrabold shadow-sm">
+          <span className="w-6 h-6 rounded-full bg-[#1c1c1c] border border-[#383838] text-[#a8f1e0] flex items-center justify-center text-xs font-extrabold shadow-sm">
             {qIndex + 1}
           </span>
-          <span className="text-xs font-bold text-slate-800">Question #{qIndex + 1}</span>
+          <span className="text-xs font-bold text-white">Question #{qIndex + 1}</span>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Marks input */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-slate-500">Marks:</span>
-            <Input
+            <span className="text-[11px] font-semibold text-[#b7b7b5]">Marks:</span>
+            <input
               type="number"
               min="1"
               max="20"
               value={marks}
               onChange={(e) => onMarksChange(Number(e.target.value))}
-              className="w-14 h-7 rounded-lg text-xs text-center font-bold"
+              className="w-14 h-8 rounded-[12px] text-xs text-center font-bold bg-[#181818] text-white placeholder:text-[#737373] border border-[#383838] focus:border-[#a8f1e0] focus:outline-none"
             />
           </div>
 
@@ -230,10 +230,10 @@ export function QuestionRichEditor({
           <button
             type="button"
             onClick={() => setIsPreview(!isPreview)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-[20px] text-xs font-semibold border transition-all ${
               isPreview
-                ? 'bg-orange-600 text-white shadow-xs'
-                : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900'
+                ? 'bg-[#a8f1e0] text-[#0c0c0c] font-bold border-[#a8f1e0]'
+                : 'bg-[#181818] border-[#383838] text-white hover:border-[#a8f1e0] hover:text-[#a8f1e0]'
             }`}
             title="Toggle Student Preview"
           >
@@ -246,7 +246,7 @@ export function QuestionRichEditor({
             <button
               type="button"
               onClick={onRemoveQuestion}
-              className="p-1 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-full text-[#8e8e8e] hover:text-red-400 hover:bg-[#262626] transition-colors"
               title="Remove question"
             >
               <Trash2 className="h-4 w-4" />
@@ -257,21 +257,21 @@ export function QuestionRichEditor({
 
       {/* Editor Body */}
       {isPreview ? (
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-inner min-h-[110px]">
+        <div className="p-4 rounded-[20px] bg-[#181818] border border-[#383838] text-white shadow-inner min-h-[110px]">
           <FormattedQuestionText
             text={value || '*(No question text entered yet)*'}
-            textClassName="text-sm font-medium text-slate-900 leading-relaxed"
+            textClassName="text-sm font-medium text-white leading-relaxed"
           />
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
-          {/* Google Forms-style Formatting Toolbar */}
-          <div className="flex flex-wrap items-center gap-1 px-2 py-1.5 bg-slate-50 border-b border-slate-200/80 text-slate-700">
+        <div className="rounded-[20px] border border-[#383838] bg-[#181818] overflow-hidden focus-within:border-[#a8f1e0] transition-all">
+          {/* Formatting Toolbar */}
+          <div className="flex flex-wrap items-center gap-1 px-2.5 py-2 bg-[#141414] border-b border-[#2e2e2e] text-[#d4d4d4]">
             {/* Bold */}
             <button
               type="button"
               onClick={() => wrapSelection('**', '**', 'bold text')}
-              className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-700 font-bold transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[#262626] text-[#d4d4d4] hover:text-white font-bold transition-colors"
               title="Bold (**text**)"
             >
               <Bold className="h-3.5 w-3.5" />
@@ -281,7 +281,7 @@ export function QuestionRichEditor({
             <button
               type="button"
               onClick={() => wrapSelection('*', '*', 'italic text')}
-              className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-700 italic transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[#262626] text-[#d4d4d4] hover:text-white italic transition-colors"
               title="Italic (*text*)"
             >
               <Italic className="h-3.5 w-3.5" />
@@ -291,7 +291,7 @@ export function QuestionRichEditor({
             <button
               type="button"
               onClick={() => wrapSelection('<u>', '</u>', 'underlined text')}
-              className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-700 underline transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[#262626] text-[#d4d4d4] hover:text-white underline transition-colors"
               title="Underline (<u>text</u>)"
             >
               <Underline className="h-3.5 w-3.5" />
@@ -301,54 +301,54 @@ export function QuestionRichEditor({
             <button
               type="button"
               onClick={() => wrapSelection('`', '`', 'formula/code')}
-              className="p-1.5 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-mono"
+              className="p-1.5 rounded-lg hover:bg-[#262626] text-[#d4d4d4] hover:text-white transition-colors font-mono"
               title="Inline Code or Formula (`code`)"
             >
               <Code className="h-3.5 w-3.5" />
             </button>
 
-            <div className="h-4 w-px bg-slate-300 mx-1" />
+            <div className="h-4 w-px bg-[#333333] mx-1" />
 
             {/* Font Style Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-[#262626] text-xs font-semibold text-[#d4d4d4] hover:text-white transition-colors"
                   title="Change Font Family / Style"
                 >
                   <Type className="h-3.5 w-3.5" />
                   <span>Font</span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="rounded-xl shadow-xl border-slate-200 text-xs z-50">
+              <DropdownMenuContent align="start" className="rounded-[16px] shadow-2xl bg-[#141414] border border-[#383838] text-white text-xs z-50">
                 <DropdownMenuItem
                   onClick={() => wrapSelection('[font=sans]', '[/font]', 'Standard text')}
-                  className="font-sans"
+                  className="font-sans hover:bg-[#222222] focus:bg-[#222222] text-white cursor-pointer"
                 >
                   Default Sans
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => wrapSelection('[font=serif]', '[/font]', 'Classic editorial text')}
-                  className="font-serif tracking-wide"
+                  className="font-serif tracking-wide hover:bg-[#222222] focus:bg-[#222222] text-white cursor-pointer"
                 >
                   Classic Serif
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => wrapSelection('[font=mono]', '[/font]', 'Monospace code')}
-                  className="font-mono text-slate-800"
+                  className="font-mono hover:bg-[#222222] focus:bg-[#222222] text-white cursor-pointer"
                 >
                   Monospace (Code)
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => wrapSelection('[font=math]', '[/font]', 'E = mc²')}
-                  className="font-mono text-indigo-900 font-semibold"
+                  className="font-mono hover:bg-[#222222] focus:bg-[#222222] text-[#a8f1e0] font-semibold cursor-pointer"
                 >
                   Math Formula
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => wrapSelection('[font=heading]', '[/font]', 'Prominent Question Header')}
-                  className="font-extrabold text-slate-900"
+                  className="font-extrabold hover:bg-[#222222] focus:bg-[#222222] text-white cursor-pointer"
                 >
                   Heading Style
                 </DropdownMenuItem>
@@ -359,33 +359,33 @@ export function QuestionRichEditor({
             <button
               type="button"
               onClick={() => setShowSymbols(!showSymbols)}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-colors ${
-                showSymbols ? 'bg-orange-100 text-orange-800 font-bold' : 'hover:bg-slate-200 text-slate-700'
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                showSymbols ? 'bg-[#222222] text-[#a8f1e0] font-bold border border-[#383838]' : 'hover:bg-[#262626] text-[#d4d4d4] hover:text-white'
               }`}
               title="Insert Math/Physics formula symbols"
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <Sparkles className="h-3.5 w-3.5 text-[#ffb956]" />
               <span>Symbols</span>
             </button>
 
-            <div className="h-4 w-px bg-slate-300 mx-1" />
+            <div className="h-4 w-px bg-[#333333] mx-1" />
 
             {/* Image / Attachment Button */}
             <button
               type="button"
               onClick={() => setIsAttachDialogOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-100/70 hover:bg-orange-100 text-orange-800 text-xs font-bold transition-colors ml-auto shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-[20px] bg-[#1f1f1f] hover:bg-[#262626] border border-[#383838] hover:border-[#a8f1e0] text-[#a8f1e0] text-xs font-bold transition-colors ml-auto shadow-xs"
               title="Add Image or Diagram Attachment"
             >
-              <ImageIcon className="h-3.5 w-3.5" />
+              <ImageIcon className="h-3.5 w-3.5 text-[#a8f1e0]" />
               <span>Add Diagram</span>
             </button>
           </div>
 
           {/* Quick Symbols Ribbon (when toggled open) */}
           {showSymbols && (
-            <div className="flex flex-wrap items-center gap-1 px-3 py-2 bg-orange-50/50 border-b border-orange-100 animate-in fade-in duration-200">
-              <span className="text-[10px] font-bold text-orange-900 uppercase tracking-wider mr-1">
+            <div className="flex flex-wrap items-center gap-1 px-3 py-2 bg-[#121212] border-b border-[#2e2e2e] animate-in fade-in duration-200">
+              <span className="text-[10px] font-bold text-[#b7b7b5] uppercase tracking-wider mr-1">
                 Quick Insert:
               </span>
               {COMMON_SYMBOLS.map((sym) => (
@@ -393,7 +393,7 @@ export function QuestionRichEditor({
                   key={sym}
                   type="button"
                   onClick={() => insertAtCursor(sym)}
-                  className="w-6 h-6 rounded bg-white hover:bg-orange-200 border border-orange-200/80 text-xs font-mono font-bold text-slate-800 flex items-center justify-center transition-all shadow-2xs hover:scale-110"
+                  className="w-7 h-7 rounded-[8px] bg-[#1c1c1c] hover:bg-[#262626] hover:border-[#a8f1e0] border border-[#333333] text-xs font-mono font-bold text-white flex items-center justify-center transition-all hover:scale-110"
                   title={`Insert ${sym}`}
                 >
                   {sym}
@@ -408,34 +408,34 @@ export function QuestionRichEditor({
             placeholder="Type question problem statement here (e.g. In the given circuit diagram, find the equivalent resistance...)"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full p-3.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none min-h-[80px] resize-y bg-transparent"
+            className="w-full p-3.5 text-xs text-white placeholder:text-[#737373] focus:outline-none min-h-[90px] resize-y bg-[#181818]"
             required
           />
 
           {/* Attached Images Mini-Viewer (inside editor card) */}
           {attachedImages.length > 0 && (
-            <div className="px-3.5 pb-3 pt-1 border-t border-slate-100 flex flex-wrap gap-3 items-center">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="px-3.5 pb-3 pt-2 border-t border-[#2e2e2e] flex flex-wrap gap-3 items-center bg-[#141414]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#8e8e8e]">
                 Attached Diagram{attachedImages.length > 1 ? 's' : ''}:
               </span>
               {attachedImages.map((url, idx) => (
                 <div
                   key={idx}
-                  className="relative group rounded-xl border border-slate-200 bg-slate-50 p-1 flex items-center gap-2 shadow-2xs"
+                  className="relative group rounded-[12px] border border-[#383838] bg-[#181818] p-1.5 flex items-center gap-2"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={url}
                     alt="Question Diagram"
-                    className="h-10 w-14 object-cover rounded-lg"
+                    className="h-10 w-14 object-cover rounded-[8px]"
                   />
-                  <span className="text-[10px] text-slate-600 font-mono max-w-[100px] truncate">
+                  <span className="text-[10px] text-[#b7b7b5] font-mono max-w-[100px] truncate">
                     Attachment #{idx + 1}
                   </span>
                   <button
                     type="button"
                     onClick={() => handleRemoveAttachment(url)}
-                    className="p-1 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    className="p-1 rounded-full text-[#8e8e8e] hover:text-red-400 hover:bg-[#262626] transition-colors"
                     title="Remove attachment"
                   >
                     <X className="h-3 w-3" />
@@ -449,13 +449,13 @@ export function QuestionRichEditor({
 
       {/* Attachment Upload Dialog */}
       <Dialog open={isAttachDialogOpen} onOpenChange={setIsAttachDialogOpen}>
-        <DialogContent className="rounded-3xl p-6 max-w-md">
+        <DialogContent className="rounded-[20px] p-6 max-w-md bg-[#141414] border border-[#383838] text-white shadow-2xl">
           <DialogHeader className="space-y-1 text-left">
-            <DialogTitle className="font-heading font-extrabold text-lg text-slate-900 flex items-center gap-2">
-              <ImageIcon className="h-5 w-5 text-orange-600" />
-              Attach Diagram or Figure to Question #{qIndex + 1}
+            <DialogTitle className="font-heading font-extrabold text-lg text-white flex items-center gap-2">
+              <ImageIcon className="h-5 w-5 text-[#a8f1e0]" />
+              Attach Diagram to Question #{qIndex + 1}
             </DialogTitle>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#8e8e8e]">
               Upload a circuit diagram, geometry figure, physics setup, or paste an image URL.
             </p>
           </DialogHeader>
@@ -463,7 +463,7 @@ export function QuestionRichEditor({
           <div className="space-y-4 pt-2">
             {/* Option 1: File Upload from device */}
             <div className="space-y-1.5">
-              <span className="text-xs font-bold text-slate-700 block">
+              <span className="text-xs font-bold text-white block">
                 Option 1: Upload from your device
               </span>
               <input
@@ -480,20 +480,20 @@ export function QuestionRichEditor({
                 type="button"
                 disabled={isUploadingImage}
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-slate-200 hover:border-orange-400 bg-slate-50/70 hover:bg-orange-50/30 rounded-2xl p-4 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-1.5"
+                className="w-full border-2 border-dashed border-[#383838] hover:border-[#a8f1e0] bg-[#181818] hover:bg-[#202020] rounded-[20px] p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2"
               >
                 {isUploadingImage ? (
                   <>
-                    <Loader2 className="h-6 w-6 text-orange-600 animate-spin" />
-                    <span className="text-xs font-bold text-slate-700">Uploading diagram...</span>
+                    <Loader2 className="h-6 w-6 text-[#a8f1e0] animate-spin" />
+                    <span className="text-xs font-bold text-white">Uploading diagram...</span>
                   </>
                 ) : (
                   <>
-                    <Upload className="h-6 w-6 text-orange-500" />
-                    <span className="text-xs font-bold text-slate-700">
+                    <Upload className="h-6 w-6 text-[#a8f1e0]" />
+                    <span className="text-xs font-bold text-white">
                       Choose image / diagram file
                     </span>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[10px] text-[#8e8e8e]">
                       PNG, JPG, WEBP, or SVG (up to 20 MB)
                     </span>
                   </>
@@ -502,32 +502,32 @@ export function QuestionRichEditor({
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-px bg-slate-200 flex-1" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase">OR</span>
-              <div className="h-px bg-slate-200 flex-1" />
+              <div className="h-px bg-[#2e2e2e] flex-1" />
+              <span className="text-[10px] font-bold text-[#8e8e8e] uppercase">OR</span>
+              <div className="h-px bg-[#2e2e2e] flex-1" />
             </div>
 
             {/* Option 2: Image URL / Google Drive */}
             <div className="space-y-2">
-              <span className="text-xs font-bold text-slate-700 block">
+              <span className="text-xs font-bold text-white block">
                 Option 2: Paste Web Image or Google Drive Link
               </span>
               <div className="flex items-center gap-2">
-                <Input
-                  placeholder="https://... or Google Drive image share link"
+                <input
+                  placeholder="https://... or Google Drive image link"
                   value={attachmentUrlInput}
                   onChange={(e) => setAttachmentUrlInput(e.target.value)}
-                  className="rounded-2xl h-10 text-xs flex-1"
+                  className="rounded-[20px] h-10 text-xs flex-1 bg-[#181818] text-white placeholder:text-[#737373] border border-[#383838] px-3.5 focus:border-[#a8f1e0] focus:outline-none"
                 />
-                <Button
+                <button
                   type="button"
                   onClick={handleAddImageUrl}
-                  className="rounded-full bg-slate-900 hover:bg-orange-600 text-white text-xs font-bold px-4 h-10 shadow-xs"
+                  className="rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] text-xs font-bold px-4 h-10 shadow-xs transition-colors"
                 >
                   Attach
-                </Button>
+                </button>
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed">
+              <p className="text-[10px] text-[#8e8e8e] leading-relaxed">
                 Google Drive links are automatically converted into direct embeddable previews.
               </p>
             </div>

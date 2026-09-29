@@ -97,36 +97,36 @@ export default function TeacherDashboardPage() {
   const firstName = user?.full_name?.split(' ')[0] || 'Professor';
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-[1360px] mx-auto space-y-8 animate-in fade-in duration-300">
       
       {/* ============================================================
           TOP WELCOME HERO BANNER (Split Studio Banner)
           ============================================================ */}
-      <div className="relative rounded-studio bg-[#1c1b18] p-8 sm:p-10 text-[#fbfbfa] border border-stone-800 shadow-sm overflow-hidden">
+      <div className="relative rounded-[20px] bg-[#141414] p-8 sm:p-10 text-white border border-[#2a2a2a] shadow-xl overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-[#a05120] text-white text-xs font-semibold uppercase tracking-wider">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>EduFlow Academic Operations • Faculty Console</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#333333] text-xs font-semibold uppercase tracking-widest">
+              <Sparkles className="h-3.5 w-3.5 text-[#a8f1e0]" />
+              <span>Academic Operations • Faculty Studio</span>
             </div>
-            <h1 className="font-display font-bold uppercase text-3xl sm:text-5xl tracking-tight leading-tight text-[#fbfbfa]">
+            <h1 className="font-display font-bold uppercase text-3xl sm:text-5xl tracking-tight leading-tight text-white">
               Welcome back, {firstName}
             </h1>
-            <p className="text-stone-300 text-xs sm:text-sm leading-relaxed">
-              Manage classroom batches, grade pending homework sheets, publish MCQ test series, and log daily batch attendance.
+            <p className="text-[#b7b7b5] text-xs sm:text-sm leading-relaxed">
+              Manage classroom batches, grade pending student submissions, publish interactive MCQ test series, and log daily batch attendance.
             </p>
           </div>
 
           {/* Quick CTA Actions */}
           <div className="flex flex-wrap items-center gap-3">
             <Link href="/teacher/grading">
-              <button className="btn-pill btn-rust text-xs font-semibold uppercase tracking-wider py-2.5 px-5 flex items-center gap-1.5">
-                <CheckSquare className="h-4 w-4" />
+              <button className="bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] text-xs font-bold uppercase tracking-wider py-3 px-6 rounded-[20px] flex items-center gap-2 transition-all shadow-md">
+                <CheckSquare className="h-4 w-4 text-[#0c0c0c]" />
                 Grading Station
               </button>
             </Link>
             <Link href="/teacher/quizzes">
-              <button className="btn-pill btn-studio-outline border-stone-700 text-stone-200 hover:bg-stone-800 text-xs font-semibold uppercase tracking-wider py-2.5 px-5 flex items-center gap-1.5">
+              <button className="bg-[#181818] hover:bg-[#222222] border border-[#383838] text-white hover:text-[#a8f1e0] hover:border-[#a8f1e0] text-xs font-semibold uppercase tracking-wider py-3 px-6 rounded-[20px] flex items-center gap-2 transition-all">
                 <HelpCircle className="h-4 w-4 text-[#ffb956]" />
                 New Quiz
               </button>
@@ -136,37 +136,37 @@ export default function TeacherDashboardPage() {
       </div>
 
       {/* ============================================================
-          METRIC STAT CARDS (Architectural 1px Studio Grid)
+          METRIC STAT CARDS (3 High-Contrast Studio Cards with 79px Numbers)
           ============================================================ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Metric 1: Pending Grading */}
         <Link href="/teacher/grading" className="group">
-          <div className="studio-card p-6 hover:border-stone-400 transition-all duration-300 h-full">
+          <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-6 transition-all duration-300 h-full flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-pill bg-[#a05120]/10 text-[#a05120] flex items-center justify-center">
-                <CheckSquare className="h-5 w-5" />
+              <div className="w-12 h-12 rounded-[16px] bg-[#ffb956]/15 text-[#ffb956] border border-[#ffb956]/30 flex items-center justify-center">
+                <CheckSquare className="h-6 w-6" />
               </div>
               {stats.pendingToGrade > 0 ? (
-                <Badge variant="rust" className="text-[10px] uppercase font-semibold">
-                  Action Required
-                </Badge>
+                <span className="bg-[#ffb956] text-[#0c0c0c] text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-[20px] shadow-xs">
+                  {stats.pendingToGrade} Pending
+                </span>
               ) : (
-                <Badge variant="mint" className="text-[10px] uppercase font-semibold">
-                  Cleared
-                </Badge>
+                <span className="bg-[#9ee4a0] text-[#0c0c0c] text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-[20px] shadow-xs">
+                  All Clear
+                </span>
               )}
             </div>
-            <div className="space-y-1">
-              <div className="font-display font-bold uppercase text-4xl sm:text-5xl text-[#111111] tracking-tight">
+            <div>
+              <div className="font-display font-bold uppercase text-[79px] leading-none text-white tracking-tight">
                 {loading ? '—' : stats.pendingToGrade}
               </div>
-              <div className="text-xs uppercase tracking-wider text-stone-500 font-semibold font-condensed">
+              <div className="text-xs uppercase tracking-wider text-[#b7b7b5] font-semibold font-condensed mt-2">
                 Assignments to Grade
               </div>
-              <div className="text-[11px] text-[#a05120] font-semibold pt-2 flex items-center gap-1 uppercase tracking-wider">
-                <span>Evaluate submissions</span>
-                <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              <div className="text-xs text-[#a8f1e0] font-semibold pt-3 flex items-center gap-1 uppercase tracking-wider">
+                <span>Evaluate Submissions</span>
+                <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
@@ -174,77 +174,51 @@ export default function TeacherDashboardPage() {
 
         {/* Metric 2: Active Quizzes */}
         <Link href="/teacher/quizzes" className="group">
-          <div className="studio-card p-6 hover:border-stone-400 transition-all duration-300 h-full">
+          <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-6 transition-all duration-300 h-full flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-pill bg-[#ffb956]/20 text-stone-900 flex items-center justify-center">
-                <HelpCircle className="h-5 w-5" />
+              <div className="w-12 h-12 rounded-[16px] bg-[#a8f1e0]/15 text-[#a8f1e0] border border-[#a8f1e0]/30 flex items-center justify-center">
+                <HelpCircle className="h-6 w-6" />
               </div>
-              <Badge variant="gold" className="text-[10px] uppercase font-semibold">
-                Quizzes
-              </Badge>
+              <span className="bg-[#a8f1e0] text-[#0c0c0c] text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-[20px] shadow-xs">
+                Active Quizzes
+              </span>
             </div>
-            <div className="space-y-1">
-              <div className="font-display font-bold uppercase text-4xl sm:text-5xl text-[#111111] tracking-tight">
+            <div>
+              <div className="font-display font-bold uppercase text-[79px] leading-none text-white tracking-tight">
                 {loading ? '—' : stats.totalQuizzes}
               </div>
-              <div className="text-xs uppercase tracking-wider text-stone-500 font-semibold font-condensed">
+              <div className="text-xs uppercase tracking-wider text-[#b7b7b5] font-semibold font-condensed mt-2">
                 Active Quizzes &amp; Tests
               </div>
-              <div className="text-[11px] text-stone-700 font-semibold pt-2 flex items-center gap-1 uppercase tracking-wider">
+              <div className="text-xs text-[#a8f1e0] font-semibold pt-3 flex items-center gap-1 uppercase tracking-wider">
                 <span>Question Bank</span>
-                <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
         </Link>
 
-        {/* Metric 3: Classroom Batches */}
+        {/* Metric 3: Classroom Batches & Materials */}
         <Link href="/teacher/courses" className="group">
-          <div className="studio-card p-6 hover:border-stone-400 transition-all duration-300 h-full">
+          <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-6 transition-all duration-300 h-full flex flex-col justify-between shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-pill bg-[#a8f1e0]/30 text-stone-900 flex items-center justify-center">
-                <Layers className="h-5 w-5" />
+              <div className="w-12 h-12 rounded-[16px] bg-[#9dc1ff]/15 text-[#9dc1ff] border border-[#9dc1ff]/30 flex items-center justify-center">
+                <Layers className="h-6 w-6" />
               </div>
-              <Badge variant="mint" className="text-[10px] uppercase font-semibold">
-                Batches
-              </Badge>
+              <span className="bg-[#9dc1ff] text-[#0c0c0c] text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-[20px] shadow-xs">
+                {stats.totalMaterials} Notes &amp; PDFs
+              </span>
             </div>
-            <div className="space-y-1">
-              <div className="font-display font-bold uppercase text-4xl sm:text-5xl text-[#111111] tracking-tight">
+            <div>
+              <div className="font-display font-bold uppercase text-[79px] leading-none text-white tracking-tight">
                 {loading ? '—' : stats.totalCourses}
               </div>
-              <div className="text-xs uppercase tracking-wider text-stone-500 font-semibold font-condensed">
-                Classroom Batches
+              <div className="text-xs uppercase tracking-wider text-[#b7b7b5] font-semibold font-condensed mt-2">
+                Enrolled Classrooms
               </div>
-              <div className="text-[11px] text-stone-700 font-semibold pt-2 flex items-center gap-1 uppercase tracking-wider">
-                <span>{stats.totalMaterials} Notes &amp; PDFs</span>
-                <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Metric 4: Today's Attendance */}
-        <Link href="/teacher/attendance" className="group">
-          <div className="studio-card p-6 hover:border-stone-400 transition-all duration-300 h-full">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-pill bg-stone-100 text-stone-900 flex items-center justify-center">
-                <CalendarCheck className="h-5 w-5" />
-              </div>
-              <Badge variant="stone" className="text-[10px] uppercase font-semibold">
-                Today
-              </Badge>
-            </div>
-            <div className="space-y-1">
-              <div className="font-display font-bold uppercase text-4xl sm:text-5xl text-[#111111] tracking-tight">
-                {loading ? '—' : stats.todayAttendanceCount}
-              </div>
-              <div className="text-xs uppercase tracking-wider text-stone-500 font-semibold font-condensed">
-                Attendance Marked Today
-              </div>
-              <div className="text-[11px] text-stone-700 font-semibold pt-2 flex items-center gap-1 uppercase tracking-wider">
-                <span>Daily Register</span>
-                <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              <div className="text-xs text-[#a8f1e0] font-semibold pt-3 flex items-center gap-1 uppercase tracking-wider">
+                <span>Manage Course Vault</span>
+                <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </div>
@@ -253,7 +227,7 @@ export default function TeacherDashboardPage() {
       </div>
 
       {/* ============================================================
-          TWO COLUMN SECTION: RECENT SUBMISSIONS & QUICK ACTIONS
+          MAIN WORKSPACE SPLIT: RECENT SUBMISSIONS (7) & FAST TOOLS (5)
           ============================================================ */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
@@ -261,29 +235,31 @@ export default function TeacherDashboardPage() {
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="h-7 w-7 rounded-pill bg-stone-100 text-[#111111] flex items-center justify-center">
+              <div className="h-8 w-8 rounded-[12px] bg-[#1c1c1c] border border-[#2a2a2a] text-[#a8f1e0] flex items-center justify-center">
                 <Clock className="h-4 w-4" />
               </div>
-              <h2 className="font-display uppercase text-lg font-bold text-[#111111] tracking-tight">
-                Recent Student Submissions
+              <h2 className="font-display uppercase text-lg font-bold text-white tracking-tight">
+                Recent Submissions &amp; Quick Grading
               </h2>
             </div>
-            <Link href="/teacher/grading" className="text-xs font-semibold uppercase tracking-wider text-[#a05120] hover:underline flex items-center gap-1">
-              View All <ArrowRight className="h-3 w-3" />
+            <Link href="/teacher/grading" className="text-xs font-semibold uppercase tracking-wider text-[#a8f1e0] hover:text-[#9ee4a0] hover:underline flex items-center gap-1 transition-colors">
+              View All <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
-          <div className="studio-card p-5 sm:p-6 space-y-3.5">
+          <div className="bg-[#141414] border border-[#2a2a2a] rounded-[20px] p-6 space-y-3.5 shadow-xl">
             {loading ? (
-              <div className="py-12 flex flex-col items-center justify-center text-stone-400 gap-2">
-                <div className="w-8 h-8 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+              <div className="py-12 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
+                <div className="w-8 h-8 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
                 <span className="text-xs uppercase tracking-wider font-condensed">Loading submission feed...</span>
               </div>
             ) : recentSubmissions.length === 0 ? (
-              <div className="py-10 text-center space-y-2">
-                <FileText className="h-8 w-8 text-stone-300 mx-auto" />
-                <p className="text-xs uppercase tracking-wider font-semibold text-stone-700 font-condensed">No submissions received yet</p>
-                <p className="text-xs text-stone-400 max-w-sm mx-auto">
+              <div className="py-12 text-center space-y-2">
+                <div className="w-12 h-12 rounded-[16px] bg-[#1c1c1c] border border-[#2e2e2e] text-[#8e8e8e] flex items-center justify-center mx-auto mb-2">
+                  <FileText className="h-6 w-6" />
+                </div>
+                <p className="text-xs uppercase tracking-wider font-semibold text-white font-condensed">No submissions received yet</p>
+                <p className="text-xs text-[#8e8e8e] max-w-sm mx-auto">
                   When students submit their assignment solutions or test papers, they will appear here in real-time for evaluation.
                 </p>
               </div>
@@ -301,42 +277,49 @@ export default function TeacherDashboardPage() {
                 return (
                   <div
                     key={sub.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-studio bg-[#fbfbfa] hover:border-stone-900 border border-stone-200 transition-all duration-200"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-[20px] bg-[#181818] hover:border-[#a8f1e0]/40 border border-[#2e2e2e] transition-all duration-200"
                   >
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9 border border-stone-300">
+                      <Avatar className="h-10 w-10 border border-[#383838]">
                         <AvatarImage src={sub.users?.avatar_url} />
-                        <AvatarFallback className="bg-[#111111] text-[#fbfbfa] text-xs font-bold">
+                        <AvatarFallback className="bg-[#242424] text-white text-xs font-bold">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-xs sm:text-sm text-[#111111]">
+                          <span className="font-semibold text-xs sm:text-sm text-white">
                             {studentName}
                           </span>
-                          <Badge
-                            variant={isGraded ? 'mint' : 'rust'}
-                            className="text-[10px] px-2 py-0 uppercase font-semibold"
-                          >
-                            {isGraded ? 'Graded' : 'Needs Grading'}
-                          </Badge>
+                          {isGraded ? (
+                            <span className="bg-[#9ee4a0] text-[#0c0c0c] text-[10px] px-2 py-0.5 rounded-[20px] uppercase font-bold">
+                              Graded
+                            </span>
+                          ) : (
+                            <span className="bg-[#ffb956] text-[#0c0c0c] text-[10px] px-2 py-0.5 rounded-[20px] uppercase font-bold">
+                              Needs Grading
+                            </span>
+                          )}
                         </div>
-                        <p className="text-xs text-stone-500 truncate max-w-xs sm:max-w-md font-condensed">
-                          {sub.assignments?.title} • <span className="text-stone-800 font-semibold">{sub.assignments?.courses?.code}</span>
+                        <p className="text-xs text-[#b7b7b5] truncate max-w-xs sm:max-w-md font-condensed">
+                          {sub.assignments?.title} • <span className="text-[#a8f1e0] font-semibold">{sub.assignments?.courses?.code}</span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-0 border-stone-200">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-0 border-[#262626]">
                       {isGraded && sub.marks_obtained !== null && (
-                        <span className="text-xs font-bold text-stone-900 bg-stone-100 px-2.5 py-1 rounded-pill border border-stone-200 font-condensed">
+                        <span className="text-xs font-bold text-white bg-[#222222] px-2.5 py-1 rounded-[20px] border border-[#383838] font-condensed">
                           {sub.marks_obtained} / {sub.assignments?.max_marks || 100}
                         </span>
                       )}
                       <Link href={`/teacher/grading/${sub.id}`}>
                         <button
-                          className="btn-pill btn-dark text-xs font-semibold uppercase tracking-wider py-1.5 px-4"
+                          className={`text-xs font-semibold uppercase tracking-wider py-1.5 px-4 rounded-[20px] border transition-all ${
+                            isGraded
+                              ? 'bg-[#1f1f1f] text-white hover:bg-[#282828] border-[#383838]'
+                              : 'bg-[#a8f1e0] text-[#0c0c0c] font-bold hover:bg-[#9ee4a0] border-[#a8f1e0]'
+                          }`}
                         >
                           {isGraded ? 'Review' : 'Grade Paper'}
                         </button>
@@ -353,76 +336,80 @@ export default function TeacherDashboardPage() {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Quick Actions Card */}
-          <div className="studio-card p-6 space-y-4">
-            <h3 className="font-display uppercase text-base font-bold text-[#111111] flex items-center gap-2 tracking-tight">
-              <Sparkles className="h-4 w-4 text-[#a05120]" />
+          <div className="bg-[#141414] border border-[#2a2a2a] rounded-[20px] p-6 space-y-4 shadow-xl">
+            <h3 className="font-display uppercase text-base font-bold text-white flex items-center gap-2 tracking-tight">
+              <Sparkles className="h-4 w-4 text-[#a8f1e0]" />
               Faculty Fast Tools
             </h3>
 
             <div className="grid grid-cols-2 gap-3">
               <Link href="/teacher/quizzes">
-                <div className="p-3.5 rounded-studio bg-[#fbfbfa] border border-stone-200 hover:border-stone-900 transition-all cursor-pointer space-y-1 text-left">
-                  <HelpCircle className="h-5 w-5 text-[#a05120]" />
-                  <div className="font-semibold text-xs text-[#111111]">Create Quiz</div>
-                  <div className="text-[10px] text-stone-500 font-condensed">Add MCQs &amp; timers</div>
+                <div className="p-4 rounded-[20px] bg-[#181818] border border-[#2e2e2e] hover:border-[#a8f1e0]/50 transition-all cursor-pointer space-y-1.5 text-left group">
+                  <HelpCircle className="h-5 w-5 text-[#ffb956] group-hover:scale-110 transition-transform" />
+                  <div className="font-semibold text-xs text-white group-hover:text-[#a8f1e0] transition-colors">Create Quiz</div>
+                  <div className="text-[11px] text-[#8e8e8e] font-condensed">Add MCQs &amp; timers</div>
                 </div>
               </Link>
 
               <Link href="/teacher/courses">
-                <div className="p-3.5 rounded-studio bg-[#fbfbfa] border border-stone-200 hover:border-stone-900 transition-all cursor-pointer space-y-1 text-left">
-                  <UploadCloud className="h-5 w-5 text-stone-800" />
-                  <div className="font-semibold text-xs text-[#111111]">Upload PDF</div>
-                  <div className="text-[10px] text-stone-500 font-condensed">Syllabus &amp; Notes</div>
+                <div className="p-4 rounded-[20px] bg-[#181818] border border-[#2e2e2e] hover:border-[#a8f1e0]/50 transition-all cursor-pointer space-y-1.5 text-left group">
+                  <UploadCloud className="h-5 w-5 text-[#9dc1ff] group-hover:scale-110 transition-transform" />
+                  <div className="font-semibold text-xs text-white group-hover:text-[#a8f1e0] transition-colors">Upload PDF</div>
+                  <div className="text-[11px] text-[#8e8e8e] font-condensed">Syllabus &amp; Notes</div>
                 </div>
               </Link>
 
               <Link href="/teacher/attendance">
-                <div className="p-3.5 rounded-studio bg-[#fbfbfa] border border-stone-200 hover:border-stone-900 transition-all cursor-pointer space-y-1 text-left">
-                  <CalendarCheck className="h-5 w-5 text-stone-800" />
-                  <div className="font-semibold text-xs text-[#111111]">Log Attendance</div>
-                  <div className="text-[10px] text-stone-500 font-condensed">Batch daily register</div>
+                <div className="p-4 rounded-[20px] bg-[#181818] border border-[#2e2e2e] hover:border-[#a8f1e0]/50 transition-all cursor-pointer space-y-1.5 text-left group">
+                  <CalendarCheck className="h-5 w-5 text-[#9ee4a0] group-hover:scale-110 transition-transform" />
+                  <div className="font-semibold text-xs text-white group-hover:text-[#a8f1e0] transition-colors">Log Attendance</div>
+                  <div className="text-[11px] text-[#8e8e8e] font-condensed">Batch daily register</div>
                 </div>
               </Link>
 
               <Link href="/teacher/announcements">
-                <div className="p-3.5 rounded-studio bg-[#fbfbfa] border border-stone-200 hover:border-stone-900 transition-all cursor-pointer space-y-1 text-left">
-                  <Megaphone className="h-5 w-5 text-[#a05120]" />
-                  <div className="font-semibold text-xs text-[#111111]">Broadcast Notice</div>
-                  <div className="text-[10px] text-stone-500 font-condensed">Notify batch students</div>
+                <div className="p-4 rounded-[20px] bg-[#181818] border border-[#2e2e2e] hover:border-[#a8f1e0]/50 transition-all cursor-pointer space-y-1.5 text-left group">
+                  <Megaphone className="h-5 w-5 text-[#e2bcc2] group-hover:scale-110 transition-transform" />
+                  <div className="font-semibold text-xs text-white group-hover:text-[#a8f1e0] transition-colors">Broadcast Notice</div>
+                  <div className="text-[11px] text-[#8e8e8e] font-condensed">Notify batch students</div>
                 </div>
               </Link>
             </div>
           </div>
 
           {/* Active Batches Mini-List */}
-          <div className="studio-card p-6 space-y-3.5">
+          <div className="bg-[#141414] border border-[#2a2a2a] rounded-[20px] p-6 space-y-3.5 shadow-xl">
             <div className="flex items-center justify-between">
-              <h3 className="font-display uppercase text-base font-bold text-[#111111] tracking-tight">
+              <h3 className="font-display uppercase text-base font-bold text-white tracking-tight">
                 Assigned Batches
               </h3>
-              <Link href="/teacher/courses" className="text-xs font-semibold uppercase tracking-wider text-[#a05120] hover:underline">
+              <Link href="/teacher/courses" className="text-xs font-semibold uppercase tracking-wider text-[#a8f1e0] hover:text-[#9ee4a0] hover:underline transition-colors">
                 Manage
               </Link>
             </div>
 
             <div className="space-y-2.5">
-              {courses.map((course) => (
-                <Link
-                  key={course.id}
-                  href={`/teacher/courses/${course.id}`}
-                  className="flex items-center justify-between p-3.5 rounded-studio bg-[#fbfbfa] hover:border-stone-900 border border-stone-200 transition-colors group"
-                >
-                  <div className="space-y-0.5">
-                    <div className="font-semibold text-xs text-[#111111] group-hover:text-[#a05120] transition-colors">
-                      {course.title}
+              {courses.length === 0 ? (
+                <div className="py-6 text-center text-xs text-[#8e8e8e]">No batches assigned yet</div>
+              ) : (
+                courses.map((course) => (
+                  <Link
+                    key={course.id}
+                    href={`/teacher/courses/${course.id}`}
+                    className="flex items-center justify-between p-3.5 rounded-[20px] bg-[#181818] hover:border-[#a8f1e0]/40 border border-[#2e2e2e] transition-colors group"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="font-semibold text-xs text-white group-hover:text-[#a8f1e0] transition-colors">
+                        {course.title}
+                      </div>
+                      <div className="text-[11px] font-semibold text-[#8e8e8e] font-condensed uppercase tracking-wider">
+                        Code: <span className="text-[#a8f1e0]">{course.code}</span>
+                      </div>
                     </div>
-                    <div className="text-[10px] font-semibold text-stone-500 font-condensed uppercase tracking-wider">
-                      Code: {course.code}
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-stone-400 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              ))}
+                    <ChevronRight className="h-4 w-4 text-[#8e8e8e] group-hover:text-[#a8f1e0] group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 

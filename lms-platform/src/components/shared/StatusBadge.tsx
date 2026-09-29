@@ -62,9 +62,9 @@ interface LevelBadgeProps {
  */
 export function LevelBadge({ level, className }: LevelBadgeProps) {
   const colors = {
-    Beginner: 'bg-green-50 text-green-700',
-    Intermediate: 'bg-blue-50 text-blue-700',
-    Advanced: 'bg-purple-50 text-purple-700',
+    Beginner: 'bg-[#9ee4a0]/20 text-[#9ee4a0] border border-[#9ee4a0]/30 font-semibold',
+    Intermediate: 'bg-[#9dc1ff]/20 text-[#9dc1ff] border border-[#9dc1ff]/30 font-semibold',
+    Advanced: 'bg-[#e2bcc2]/20 text-[#e2bcc2] border border-[#e2bcc2]/30 font-semibold',
   };
 
   return (
