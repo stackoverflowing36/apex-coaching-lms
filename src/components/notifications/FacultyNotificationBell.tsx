@@ -169,7 +169,7 @@ export function FacultyNotificationBell() {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative p-2 rounded-full text-[#b7b7b5] hover:text-white hover:bg-[#1a1a1a] focus:outline-none transition-colors border border-transparent hover:border-[#383838]"
+          className="relative p-2 rounded-full text-stone-500 hover:text-[#111111] hover:bg-stone-50 focus:outline-none transition-colors border border-transparent hover:border-stone-300"
           aria-label="Faculty Notifications"
           title="Notifications"
           onClick={() => setHasInteracted(true)}
@@ -178,7 +178,7 @@ export function FacultyNotificationBell() {
           {unreadCount > 0 && (
             <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ffb956] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#ffb956] text-[#0c0c0c] text-[9px] font-extrabold items-center justify-center shadow-sm">
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#ffb956] text-[#111111] text-[9px] font-extrabold items-center justify-center shadow-sm">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             </span>
@@ -188,14 +188,14 @@ export function FacultyNotificationBell() {
 
       <DropdownMenuContent
         align="end"
-        className="w-80 sm:w-96 rounded-[20px] p-0 shadow-2xl border border-[#383838] overflow-hidden bg-[#141414] text-white z-50"
+        className="w-80 sm:w-96 rounded-studio p-0 shadow-xl border border-stone-300 overflow-hidden bg-white text-[#111111] z-50"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-[#181818] border-b border-[#262626]">
+        <div className="flex items-center justify-between px-4 py-3 bg-stone-50 border-b border-stone-200">
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold uppercase text-sm text-white tracking-wide">Faculty Alerts</span>
+            <span className="font-display font-bold uppercase text-sm text-[#111111] tracking-wide">Faculty Alerts</span>
             {unreadCount > 0 && (
-              <Badge className="bg-[#a8f1e0] text-[#0c0c0c] text-[10px] font-bold px-1.5 py-0 border-0">
+              <Badge className="bg-[#a8f1e0] text-[#111111] text-[10px] font-bold px-1.5 py-0 border-0">
                 {unreadCount} new
               </Badge>
             )}
@@ -203,7 +203,7 @@ export function FacultyNotificationBell() {
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[#a8f1e0] hover:underline transition-colors"
+              className="flex items-center gap-1 text-[11px] font-semibold text-[#a05120] hover:underline transition-colors"
             >
               <CheckCheck className="h-3 w-3" />
               Mark all read
@@ -212,16 +212,16 @@ export function FacultyNotificationBell() {
         </div>
 
         {/* Notifications List */}
-        <div className="max-h-80 overflow-y-auto divide-y divide-[#262626]">
+        <div className="max-h-80 overflow-y-auto divide-y divide-stone-200">
           {loading ? (
-            <div className="py-8 text-center text-xs text-[#8e8e8e]">Loading alerts...</div>
+            <div className="py-8 text-center text-xs text-stone-400">Loading alerts...</div>
           ) : notifications.length === 0 ? (
             <div className="py-10 text-center px-4">
-              <div className="w-10 h-10 rounded-full bg-[#1c1c1c] text-[#8e8e8e] flex items-center justify-center mx-auto mb-2 border border-[#333]">
+              <div className="w-10 h-10 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto mb-2 border border-stone-300">
                 <Bell className="h-5 w-5" />
               </div>
-              <p className="text-xs font-semibold text-white">No alerts yet</p>
-              <p className="text-[11px] text-[#8e8e8e] mt-0.5">
+              <p className="text-xs font-semibold text-[#111111]">No alerts yet</p>
+              <p className="text-[11px] text-stone-400 mt-0.5">
                 You will be notified here when students register or submit work.
               </p>
             </div>
@@ -244,8 +244,8 @@ export function FacultyNotificationBell() {
                 <div
                   key={item.id}
                   onClick={() => handleItemClick(item)}
-                  className={`group relative flex items-start gap-3 p-3 transition-colors cursor-pointer text-left hover:bg-[#1a1a1a] ${
-                    !item.is_read ? 'bg-[#1c1815]' : ''
+                  className={`group relative flex items-start gap-3 p-3 transition-colors cursor-pointer text-left hover:bg-stone-50 ${
+                    !item.is_read ? 'bg-amber-50/60' : ''
                   }`}
                 >
                   {getItemIcon(item.type)}
@@ -254,24 +254,24 @@ export function FacultyNotificationBell() {
                       <p
                         className={`text-xs truncate ${
                           !item.is_read
-                            ? 'font-bold text-white'
-                            : 'font-semibold text-[#d4d4d4]'
+                            ? 'font-bold text-[#111111]'
+                            : 'font-semibold text-stone-600'
                         }`}
                       >
                         {item.title}
                       </p>
-                      <span className="text-[10px] text-[#8e8e8e] shrink-0 flex items-center gap-0.5">
+                      <span className="text-[10px] text-stone-400 shrink-0 flex items-center gap-0.5">
                         <Clock className="h-2.5 w-2.5" />
                         {formatTimeAgo(item.created_at)}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#b7b7b5] mt-0.5 leading-relaxed line-clamp-2">
+                    <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed line-clamp-2">
                       {item.message}
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0 self-center">
                     {!item.is_read && (
-                      <span className="w-2 h-2 rounded-full bg-[#ffb956] shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[#a05120] shrink-0" />
                     )}
                     <button
                       type="button"
@@ -281,7 +281,7 @@ export function FacultyNotificationBell() {
                         e.stopPropagation();
                         handleDeleteNotification(item.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-950/40 text-[#8e8e8e] hover:text-red-400 rounded transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 text-stone-400 hover:text-red-600 rounded transition-all"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -309,7 +309,7 @@ export function FacultyNotificationBell() {
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 bg-[#181818] border-t border-[#262626] flex items-center justify-between text-[11px] text-[#8e8e8e]">
+        <div className="px-4 py-2.5 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-400">
           <div className="flex items-center gap-1.5">
             <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>Real-time channel active</span>
@@ -317,7 +317,7 @@ export function FacultyNotificationBell() {
           <Link
             href="/teacher/grading"
             onClick={() => setIsOpen(false)}
-            className="font-semibold text-[#a8f1e0] hover:underline flex items-center gap-1"
+            className="font-semibold text-[#a05120] hover:underline flex items-center gap-1"
           >
             <span>Grading Station</span>
             <ExternalLink className="h-2.5 w-2.5" />

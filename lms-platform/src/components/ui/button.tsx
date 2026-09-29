@@ -12,15 +12,15 @@ const buttonVariants = cva(
         default: 'bg-[#a8f1e0] text-[#0c0c0c] hover:bg-[#9ee4a0] font-bold shadow-sm',
         mint: 'bg-[#a8f1e0] text-[#0c0c0c] hover:bg-[#9ee4a0] font-bold shadow-sm',
         rust: 'bg-[#a05120] text-white hover:bg-[#854218] font-bold shadow-sm',
-        dark: 'bg-[#141414] text-white border border-[#262626] hover:bg-[#1f1f1f] shadow-sm',
-        studioOutline: 'border border-[#383838] bg-[#181818] text-white hover:bg-[#222222] hover:text-[#a8f1e0]',
-        destructive: 'bg-[#63200c] text-white hover:bg-[#4a1708] font-bold shadow-sm',
+        dark: 'bg-[#111111] text-white border border-[#333333] hover:bg-[#1a1a1a] shadow-sm',
+        studioOutline: 'border border-stone-300 bg-white text-stone-700 hover:border-[#a05120] hover:text-[#a05120]',
+        destructive: 'bg-[#a05120] text-white hover:bg-[#854218] font-bold shadow-sm',
         outline:
-          'border border-[#383838] bg-[#181818] text-white hover:bg-[#222222] hover:text-[#a8f1e0] hover:border-[#a8f1e0]',
+          'border border-stone-300 bg-white text-stone-700 hover:border-[#a05120] hover:text-[#a05120]',
         secondary:
-          'bg-[#262626] text-white hover:bg-[#333333]',
-        ghost: 'text-[#b7b7b5] hover:text-white hover:bg-[#1f1f1f]',
-        link: 'text-[#a8f1e0] underline-offset-4 hover:underline',
+          'bg-stone-100 text-stone-700 hover:bg-stone-200',
+        ghost: 'text-stone-500 hover:text-[#a05120] hover:bg-stone-50',
+        link: 'text-[#a05120] underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-6 py-2',

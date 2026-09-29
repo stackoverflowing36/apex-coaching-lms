@@ -166,8 +166,8 @@ export default function TeacherAssignmentDetailsPage() {
 
   if (loading) {
     return (
-      <div className="py-24 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
-        <div className="w-10 h-10 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
+      <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+        <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a8f1e0] rounded-full animate-spin" />
         <p className="text-xs font-semibold uppercase tracking-wider font-condensed">Loading assignment details...</p>
       </div>
     );
@@ -175,9 +175,9 @@ export default function TeacherAssignmentDetailsPage() {
 
   if (!assignment) {
     return (
-      <div className="py-24 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
-        <AlertCircle className="h-10 w-10 text-[#ff6b6b]" />
-        <p className="text-sm font-semibold uppercase tracking-wider text-white">Assignment not found</p>
+      <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+        <AlertCircle className="h-10 w-10 text-red-600" />
+        <p className="text-sm font-semibold uppercase tracking-wider text-[#111111]">Assignment not found</p>
       </div>
     );
   }
@@ -210,7 +210,7 @@ export default function TeacherAssignmentDetailsPage() {
       <div>
         <Link
           href={`/teacher/courses/${assignment.course_id}`}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#b7b7b5] hover:text-[#a8f1e0] transition-colors font-condensed"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-500 hover:text-[#a05120] transition-colors font-condensed"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Course
@@ -218,15 +218,15 @@ export default function TeacherAssignmentDetailsPage() {
       </div>
 
       {/* Header Section (Studio Card) */}
-      <div className="studio-card p-6 sm:p-8 relative overflow-hidden bg-[#141414] border border-[#262626] rounded-[20px]">
+      <div className="studio-card p-6 sm:p-8 relative overflow-hidden bg-white border border-stone-200 rounded-studio">
         <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-          <FileCheck className="w-64 h-64 text-white rotate-12" />
+          <FileCheck className="w-64 h-64 text-[#111111] rotate-12" />
         </div>
         
         <div className="relative z-10 space-y-4">
           <div className="flex flex-wrap items-center gap-3 justify-between">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-white tracking-tight">
+              <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
                 {assignment.title}
               </h1>
               <Badge variant="mint" className="font-bold uppercase tracking-wider text-[10px]">
@@ -240,7 +240,7 @@ export default function TeacherAssignmentDetailsPage() {
             </div>
             <button
               onClick={handleEditOpen}
-              className="rounded-[20px] border border-[#383838] bg-[#181818] text-white hover:border-[#a8f1e0] hover:text-[#a8f1e0] text-xs font-bold uppercase tracking-wider py-1.5 px-4 flex items-center gap-1.5 transition-all"
+              className="rounded-studio border border-stone-300 bg-stone-50 text-[#111111] hover:border-[#a05120] hover:text-[#a05120] text-xs font-bold uppercase tracking-wider py-1.5 px-4 flex items-center gap-1.5 transition-all"
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit
@@ -248,11 +248,11 @@ export default function TeacherAssignmentDetailsPage() {
           </div>
           
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs uppercase tracking-wider font-condensed font-semibold">
-            <span className="flex items-center gap-2 text-[#ffb956]">
+            <span className="flex items-center gap-2 text-amber-700">
               <Calendar className="h-4 w-4" />
               Due: {new Date(assignment.due_date).toLocaleDateString()}
             </span>
-            <span className="flex items-center gap-2 text-[#a8f1e0]">
+            <span className="flex items-center gap-2 text-[#a05120]">
               <Award className="h-4 w-4" />
               {assignment.max_marks} Max Marks
             </span>
@@ -262,13 +262,13 @@ export default function TeacherAssignmentDetailsPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditing} onOpenChange={(open) => !open && setIsEditing(false)}>
-        <DialogContent className="rounded-[20px] p-6 max-w-2xl max-h-[90vh] overflow-y-auto bg-[#141414] border border-[#383838] text-white">
+        <DialogContent className="rounded-studio p-6 max-w-2xl max-h-[90vh] overflow-y-auto bg-white border border-stone-300 text-[#111111]">
           <DialogHeader className="space-y-2 text-left">
-            <DialogTitle className="font-heading font-extrabold text-xl text-white flex items-center gap-2">
-              <Pencil className="h-5 w-5 text-[#a8f1e0]" />
+            <DialogTitle className="font-heading font-extrabold text-xl text-[#111111] flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-[#a05120]" />
               Edit Assignment
             </DialogTitle>
-            <p className="text-xs text-[#b7b7b5]">
+            <p className="text-xs text-stone-500">
               Update assignment details, description, and settings
             </p>
           </DialogHeader>
@@ -276,8 +276,8 @@ export default function TeacherAssignmentDetailsPage() {
           <form onSubmit={handleEditSubmit} className="space-y-6 mt-4">
             {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="edit-title" className="text-xs font-bold text-[#e2bcc2]">
-                Title <span className="text-[#ff6b6b]">*</span>
+              <Label htmlFor="edit-title" className="text-xs font-bold text-rose-700">
+                Title <span className="text-red-600">*</span>
               </Label>
               <Input
                 id="edit-title"
@@ -285,13 +285,13 @@ export default function TeacherAssignmentDetailsPage() {
                 onChange={(e) => handleEditChange('title', e.target.value)}
                 placeholder="Enter assignment title"
                 required
-                className="rounded-[20px] text-sm font-medium bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                className="rounded-studio text-sm font-medium bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
               />
             </div>
 
             {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="edit-description" className="text-xs font-bold text-[#e2bcc2]">
+              <Label htmlFor="edit-description" className="text-xs font-bold text-rose-700">
                 Description
               </Label>
               <Textarea
@@ -300,14 +300,14 @@ export default function TeacherAssignmentDetailsPage() {
                 onChange={(e) => handleEditChange('description', e.target.value)}
                 placeholder="Enter assignment description"
                 rows={4}
-                className="resize-none rounded-[20px] text-sm font-medium bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                className="resize-none rounded-studio text-sm font-medium bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
               />
             </div>
 
             {/* Row with Due Date and Max Marks */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-due-date" className="text-xs font-bold text-[#e2bcc2]">
+                <Label htmlFor="edit-due-date" className="text-xs font-bold text-rose-700">
                   Due Date
                 </Label>
                 <Input
@@ -315,11 +315,11 @@ export default function TeacherAssignmentDetailsPage() {
                   type="date"
                   value={editForm.due_date}
                   onChange={(e) => handleEditChange('due_date', e.target.value)}
-                  className="rounded-[20px] text-sm font-medium bg-[#181818] border-[#383838] text-white focus:border-[#a8f1e0]"
+                  className="rounded-studio text-sm font-medium bg-stone-50 border-stone-300 text-[#111111] focus:border-[#a05120]"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-max-marks" className="text-xs font-bold text-[#e2bcc2]">
+                <Label htmlFor="edit-max-marks" className="text-xs font-bold text-rose-700">
                   Max Marks
                 </Label>
                 <Input
@@ -329,25 +329,25 @@ export default function TeacherAssignmentDetailsPage() {
                   value={editForm.max_marks}
                   onChange={(e) => handleEditChange('max_marks', Number(e.target.value))}
                   placeholder="e.g., 100"
-                  className="rounded-[20px] text-sm font-medium bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                  className="rounded-studio text-sm font-medium bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                 />
               </div>
             </div>
 
             {/* Chapter */}
             <div className="space-y-2">
-              <Label htmlFor="edit-chapter" className="text-xs font-bold text-[#e2bcc2]">
+              <Label htmlFor="edit-chapter" className="text-xs font-bold text-rose-700">
                 Chapter (Optional)
               </Label>
               <select
                 id="edit-chapter"
                 value={editForm.chapter_id}
                 onChange={(e) => handleEditChange('chapter_id', e.target.value)}
-                className="flex h-10 w-full rounded-[20px] border border-[#383838] bg-[#181818] px-4 py-2 text-sm text-white focus:border-[#a8f1e0] focus:outline-none"
+                className="flex h-10 w-full rounded-studio border border-stone-300 bg-stone-50 px-4 py-2 text-sm text-[#111111] focus:border-[#a05120] focus:outline-none"
               >
-                <option value="" className="bg-[#181818] text-white">No Chapter</option>
+                <option value="" className="bg-stone-50 text-[#111111]">No Chapter</option>
                 {chapters.map((chapter) => (
-                  <option key={chapter.id} value={chapter.id} className="bg-[#181818] text-white">
+                  <option key={chapter.id} value={chapter.id} className="bg-stone-50 text-[#111111]">
                     {chapter.title}
                   </option>
                 ))}
@@ -356,7 +356,7 @@ export default function TeacherAssignmentDetailsPage() {
 
             {/* Attachment URL */}
             <div className="space-y-2">
-              <Label htmlFor="edit-attachment" className="text-xs font-bold text-[#e2bcc2]">
+              <Label htmlFor="edit-attachment" className="text-xs font-bold text-rose-700">
                 Attachment URL
               </Label>
               <Input
@@ -365,9 +365,9 @@ export default function TeacherAssignmentDetailsPage() {
                 value={editForm.attachment_url}
                 onChange={(e) => handleEditChange('attachment_url', e.target.value)}
                 placeholder="https://example.com/document.pdf"
-                className="rounded-[20px] text-sm font-medium bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                className="rounded-studio text-sm font-medium bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
               />
-              <p className="text-xs text-[#8e8e8e]">
+              <p className="text-xs text-stone-400">
                 URL will be added to description as: [ATTACHMENT:url]
               </p>
             </div>
@@ -379,14 +379,14 @@ export default function TeacherAssignmentDetailsPage() {
                 variant="ghost"
                 onClick={() => setIsEditing(false)}
                 disabled={isSaving}
-                className="rounded-[20px] text-xs font-bold border border-[#383838] bg-[#181818] text-white hover:bg-[#222]"
+                className="rounded-studio text-xs font-bold border border-stone-300 bg-stone-50 text-[#111111] hover:bg-stone-100"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSaving || !editForm.title.trim()}
-                className="rounded-[20px] text-xs font-bold bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] shadow-sm"
+                className="rounded-studio text-xs font-bold bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#111111] shadow-sm"
               >
                 {isSaving ? (
                   <span className="flex items-center gap-1.5">
@@ -406,31 +406,31 @@ export default function TeacherAssignmentDetailsPage() {
         
         {/* Left Column: Details & Attachment */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="studio-card p-6 space-y-4 bg-[#141414] border border-[#262626] rounded-[20px]">
-            <h2 className="font-display font-bold uppercase text-base text-white border-b border-[#262626] pb-3 tracking-tight">
+          <div className="studio-card p-6 space-y-4 bg-white border border-stone-200 rounded-studio">
+            <h2 className="font-display font-bold uppercase text-base text-[#111111] border-b border-stone-200 pb-3 tracking-tight">
               Instructions
             </h2>
-            <div className="text-white whitespace-pre-wrap font-sans text-sm leading-relaxed">
+            <div className="text-[#111111] whitespace-pre-wrap font-sans text-sm leading-relaxed">
               {descriptionText || 'No additional instructions provided.'}
             </div>
             
             {attachmentUrl && (
-              <div className="pt-4 border-t border-[#262626] space-y-3">
+              <div className="pt-4 border-t border-stone-200 space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#a8f1e0] flex items-center gap-2">
+                  <h3 className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#a05120] flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" /> Attached Resource
                   </h3>
                   <a
                     href={attachmentUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-semibold uppercase tracking-wider text-[#a8f1e0] hover:underline flex items-center gap-1 font-condensed"
+                    className="text-xs font-semibold uppercase tracking-wider text-[#a05120] hover:underline flex items-center gap-1 font-condensed"
                   >
                     Open in new tab <ChevronRight className="h-3 w-3" />
                   </a>
                 </div>
                 
-                <div className="rounded-[16px] overflow-hidden border border-[#383838] bg-[#181818] h-[400px]">
+                <div className="rounded-[16px] overflow-hidden border border-stone-300 bg-stone-50 h-[400px]">
                   {attachmentUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
                     <img 
                       src={attachmentUrl} 
@@ -454,39 +454,39 @@ export default function TeacherAssignmentDetailsPage() {
         <div className="space-y-6">
           {/* Stats Cards (Architectural 1px Studio Grid) */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px]">
-              <div className="w-9 h-9 rounded-[16px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center mb-3">
+            <div className="studio-card p-5 bg-white border border-stone-200 rounded-studio">
+              <div className="w-9 h-9 rounded-[16px] bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center mb-3">
                 <Users className="h-4 w-4" />
               </div>
-              <p className="text-[10px] font-bold text-[#8e8e8e] uppercase tracking-wider mb-1 font-condensed">Total</p>
-              <p className="font-display font-bold uppercase text-3xl text-white">{totalSubmissions}</p>
+              <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 font-condensed">Total</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{totalSubmissions}</p>
             </div>
-            <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px]">
-              <div className="w-9 h-9 rounded-[16px] bg-[#1c1c1c] text-[#ffb956] border border-[#383838] flex items-center justify-center mb-3">
+            <div className="studio-card p-5 bg-white border border-stone-200 rounded-studio">
+              <div className="w-9 h-9 rounded-[16px] bg-stone-100 text-amber-700 border border-stone-300 flex items-center justify-center mb-3">
                 <Clock className="h-4 w-4" />
               </div>
-              <p className="text-[10px] font-bold text-[#ffb956] uppercase tracking-wider mb-1 font-condensed">Pending</p>
-              <p className="font-display font-bold uppercase text-3xl text-white">{pendingSubmissions}</p>
+              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1 font-condensed">Pending</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{pendingSubmissions}</p>
             </div>
-            <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px]">
-              <div className="w-9 h-9 rounded-[16px] bg-[#1c1c1c] text-[#9ee4a0] border border-[#383838] flex items-center justify-center mb-3">
+            <div className="studio-card p-5 bg-white border border-stone-200 rounded-studio">
+              <div className="w-9 h-9 rounded-[16px] bg-stone-100 text-emerald-700 border border-stone-300 flex items-center justify-center mb-3">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
-              <p className="text-[10px] font-bold text-[#9ee4a0] uppercase tracking-wider mb-1 font-condensed">Graded</p>
-              <p className="font-display font-bold uppercase text-3xl text-white">{gradedSubmissions.length}</p>
+              <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-1 font-condensed">Graded</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{gradedSubmissions.length}</p>
             </div>
-            <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px]">
-              <div className="w-9 h-9 rounded-[16px] bg-[#1c1c1c] text-[#9dc1ff] border border-[#383838] flex items-center justify-center mb-3">
+            <div className="studio-card p-5 bg-white border border-stone-200 rounded-studio">
+              <div className="w-9 h-9 rounded-[16px] bg-stone-100 text-[#9dc1ff] border border-stone-300 flex items-center justify-center mb-3">
                 <Award className="h-4 w-4" />
               </div>
               <p className="text-[10px] font-bold text-[#9dc1ff] uppercase tracking-wider mb-1 font-condensed">Avg Score</p>
-              <p className="font-display font-bold uppercase text-3xl text-white">{averageScore}</p>
+              <p className="font-display font-bold uppercase text-3xl text-[#111111]">{averageScore}</p>
             </div>
           </div>
 
           {/* Submissions List */}
-          <div className="studio-card p-6 bg-[#141414] border border-[#262626] rounded-[20px]">
-            <h3 className="font-display font-bold uppercase text-base text-white mb-4 flex items-center justify-between tracking-tight">
+          <div className="studio-card p-6 bg-white border border-stone-200 rounded-studio">
+            <h3 className="font-display font-bold uppercase text-base text-[#111111] mb-4 flex items-center justify-between tracking-tight">
               Submissions
               <Badge variant="stone" className="font-bold uppercase tracking-wider text-[10px]">
                 {submissions.length}
@@ -494,9 +494,9 @@ export default function TeacherAssignmentDetailsPage() {
             </h3>
             
             {submissions.length === 0 ? (
-              <div className="text-center py-8 bg-[#181818] rounded-[16px] border border-[#383838] border-dashed">
-                <FileCheck className="h-6 w-6 text-[#8e8e8e] mx-auto mb-2" />
-                <p className="text-xs uppercase tracking-wider font-semibold text-[#8e8e8e] font-condensed">No submissions yet.</p>
+              <div className="text-center py-8 bg-stone-50 rounded-[16px] border border-stone-300 border-dashed">
+                <FileCheck className="h-6 w-6 text-stone-400 mx-auto mb-2" />
+                <p className="text-xs uppercase tracking-wider font-semibold text-stone-400 font-condensed">No submissions yet.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -506,15 +506,15 @@ export default function TeacherAssignmentDetailsPage() {
                     href={`/teacher/grading/${sub.id}`}
                     className="block group"
                   >
-                    <div className="flex items-center gap-3 p-3 rounded-[16px] bg-[#181818] hover:border-[#a8f1e0]/60 border border-[#383838] transition-all">
-                      <Avatar className="h-9 w-9 border border-[#383838] shrink-0">
+                    <div className="flex items-center gap-3 p-3 rounded-[16px] bg-stone-50 hover:border-[#a05120]/60 border border-stone-300 transition-all">
+                      <Avatar className="h-9 w-9 border border-stone-300 shrink-0">
                         <AvatarImage src={sub.users?.avatar_url || ''} alt={sub.users?.full_name || 'Student'} />
-                        <AvatarFallback className="bg-[#1c1c1c] text-[#a8f1e0] font-bold text-xs">
+                        <AvatarFallback className="bg-stone-100 text-[#a05120] font-bold text-xs">
                           {sub.users?.full_name?.charAt(0) || 'S'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-[#a8f1e0] transition-colors">
+                        <h4 className="text-xs sm:text-sm font-semibold text-[#111111] truncate group-hover:text-[#a05120] transition-colors">
                           {sub.users?.full_name || 'Unknown Student'}
                         </h4>
                         <div className="flex items-center gap-2 mt-0.5">
@@ -537,12 +537,12 @@ export default function TeacherAssignmentDetailsPage() {
                             e.stopPropagation();
                             setSubmissionToDelete(sub);
                           }}
-                          className="p-1.5 rounded-[20px] text-[#8e8e8e] hover:text-[#ff6b6b] hover:bg-[#2a1717] border border-transparent hover:border-[#ff6b6b]/40 transition-colors"
+                          className="p-1.5 rounded-studio text-stone-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-[#ff6b6b]/40 transition-colors"
                           title="Delete submission"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <div className="text-[#8e8e8e] group-hover:text-white transition-colors">
+                        <div className="text-stone-400 group-hover:text-[#111111] transition-colors">
                           <ChevronRight className="h-4 w-4" />
                         </div>
                       </div>
@@ -558,15 +558,15 @@ export default function TeacherAssignmentDetailsPage() {
 
       {/* Delete Submission Confirmation Modal */}
       <Dialog open={!!submissionToDelete} onOpenChange={(open) => !open && setSubmissionToDelete(null)}>
-        <DialogContent className="rounded-[20px] p-6 max-w-sm bg-[#141414] border border-[#383838] text-white">
+        <DialogContent className="rounded-studio p-6 max-w-sm bg-white border border-stone-300 text-[#111111]">
           <DialogHeader className="space-y-2 text-left">
-            <DialogTitle className="font-heading font-extrabold text-lg text-[#ff6b6b] flex items-center gap-2">
+            <DialogTitle className="font-heading font-extrabold text-lg text-red-600 flex items-center gap-2">
               <Trash2 className="h-5 w-5" />
               Delete Submission?
             </DialogTitle>
-            <p className="text-xs text-[#b7b7b5] leading-relaxed">
+            <p className="text-xs text-stone-500 leading-relaxed">
               Are you sure you want to permanently delete the submission by{' '}
-              <strong className="text-white">
+              <strong className="text-[#111111]">
                 {submissionToDelete?.users?.full_name || 'this student'}
               </strong>?
               All marks and evaluations will be deleted. This action cannot be undone.
@@ -578,7 +578,7 @@ export default function TeacherAssignmentDetailsPage() {
               size="sm"
               onClick={() => setSubmissionToDelete(null)}
               disabled={isDeleting}
-              className="rounded-[20px] text-xs font-bold border border-[#383838] bg-[#181818] text-white hover:bg-[#222]"
+              className="rounded-studio text-xs font-bold border border-stone-300 bg-stone-50 text-[#111111] hover:bg-stone-100"
             >
               Cancel
             </Button>
@@ -587,7 +587,7 @@ export default function TeacherAssignmentDetailsPage() {
               size="sm"
               onClick={handleConfirmDelete}
               disabled={isDeleting}
-              className="rounded-[20px] text-xs font-bold bg-[#ff6b6b] hover:bg-[#e05555] text-white shadow-md shadow-red-600/20"
+              className="rounded-studio text-xs font-bold bg-[#ff6b6b] hover:bg-[#e05555] text-[#111111] shadow-md shadow-red-600/20"
             >
               {isDeleting ? (
                 <span className="flex items-center gap-1.5">

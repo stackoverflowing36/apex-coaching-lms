@@ -14,10 +14,10 @@ interface EmptyStateProps {
 }
 
 const defaultIcons: Record<string, React.ReactNode> = {
-  courses: <BookOpen className="h-12 w-12 text-emerald-400" />,
-  inbox: <Inbox className="h-12 w-12 text-blue-400" />,
-  assignments: <FileQuestion className="h-12 w-12 text-amber-400" />,
-  search: <Search className="h-12 w-12 text-slate-400" />,
+  courses: <BookOpen className="h-12 w-12 text-emerald-500" />,
+  inbox: <Inbox className="h-12 w-12 text-blue-500" />,
+  assignments: <FileQuestion className="h-12 w-12 text-amber-500" />,
+  search: <Search className="h-12 w-12 text-stone-400" />,
 };
 
 /**
@@ -37,18 +37,18 @@ export function EmptyState({
       className={cn(
         'flex flex-col items-center justify-center text-center',
         variant === 'default'
-          ? 'rounded-[20px] bg-[#141414] border border-[#262626] p-12 shadow-card'
+          ? 'rounded-studio bg-white border border-stone-200 p-12 shadow-card'
           : 'py-8',
         className
       )}
     >
       {/* Icon circle */}
-      <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#181818] border border-[#383838]">
+      <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-stone-50 border border-stone-200">
         {icon || defaultIcons.courses}
       </div>
 
-      <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
-      <p className="mb-6 max-w-sm text-sm text-[#b7b7b5]">{description}</p>
+      <h3 className="mb-2 text-lg font-bold text-[#111111]">{title}</h3>
+      <p className="mb-6 max-w-sm text-sm text-stone-500">{description}</p>
 
       {action && <div>{action}</div>}
     </div>

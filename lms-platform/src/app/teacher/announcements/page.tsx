@@ -127,14 +127,14 @@ export default function TeacherAnnouncementsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center">
+            <div className="h-8 w-8 rounded-studio bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center">
               <Megaphone className="h-4 w-4" />
             </div>
-            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-white tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
               Academic Notice Broadcast
             </h1>
           </div>
-          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#b7b7b5]">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500">
             Send real-time alerts, class schedule changes, and test reminders to enrolled batches and the portal ticker.
           </p>
         </div>
@@ -143,16 +143,16 @@ export default function TeacherAnnouncementsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Column: Broadcast Composer (5 cols) */}
-        <div className="lg:col-span-5 studio-card p-6 sm:p-7 bg-[#141414] border border-[#262626] rounded-[20px] space-y-6">
+        <div className="lg:col-span-5 studio-card p-6 sm:p-7 bg-white border border-stone-200 rounded-studio space-y-6">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#a8f1e0]">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#a05120]">
               <Radio className="h-3.5 w-3.5 animate-pulse" />
               <span>Live Broadcast Console</span>
             </div>
-            <h2 className="font-display font-bold uppercase text-xl text-white tracking-tight">
+            <h2 className="font-display font-bold uppercase text-xl text-[#111111] tracking-tight">
               New Notice Announcement
             </h2>
-            <p className="text-xs text-[#b7b7b5] font-condensed">
+            <p className="text-xs text-stone-500 font-condensed">
               Dispatches instantly to student dashboards and the public landing page ticker.
             </p>
           </div>
@@ -161,18 +161,18 @@ export default function TeacherAnnouncementsPage() {
             
             {/* Target Batch Selector */}
             <div className="space-y-1.5">
-              <Label htmlFor="targetBatch" className="text-xs font-semibold uppercase tracking-wider text-[#e2bcc2] font-condensed">
+              <Label htmlFor="targetBatch" className="text-xs font-semibold uppercase tracking-wider text-rose-700 font-condensed">
                 Target Audience
               </Label>
               <select
                 id="targetBatch"
                 value={targetCourseId}
                 onChange={(e) => setTargetCourseId(e.target.value)}
-                className="w-full h-10 rounded-[20px] border border-[#383838] bg-[#181818] px-3.5 text-xs font-semibold uppercase tracking-wider text-white focus:border-[#a8f1e0] focus:outline-none"
+                className="w-full h-10 rounded-studio border border-stone-300 bg-stone-50 px-3.5 text-xs font-semibold uppercase tracking-wider text-[#111111] focus:border-[#a05120] focus:outline-none"
               >
-                <option value="all" className="bg-[#181818] text-white">📢 All Institute Batches &amp; Public Notice</option>
+                <option value="all" className="bg-stone-50 text-[#111111]">📢 All Institute Batches &amp; Public Notice</option>
                 {courses.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-[#181818] text-white">
+                  <option key={c.id} value={c.id} className="bg-stone-50 text-[#111111]">
                     {c.code} — {c.title}
                   </option>
                 ))}
@@ -181,7 +181,7 @@ export default function TeacherAnnouncementsPage() {
 
             {/* Title Input */}
             <div className="space-y-1.5">
-              <Label htmlFor="noticeTitle" className="text-xs font-semibold uppercase tracking-wider text-[#e2bcc2] font-condensed">
+              <Label htmlFor="noticeTitle" className="text-xs font-semibold uppercase tracking-wider text-rose-700 font-condensed">
                 Headline / Subject
               </Label>
               <Input
@@ -189,14 +189,14 @@ export default function TeacherAnnouncementsPage() {
                 placeholder="e.g. Schedule Change for Physics Mechanics Class"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="rounded-[20px] h-10 text-xs border-[#383838] bg-[#181818] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                className="rounded-studio h-10 text-xs border-stone-300 bg-stone-50 text-[#111111] placeholder:text-stone-400 focus:border-[#a05120]"
                 required
               />
             </div>
 
             {/* Content Textarea */}
             <div className="space-y-1.5">
-              <Label htmlFor="noticeBody" className="text-xs font-semibold uppercase tracking-wider text-[#e2bcc2] font-condensed">
+              <Label htmlFor="noticeBody" className="text-xs font-semibold uppercase tracking-wider text-rose-700 font-condensed">
                 Notice Content &amp; Details
               </Label>
               <Textarea
@@ -204,14 +204,14 @@ export default function TeacherAnnouncementsPage() {
                 placeholder="Write the full announcement message here..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="rounded-[20px] min-h-[120px] text-xs resize-none border-[#383838] bg-[#181818] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                className="rounded-studio min-h-[120px] text-xs resize-none border-stone-300 bg-stone-50 text-[#111111] placeholder:text-stone-400 focus:border-[#a05120]"
                 required
               />
             </div>
 
             {/* Quick Presets */}
             <div className="space-y-1.5 pt-1">
-              <span className="text-[10px] font-bold text-[#8e8e8e] uppercase tracking-wider font-condensed">
+              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-condensed">
                 Quick Template Inserts:
               </span>
               <div className="space-y-1">
@@ -223,7 +223,7 @@ export default function TeacherAnnouncementsPage() {
                       if (!title) setTitle(preset.slice(2, 40) + '...');
                       setContent(preset);
                     }}
-                    className="w-full text-left text-[11px] text-[#d4d4d4] hover:text-white bg-[#181818] hover:bg-[#202020] p-2.5 rounded-[16px] border border-[#383838] hover:border-[#a8f1e0]/50 transition-colors truncate block"
+                    className="w-full text-left text-[11px] text-stone-600 hover:text-[#111111] bg-stone-50 hover:bg-stone-100 p-2.5 rounded-[16px] border border-stone-300 hover:border-[#a05120]/50 transition-colors truncate block"
                   >
                     {preset}
                   </button>
@@ -235,7 +235,7 @@ export default function TeacherAnnouncementsPage() {
             <button
               type="submit"
               disabled={isBroadcasting}
-              className="w-full bg-[#a8f1e0] text-[#0c0c0c] hover:bg-[#9ee4a0] rounded-[20px] text-xs font-bold uppercase tracking-wider py-3 flex items-center justify-center gap-2 mt-2 transition-all"
+              className="w-full bg-[#a8f1e0] text-[#111111] hover:bg-[#9ee4a0] rounded-studio text-xs font-bold uppercase tracking-wider py-3 flex items-center justify-center gap-2 mt-2 transition-all"
             >
               {isBroadcasting ? (
                 <span className="flex items-center gap-2">
@@ -256,25 +256,25 @@ export default function TeacherAnnouncementsPage() {
         {/* Right Column: History of Sent Announcements (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-display font-bold uppercase text-base text-white flex items-center gap-2 tracking-tight">
-              <Bell className="h-4 w-4 text-[#a8f1e0]" />
+            <h3 className="font-display font-bold uppercase text-base text-[#111111] flex items-center gap-2 tracking-tight">
+              <Bell className="h-4 w-4 text-[#a05120]" />
               Broadcast History ({announcements.length})
             </h3>
-            <span className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#8e8e8e]">Real-time synchronized</span>
+            <span className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-400">Real-time synchronized</span>
           </div>
 
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
-              <div className="w-8 h-8 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
+            <div className="py-20 flex flex-col items-center justify-center text-stone-400 gap-3">
+              <div className="w-8 h-8 border-2 border-stone-200 border-t-[#a8f1e0] rounded-full animate-spin" />
               <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading notice history...</p>
             </div>
           ) : announcements.length === 0 ? (
-            <div className="studio-card p-12 text-center space-y-3 bg-[#141414] border border-[#262626] rounded-[20px]">
-              <Megaphone className="h-10 w-10 text-[#8e8e8e] mx-auto" />
-              <h4 className="font-display font-bold uppercase text-base text-white tracking-tight">
+            <div className="studio-card p-12 text-center space-y-3 bg-white border border-stone-200 rounded-studio">
+              <Megaphone className="h-10 w-10 text-stone-400 mx-auto" />
+              <h4 className="font-display font-bold uppercase text-base text-[#111111] tracking-tight">
                 No Broadcasts Sent Yet
               </h4>
-              <p className="text-xs text-[#8e8e8e] max-w-sm mx-auto">
+              <p className="text-xs text-stone-400 max-w-sm mx-auto">
                 Use the broadcast console on the left to send notifications to enrolled batch students.
               </p>
             </div>
@@ -283,7 +283,7 @@ export default function TeacherAnnouncementsPage() {
               {announcements.map((item) => (
                 <div
                   key={item.id}
-                  className="studio-card p-5 sm:p-6 bg-[#141414] border border-[#262626] rounded-[20px] hover:border-[#a8f1e0]/40 transition-all space-y-3"
+                  className="studio-card p-5 sm:p-6 bg-white border border-stone-200 rounded-studio hover:border-[#a05120]/40 transition-all space-y-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
@@ -291,7 +291,7 @@ export default function TeacherAnnouncementsPage() {
                         <Badge variant="mint" className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5">
                           {item.courses?.code || 'ALL BATCHES'}
                         </Badge>
-                        <span className="text-[10px] font-semibold text-[#8e8e8e] font-condensed uppercase tracking-wider">
+                        <span className="text-[10px] font-semibold text-stone-400 font-condensed uppercase tracking-wider">
                           {new Date(item.posted_at).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -300,21 +300,21 @@ export default function TeacherAnnouncementsPage() {
                           })}
                         </span>
                       </div>
-                      <h4 className="font-display font-bold uppercase text-base text-white tracking-tight">
+                      <h4 className="font-display font-bold uppercase text-base text-[#111111] tracking-tight">
                         {item.title}
                       </h4>
                     </div>
 
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="p-1.5 rounded-[20px] text-[#8e8e8e] hover:text-[#ff6b6b] hover:bg-[#2a1717] transition-colors"
+                      className="p-1.5 rounded-studio text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Delete Announcement"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-white whitespace-pre-line leading-relaxed bg-[#181818] p-3.5 rounded-[16px] border border-[#383838]">
+                  <p className="text-xs sm:text-sm text-[#111111] whitespace-pre-line leading-relaxed bg-stone-50 p-3.5 rounded-[16px] border border-stone-300">
                     {item.content}
                   </p>
                 </div>

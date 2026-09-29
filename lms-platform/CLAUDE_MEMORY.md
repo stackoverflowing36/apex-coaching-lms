@@ -99,6 +99,13 @@
 - **Dual-Directory Parity**: Mirrored all changes to `lms-platform/`.
 - **Validation**: `npx tsc --noEmit` exits with 0 errors in both root and `lms-platform/`. Next.js `npm run build` succeeds across all 20+ routes with 0 errors.
 
+### H. Light Editorial Theme Migration for Portals (COMPLETED)
+- **Scope**: Converted all Student and Teacher portal pages from dark studio theme to match the light editorial landing page theme.
+- **Design Language**: Warm off-white canvas (`#fbfbfa`), white studio cards (`bg-white border-stone-200 shadow-card`), dark charcoal typography (`#111111` / `text-stone-600`), rust primary CTAs (`#a05120`), and mint pill badges (`#a8f1e0`).
+- **Dynamic Routes Fixed**: `teacher/courses/[courseId]`, `teacher/assignments/[assignmentId]`, `teacher/grading/[submissionId]`, `student/assignments/[assignmentId]`, `student/quizzes/[quizId]`, `student/lectures/[lectureId]`.
+- **Components & Contrast**: Converted `FacultyNotificationBell`, `StudentNotificationBell`, and `QuestionRichEditor`. Resolved all white-on-white contrast issues in quiz questions and options.
+- **Dual-Directory Parity**: Mirrored to `lms-platform/` and verified with `npx tsc --noEmit` (0 errors).
+
 ---
 
 ## 3. Active Mission: Production Stability & Cloudflare DNS Configuration

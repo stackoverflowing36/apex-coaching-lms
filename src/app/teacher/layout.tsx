@@ -125,10 +125,10 @@ export default function TeacherLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0c0c0c] flex items-center justify-center">
+      <div className="min-h-screen bg-[#fbfbfa] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
-          <p className="text-xs uppercase tracking-wider text-[#b7b7b5] font-semibold font-condensed">
+          <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a05120] rounded-full animate-spin" />
+          <p className="text-xs uppercase tracking-wider text-stone-400 font-semibold font-condensed">
             Opening Faculty Studio...
           </p>
         </div>
@@ -146,24 +146,24 @@ export default function TeacherLayout({
 
   return (
     <UserContext.Provider value={user}>
-      <div className="min-h-screen bg-[#0c0c0c] text-white flex flex-col">
-        {/* ========== TOP STUDIO TASKBAR (Dropdown Navigation) ========== */}
-        <nav className="sticky top-0 z-50 h-20 bg-[#0c0c0c]/90 backdrop-blur-md border-b border-[#262626] px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-[#fbfbfa] text-[#111111] flex flex-col">
+        {/* ========== TOP EDITORIAL TASKBAR (Dropdown Navigation) ========== */}
+        <nav className="sticky top-0 z-50 h-20 bg-white/90 backdrop-blur-md border-b border-stone-200 px-4 sm:px-6 lg:px-8">
           <div className="max-w-[1360px] mx-auto h-full flex items-center justify-between gap-4">
             
             {/* Left Side: Logo + Portal Identity Badge */}
             <div className="flex items-center gap-3">
               <Link href="/teacher/dashboard" className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-[14px] bg-[#181818] border border-[#383838] flex items-center justify-center text-[#a8f1e0] shadow-sm">
+                <div className="w-9 h-9 rounded-[14px] bg-stone-900 flex items-center justify-center text-white shadow-sm">
                   <GraduationCap className="h-5 w-5" />
                 </div>
-                <span className="font-display font-bold uppercase text-xl text-white tracking-tight">
+                <span className="font-display font-bold uppercase text-xl text-[#111111] tracking-tight">
                   EduFlow
                 </span>
               </Link>
 
-              <div className="hidden sm:flex items-center gap-2 bg-[#1c1c1c] text-[#a8f1e0] border border-[#333] rounded-[20px] px-3 py-1 text-xs uppercase tracking-widest font-semibold">
-                <span className="flex h-1.5 w-1.5 rounded-full bg-[#a8f1e0] animate-pulse" />
+              <div className="hidden sm:flex items-center gap-2 bg-[#a8f1e0] text-[#111111] rounded-pill px-3 py-1 text-xs uppercase tracking-widest font-semibold">
+                <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111] animate-pulse" />
                 <span>FACULTY STUDIO</span>
               </div>
             </div>
@@ -175,16 +175,16 @@ export default function TeacherLayout({
               <DropdownMenu open={navOpen} onOpenChange={setNavOpen}>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="bg-[#181818] hover:bg-[#222222] text-white border border-[#383838] rounded-[20px] px-4 sm:px-5 py-2.5 flex items-center gap-2.5 sm:gap-3 transition-colors shadow-sm focus:outline-none focus:border-[#a8f1e0]"
+                    className="bg-white hover:bg-stone-50 text-[#111111] border border-stone-300 rounded-pill px-4 sm:px-5 py-2.5 flex items-center gap-2.5 sm:gap-3 transition-colors shadow-sm focus:outline-none focus:border-[#a05120]"
                     aria-label="Navigation Menu"
                   >
-                    <Compass className="h-4 w-4 text-[#a8f1e0] shrink-0" />
+                    <Compass className="h-4 w-4 text-[#a05120] shrink-0" />
                     <span className="font-semibold text-xs sm:text-sm tracking-wide truncate max-w-[140px] sm:max-w-none">
                       Menu: {activeRoute.label}
                     </span>
                     <ChevronDown
-                      className={`h-4 w-4 text-[#b7b7b5] transition-transform duration-200 shrink-0 ${
-                        navOpen ? 'rotate-180 text-[#a8f1e0]' : ''
+                      className={`h-4 w-4 text-stone-400 transition-transform duration-200 shrink-0 ${
+                        navOpen ? 'rotate-180 text-[#a05120]' : ''
                       }`}
                     />
                   </button>
@@ -192,9 +192,9 @@ export default function TeacherLayout({
 
                 <DropdownMenuContent
                   align="end"
-                  className="w-72 bg-[#141414] border border-[#383838] rounded-[20px] shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  className="w-72 bg-white border border-stone-200 rounded-studio shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
-                  <div className="px-3 py-1.5 mb-1 text-[10px] font-bold uppercase tracking-wider text-[#988a79]">
+                  <div className="px-3 py-1.5 mb-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
                     Faculty Navigation
                   </div>
 
@@ -213,20 +213,20 @@ export default function TeacherLayout({
                             onClick={() => setNavOpen(false)}
                             className={`flex items-start gap-3 p-2.5 rounded-[16px] transition-all cursor-pointer ${
                               isActive
-                                ? 'bg-[#222222] text-[#a8f1e0] border border-[#383838]'
-                                : 'text-white hover:bg-[#1a1a1a] hover:text-[#a8f1e0]'
+                                ? 'bg-stone-100 text-[#a05120] border border-stone-200'
+                                : 'text-stone-700 hover:bg-stone-50 hover:text-[#a05120]'
                             }`}
                           >
                             <Icon
                               className={`h-4 w-4 mt-0.5 shrink-0 ${
-                                isActive ? 'text-[#a8f1e0]' : 'text-[#b7b7b5]'
+                                isActive ? 'text-[#a05120]' : 'text-stone-400'
                               }`}
                             />
                             <div className="space-y-0.5">
-                              <div className="text-xs font-semibold text-white leading-tight">
+                              <div className="text-xs font-semibold text-[#111111] leading-tight">
                                 {item.label}
                               </div>
-                              <div className="text-[11px] text-[#988a79] leading-tight">
+                              <div className="text-[11px] text-stone-400 leading-tight">
                                 {item.description}
                               </div>
                             </div>
@@ -243,11 +243,11 @@ export default function TeacherLayout({
                 asChild
                 variant="outline"
                 size="sm"
-                className="hidden md:flex items-center gap-1.5 rounded-[20px] border-[#383838] text-[#d4d4d4] hover:text-white bg-[#181818] hover:bg-[#222222] h-10 px-4 text-xs font-semibold uppercase tracking-wider shadow-none transition-all"
+                className="hidden md:flex items-center gap-1.5 rounded-pill border-stone-300 text-stone-600 hover:text-[#a05120] bg-white hover:bg-stone-50 h-10 px-4 text-xs font-semibold uppercase tracking-wider shadow-none transition-all"
               >
                 <Link href="/student/dashboard">
                   <span>Student View</span>
-                  <ExternalLink className="h-3.5 w-3.5 text-[#8e8e8e]" />
+                  <ExternalLink className="h-3.5 w-3.5 text-stone-400" />
                 </Link>
               </Button>
 
@@ -257,34 +257,34 @@ export default function TeacherLayout({
               {/* 4. User Profile & Quick Logout */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 p-1.5 rounded-[20px] hover:bg-[#1a1a1a] transition-colors border border-transparent hover:border-[#383838] focus:outline-none">
-                    <Avatar className="h-8 w-8 border border-[#383838]">
+                  <button className="flex items-center gap-2 p-1.5 rounded-pill hover:bg-stone-100 transition-colors border border-transparent hover:border-stone-200 focus:outline-none">
+                    <Avatar className="h-8 w-8 border border-stone-200">
                       <AvatarImage src={user?.avatar_url ?? undefined} />
-                      <AvatarFallback className="bg-[#1c1c1c] text-[#a8f1e0] font-bold text-xs">
+                      <AvatarFallback className="bg-stone-100 text-[#a05120] font-bold text-xs">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden lg:block text-xs font-semibold text-white max-w-[110px] truncate">
+                    <span className="hidden lg:block text-xs font-semibold text-[#111111] max-w-[110px] truncate">
                       {user?.full_name || 'Faculty Member'}
                     </span>
-                    <ChevronDown className="h-3.5 w-3.5 text-[#b7b7b5] hidden lg:block" />
+                    <ChevronDown className="h-3.5 w-3.5 text-stone-400 hidden lg:block" />
                   </button>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
                   align="end"
-                  className="w-64 bg-[#141414] border border-[#383838] text-white rounded-[20px] shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  className="w-64 bg-white border border-stone-200 text-stone-800 rounded-studio shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
-                  <div className="px-3 py-2 border-b border-[#262626]">
+                  <div className="px-3 py-2 border-b border-stone-200">
                     <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold text-white truncate">
+                      <p className="text-xs font-bold text-[#111111] truncate">
                         {user?.full_name || 'Faculty Member'}
                       </p>
                       <Badge variant="rust" className="text-[9px] px-1.5 py-0">
                         Faculty
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-[#8e8e8e] truncate mt-0.5">
+                    <p className="text-[11px] text-stone-400 truncate mt-0.5">
                       {user?.email}
                     </p>
                   </div>
@@ -293,9 +293,9 @@ export default function TeacherLayout({
                     <DropdownMenuItem asChild>
                       <Link
                         href="/student/dashboard"
-                        className="rounded-[12px] text-[#d4d4d4] hover:text-white hover:bg-[#1f1f1f] cursor-pointer flex items-center gap-2 px-3 py-2 text-xs font-medium"
+                        className="rounded-[12px] text-stone-600 hover:text-[#a05120] hover:bg-stone-50 cursor-pointer flex items-center gap-2 px-3 py-2 text-xs font-medium"
                       >
-                        <GraduationCap className="h-4 w-4 text-[#a8f1e0]" />
+                        <GraduationCap className="h-4 w-4 text-[#a05120]" />
                         <span>Switch to Student View</span>
                       </Link>
                     </DropdownMenuItem>
@@ -303,21 +303,21 @@ export default function TeacherLayout({
                     <DropdownMenuItem asChild>
                       <Link
                         href="/teacher/courses"
-                        className="rounded-[12px] text-[#d4d4d4] hover:text-white hover:bg-[#1f1f1f] cursor-pointer flex items-center gap-2 px-3 py-2 text-xs font-medium"
+                        className="rounded-[12px] text-stone-600 hover:text-[#a05120] hover:bg-stone-50 cursor-pointer flex items-center gap-2 px-3 py-2 text-xs font-medium"
                       >
-                        <Layers className="h-4 w-4 text-[#b7b7b5]" />
+                        <Layers className="h-4 w-4 text-stone-400" />
                         <span>Course &amp; PDF Builder</span>
                       </Link>
                     </DropdownMenuItem>
                   </div>
 
-                  <DropdownMenuSeparator className="bg-[#262626]" />
+                  <DropdownMenuSeparator className="bg-stone-200" />
 
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="rounded-[12px] text-red-400 hover:text-red-300 hover:bg-red-950/30 cursor-pointer flex items-center gap-2 px-3 py-2 text-xs font-medium"
+                    className="rounded-[12px] text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer flex items-center gap-2 px-3 py-2 text-xs font-medium"
                   >
-                    <LogOut className="h-4 w-4 mr-1 text-red-400" />
+                    <LogOut className="h-4 w-4 mr-1 text-red-500" />
                     <span>Sign out of Faculty Studio</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

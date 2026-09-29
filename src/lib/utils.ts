@@ -73,30 +73,31 @@ export function getCourseGradient(index: number): string {
 }
 
 /**
- * Get status color classes for assignment status badges (Dark Studio theme).
+ * Get status color classes for assignment status badges (Light Editorial theme).
  */
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    pending: 'bg-[#ffb956]/20 text-[#ffb956] border-[#ffb956]/30 font-semibold',
-    submitted: 'bg-[#9dc1ff]/20 text-[#9dc1ff] border-[#9dc1ff]/30 font-semibold',
-    graded: 'bg-[#9ee4a0]/20 text-[#9ee4a0] border-[#9ee4a0]/30 font-semibold',
-    overdue: 'bg-[#ff6b6b]/20 text-[#ff6b6b] border-[#ff6b6b]/30 font-semibold',
-    draft: 'bg-[#262626] text-[#b7b7b5] border-[#383838] font-semibold',
-    published: 'bg-[#a8f1e0]/20 text-[#a8f1e0] border-[#a8f1e0]/30 font-semibold',
-    archived: 'bg-[#262626] text-[#8e8e8e] border-[#383838] font-semibold',
+    pending: 'bg-amber-50 text-amber-700 border-amber-200 font-semibold',
+    submitted: 'bg-blue-50 text-blue-700 border-blue-200 font-semibold',
+    graded: 'bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold',
+    overdue: 'bg-red-50 text-red-700 border-red-200 font-semibold',
+    draft: 'bg-stone-100 text-stone-500 border-stone-200 font-semibold',
+    published: 'bg-teal-50 text-teal-700 border-teal-200 font-semibold',
+    archived: 'bg-stone-100 text-stone-400 border-stone-200 font-semibold',
   };
-  return colors[status] || 'bg-[#262626] text-[#b7b7b5] border-[#383838] font-semibold';
+  return colors[status] || 'bg-stone-100 text-stone-500 border-stone-200 font-semibold';
 }
 
 /**
- * Get priority color classes for announcement priority badges (Dark Studio theme).
+ * Get priority color classes for announcement priority badges (Light Editorial theme).
  */
 export function getPriorityColor(priority: string): string {
   const colors: Record<string, string> = {
-    normal: 'bg-[#262626] text-[#b7b7b5] font-semibold',
-    important: 'bg-[#ffb956]/20 text-[#ffb956] font-semibold',
-    urgent: 'bg-[#ff6b6b]/20 text-[#ff6b6b] font-semibold',
+    normal: 'bg-stone-100 text-stone-600 font-semibold',
+    important: 'bg-amber-50 text-amber-700 font-semibold',
+    urgent: 'bg-red-50 text-red-700 font-semibold',
   };
-  return colors[priority] || 'bg-[#262626] text-[#b7b7b5] font-semibold';
+  return colors[priority] || 'bg-stone-100 text-stone-600 font-semibold';
 }
+
 

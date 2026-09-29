@@ -270,7 +270,7 @@ function LoginForm() {
           disabled={isLoading || isGoogleLoading}
           className={`w-full h-11 rounded-pill text-white font-medium text-sm shadow-sm transition-all mt-2 ${
             role === 'student'
-              ? 'bg-[#111111] hover:bg-[#262626]'
+              ? 'bg-stone-900 hover:bg-stone-800'
               : 'bg-[#a05120] hover:bg-[#854218]'
           }`}
         >

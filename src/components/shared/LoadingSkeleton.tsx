@@ -8,13 +8,13 @@ interface LoadingSkeletonProps {
 }
 
 /**
- * Animated pulse skeleton for loading states (Dark Studio theme).
+ * Animated pulse skeleton for loading states (Light Editorial theme).
  */
 export function Skeleton({ className }: LoadingSkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-xl bg-gradient-to-r from-[#1c1c1c] via-[#2a2a2a] to-[#1c1c1c] bg-[length:200%_100%]',
+        'animate-pulse rounded-xl bg-gradient-to-r from-stone-100 via-stone-200 to-stone-100 bg-[length:200%_100%]',
         className
       )}
     />
@@ -26,7 +26,7 @@ export function Skeleton({ className }: LoadingSkeletonProps) {
  */
 export function CourseCardSkeleton() {
   return (
-    <div className="rounded-[20px] bg-[#141414] border border-[#262626] p-5 shadow-card">
+    <div className="rounded-studio bg-white border border-stone-200 p-5 shadow-card">
       <Skeleton className="mb-4 h-40 w-full rounded-xl" />
       <Skeleton className="mb-2 h-5 w-3/4" />
       <Skeleton className="mb-3 h-4 w-full" />
@@ -44,7 +44,7 @@ export function CourseCardSkeleton() {
  */
 export function StatsCardSkeleton() {
   return (
-    <div className="rounded-[20px] bg-[#141414] border border-[#262626] p-6 shadow-card">
+    <div className="rounded-studio bg-white border border-stone-200 p-6 shadow-card">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-4 w-24" />
@@ -61,7 +61,7 @@ export function StatsCardSkeleton() {
  */
 export function TableRowSkeleton({ columns = 4 }: { columns?: number }) {
   return (
-    <div className="flex items-center gap-4 border-b border-[#262626] py-4">
+    <div className="flex items-center gap-4 border-b border-stone-200 py-4">
       {Array.from({ length: columns }).map((_, i) => (
         <Skeleton
           key={i}

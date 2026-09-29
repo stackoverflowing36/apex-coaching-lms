@@ -75,28 +75,28 @@ export default function AssignmentsPage() {
     switch (status) {
       case 'graded':
         return (
-          <span className="bg-[#9ee4a0] text-[#0c0c0c] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
+          <span className="bg-[#9ee4a0] text-[#111111] text-xs uppercase font-bold px-2.5 py-1 rounded-studio flex items-center shadow-xs">
             <Award className="h-3 w-3 mr-1" />
             {sub?.marks_obtained}/{sub?.assignments?.max_marks || '—'}
           </span>
         );
       case 'submitted':
         return (
-          <span className="bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
-            <CheckCircle2 className="h-3 w-3 mr-1 text-[#a8f1e0]" />
+          <span className="bg-stone-100 text-[#a05120] border border-stone-300 text-xs uppercase font-bold px-2.5 py-1 rounded-studio flex items-center shadow-xs">
+            <CheckCircle2 className="h-3 w-3 mr-1 text-[#a05120]" />
             Submitted
           </span>
         );
       case 'overdue':
         return (
-          <span className="bg-[#e2bcc2] text-[#0c0c0c] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
+          <span className="bg-[#e2bcc2] text-[#111111] text-xs uppercase font-bold px-2.5 py-1 rounded-studio flex items-center shadow-xs">
             <AlertCircle className="h-3 w-3 mr-1" />
             Overdue
           </span>
         );
       default:
         return (
-          <span className="bg-[#ffb956] text-[#0c0c0c] text-xs uppercase font-bold px-2.5 py-1 rounded-[20px] flex items-center shadow-xs">
+          <span className="bg-[#ffb956] text-[#111111] text-xs uppercase font-bold px-2.5 py-1 rounded-studio flex items-center shadow-xs">
             <Clock className="h-3 w-3 mr-1" />
             Pending
           </span>
@@ -118,7 +118,7 @@ export default function AssignmentsPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-28 rounded-[20px] bg-[#141414] animate-pulse border border-[#2a2a2a]" />
+          <div key={i} className="h-28 rounded-studio bg-white animate-pulse border border-stone-200" />
         ))}
       </div>
     );
@@ -128,10 +128,10 @@ export default function AssignmentsPage() {
     <div className="max-w-[1360px] mx-auto space-y-6 animate-in fade-in duration-300">
       {/* Header */}
       <div>
-        <h1 className="font-display uppercase text-3xl sm:text-4xl font-bold text-white tracking-tight">
+        <h1 className="font-display uppercase text-3xl sm:text-4xl font-bold text-[#111111] tracking-tight">
           Assignments
         </h1>
-        <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#b7b7b5] mt-1">
+        <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500 mt-1">
           {assignments.length} total · {filtered.filter((a) => getStatus(a) === 'pending').length} pending evaluation
         </p>
       </div>
@@ -139,21 +139,21 @@ export default function AssignmentsPage() {
       {/* Filters (Capsule & Pills) */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8e8e8e]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
           <input
             placeholder="Search assignments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 rounded-[20px] border border-[#383838] bg-[#181818] text-white placeholder:text-[#737373] focus:border-[#a8f1e0] focus:outline-none h-11 text-xs"
+            className="w-full pl-10 pr-4 rounded-studio border border-stone-300 bg-stone-50 text-[#111111] placeholder:text-stone-400 focus:border-[#a05120] focus:outline-none h-11 text-xs"
           />
         </div>
         <div className="flex gap-2 flex-wrap items-center">
           <button
             onClick={() => setSelectedCourse(null)}
-            className={`px-4 py-2 rounded-[20px] text-xs font-semibold uppercase tracking-wider transition-all ${
+            className={`px-4 py-2 rounded-studio text-xs font-semibold uppercase tracking-wider transition-all ${
               !selectedCourse
-                ? 'bg-[#a8f1e0] text-[#0c0c0c] font-bold shadow-md'
-                : 'bg-[#181818] text-[#b7b7b5] border border-[#2e2e2e] hover:border-[#a8f1e0] hover:text-white'
+                ? 'bg-[#a8f1e0] text-[#111111] font-bold shadow-md'
+                : 'bg-stone-50 text-stone-500 border border-stone-200 hover:border-[#a05120] hover:text-[#111111]'
             }`}
           >
             All Batches
@@ -162,10 +162,10 @@ export default function AssignmentsPage() {
             <button
               key={c.id}
               onClick={() => setSelectedCourse(c.id === selectedCourse ? null : c.id)}
-              className={`px-4 py-2 rounded-[20px] text-xs font-semibold uppercase tracking-wider transition-all ${
+              className={`px-4 py-2 rounded-studio text-xs font-semibold uppercase tracking-wider transition-all ${
                 selectedCourse === c.id
-                  ? 'bg-[#a8f1e0] text-[#0c0c0c] font-bold shadow-md'
-                  : 'bg-[#181818] text-[#b7b7b5] border border-[#2e2e2e] hover:border-[#a8f1e0] hover:text-white'
+                  ? 'bg-[#a8f1e0] text-[#111111] font-bold shadow-md'
+                  : 'bg-stone-50 text-stone-500 border border-stone-200 hover:border-[#a05120] hover:text-[#111111]'
               }`}
             >
               {c.code}
@@ -176,9 +176,9 @@ export default function AssignmentsPage() {
 
       {/* Assignment Cards (Studio Cards) */}
       {filtered.length === 0 ? (
-        <div className="bg-[#141414] border border-[#2a2a2a] rounded-[20px] p-16 text-center shadow-xl">
-          <FileText className="h-12 w-12 text-[#8e8e8e] mx-auto mb-4" />
-          <p className="text-xs uppercase tracking-wider font-semibold text-white font-condensed">No assignments found</p>
+        <div className="bg-white border border-stone-200 rounded-studio p-16 text-center shadow-xl">
+          <FileText className="h-12 w-12 text-stone-400 mx-auto mb-4" />
+          <p className="text-xs uppercase tracking-wider font-semibold text-[#111111] font-condensed">No assignments found</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -191,29 +191,29 @@ export default function AssignmentsPage() {
                 href={`/student/assignments/${a.id}`}
                 className="group block"
               >
-                <div className="bg-[#141414] border border-[#2a2a2a] hover:border-[#383838] rounded-[20px] p-5 sm:p-6 transition-all duration-300 shadow-xl">
+                <div className="bg-white border border-stone-200 hover:border-stone-300 rounded-studio p-5 sm:p-6 transition-all duration-300 shadow-xl">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-[#a8f1e0] uppercase tracking-wider bg-[#1c1c1c] border border-[#333] px-2.5 py-0.5 rounded-[20px] font-condensed">
+                        <span className="text-[10px] font-bold text-[#a05120] uppercase tracking-wider bg-stone-100 border border-stone-300 px-2.5 py-0.5 rounded-studio font-condensed">
                           {a.courses?.code}
                         </span>
                         {a.course_chapters?.title && (
-                          <span className="text-[10px] px-2 py-0.5 uppercase font-bold bg-[#242424] text-white border border-[#383838] rounded-[20px]">
+                          <span className="text-[10px] px-2 py-0.5 uppercase font-bold bg-stone-100 text-[#111111] border border-stone-300 rounded-studio">
                             Chapter: {a.course_chapters.title}
                           </span>
                         )}
                         <span className="text-[#383838]">·</span>
-                        <span className="text-[11px] text-[#8e8e8e] font-condensed uppercase tracking-wider font-semibold">
+                        <span className="text-[11px] text-stone-400 font-condensed uppercase tracking-wider font-semibold">
                           Max {a.max_marks} marks
                         </span>
                       </div>
-                      <p className="font-semibold text-sm sm:text-base text-white group-hover:text-[#a8f1e0] transition-colors truncate">
+                      <p className="font-semibold text-sm sm:text-base text-[#111111] group-hover:text-[#a05120] transition-colors truncate">
                         {a.title}
                       </p>
                       <div className="flex items-center gap-4 mt-2">
-                        <span className="flex items-center gap-1.5 text-xs text-[#8e8e8e] font-condensed">
-                          <Calendar className="h-3.5 w-3.5 text-[#a8f1e0]" />
+                        <span className="flex items-center gap-1.5 text-xs text-stone-400 font-condensed">
+                          <Calendar className="h-3.5 w-3.5 text-[#a05120]" />
                           Due{' '}
                           {new Date(a.due_date).toLocaleDateString('en-IN', {
                             day: 'numeric',
@@ -222,7 +222,7 @@ export default function AssignmentsPage() {
                           })}
                         </span>
                         {status === 'pending' && (
-                          <span className="bg-[#ffb956] text-[#0c0c0c] text-[10px] px-2.5 py-0.5 uppercase font-bold rounded-[20px]">
+                          <span className="bg-[#ffb956] text-[#111111] text-[10px] px-2.5 py-0.5 uppercase font-bold rounded-studio">
                             {getTimeUntil(a.due_date)}
                           </span>
                         )}
@@ -231,7 +231,7 @@ export default function AssignmentsPage() {
 
                     <div className="flex items-center gap-3 shrink-0">
                       {getStatusBadge(status, sub)}
-                      <ArrowRight className="h-4 w-4 text-[#8e8e8e] group-hover:text-[#a8f1e0] group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="h-4 w-4 text-stone-400 group-hover:text-[#a05120] group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
                 </div>

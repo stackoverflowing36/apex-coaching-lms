@@ -49,18 +49,18 @@ export default function LectureViewerPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="aspect-video rounded-[20px] bg-[#141414] border border-[#262626] animate-pulse" />
-        <div className="h-32 rounded-[20px] bg-[#141414] border border-[#262626] animate-pulse" />
+        <div className="aspect-video rounded-studio bg-white border border-stone-200 animate-pulse" />
+        <div className="h-32 rounded-studio bg-white border border-stone-200 animate-pulse" />
       </div>
     );
   }
 
   if (!lecture) {
     return (
-      <div className="bg-[#141414] rounded-[20px] border border-[#262626] p-16 text-center">
-        <Video className="h-12 w-12 text-[#8e8e8e] mx-auto mb-4" />
-        <p className="font-semibold text-white">Lecture not found</p>
-        <Link href="/student/lectures" className="text-[#a8f1e0] text-sm font-medium mt-2 inline-block hover:underline">
+      <div className="bg-white rounded-studio border border-stone-200 p-16 text-center">
+        <Video className="h-12 w-12 text-stone-400 mx-auto mb-4" />
+        <p className="font-semibold text-[#111111]">Lecture not found</p>
+        <Link href="/student/lectures" className="text-[#a05120] text-sm font-medium mt-2 inline-block hover:underline">
           ← Back to Lectures
         </Link>
       </div>
@@ -102,7 +102,7 @@ export default function LectureViewerPage() {
       {/* Back Navigation */}
       <Link
         href="/student/lectures"
-        className="inline-flex items-center gap-2 text-sm text-[#b7b7b5] hover:text-[#a8f1e0] transition-colors font-medium"
+        className="inline-flex items-center gap-2 text-sm text-stone-500 hover:text-[#a05120] transition-colors font-medium"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Lecture Vault
@@ -112,7 +112,7 @@ export default function LectureViewerPage() {
         {/* ========== MAIN VIDEO AREA ========== */}
         <div className="lg:col-span-3 space-y-5">
           {/* Video Player */}
-          <div className="bg-[#0c0c0c] border border-[#262626] rounded-[20px] overflow-hidden shadow-2xl aspect-video relative">
+          <div className="bg-[#fbfbfa] border border-stone-200 rounded-studio overflow-hidden shadow-2xl aspect-video relative">
             {isDirectVideo ? (
               <video
                 src={videoUrl}
@@ -129,21 +129,21 @@ export default function LectureViewerPage() {
                 className="w-full h-full border-0"
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-white/50">
+              <div className="flex items-center justify-center h-full text-[#111111]/50">
                 <div className="text-center">
-                  <Video className="h-16 w-16 mx-auto mb-3 opacity-30 text-[#8e8e8e]" />
-                  <p className="font-medium text-[#8e8e8e]">Video not available</p>
+                  <Video className="h-16 w-16 mx-auto mb-3 opacity-30 text-stone-400" />
+                  <p className="font-medium text-stone-400">Video not available</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Lecture Info Card */}
-          <div className="bg-[#141414] rounded-[20px] p-6 border border-[#262626]">
+          <div className="bg-white rounded-studio p-6 border border-stone-200">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <span className="shrink-0 w-7 h-7 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center font-black text-xs">
+                  <span className="shrink-0 w-7 h-7 rounded-studio bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center font-black text-xs">
                     {siblingLectures.findIndex((l) => l.id === lecture.id) >= 0
                       ? siblingLectures.findIndex((l) => l.id === lecture.id) + 1
                       : lecture.order_index || 1}
@@ -159,42 +159,42 @@ export default function LectureViewerPage() {
                       Chapter: {lecture.course_chapters.title}
                     </Badge>
                   )}
-                  <span className="text-xs text-[#8e8e8e] font-medium font-condensed uppercase tracking-wider">
+                  <span className="text-xs text-stone-400 font-medium font-condensed uppercase tracking-wider">
                     Lecture {siblingLectures.findIndex((l) => l.id === lecture.id) >= 0
                       ? siblingLectures.findIndex((l) => l.id === lecture.id) + 1
                       : lecture.order_index || 1}
                   </span>
                 </div>
-                <h1 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight">
+                <h1 className="font-display text-xl sm:text-2xl font-bold text-[#111111] tracking-tight">
                   {lecture.title}
                 </h1>
-                <p className="text-sm text-[#b7b7b5] mt-1">{lecture.courses?.title}</p>
+                <p className="text-sm text-stone-500 mt-1">{lecture.courses?.title}</p>
               </div>
             </div>
 
             {/* Resources */}
             {lecture.notes_url && (
-              <div className="mt-6 pt-5 border-t border-[#262626]">
-                <h3 className="font-semibold text-sm text-[#d4d4d4] mb-3 flex items-center gap-2">
-                  <FileDown className="h-4 w-4 text-[#a8f1e0]" />
+              <div className="mt-6 pt-5 border-t border-stone-200">
+                <h3 className="font-semibold text-sm text-stone-600 mb-3 flex items-center gap-2">
+                  <FileDown className="h-4 w-4 text-[#a05120]" />
                   Downloadable Resources
                 </h3>
                 <a
                   href={lecture.notes_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-[20px] bg-[#181818] border border-[#383838] hover:border-[#a8f1e0] hover:bg-[#202020] transition-all group"
+                  className="flex items-center gap-3 p-3 rounded-studio bg-stone-50 border border-stone-300 hover:border-[#a05120] hover:bg-stone-100 transition-all group"
                 >
-                  <div className="w-10 h-10 rounded-[14px] bg-[#1c1c1c] border border-[#383838] flex items-center justify-center">
-                    <span className="text-xs font-extrabold text-[#ffb956]">PDF</span>
+                  <div className="w-10 h-10 rounded-[14px] bg-stone-100 border border-stone-300 flex items-center justify-center">
+                    <span className="text-xs font-extrabold text-amber-700">PDF</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate group-hover:text-[#a8f1e0] transition-colors">
+                    <p className="text-sm font-medium text-[#111111] truncate group-hover:text-[#a05120] transition-colors">
                       Lecture Notes — {lecture.title}
                     </p>
-                    <p className="text-xs text-[#8e8e8e]">Click to download</p>
+                    <p className="text-xs text-stone-400">Click to download</p>
                   </div>
-                  <ExternalLink className="h-4 w-4 text-[#8e8e8e] group-hover:text-[#a8f1e0] transition-colors" />
+                  <ExternalLink className="h-4 w-4 text-stone-400 group-hover:text-[#a05120] transition-colors" />
                 </a>
               </div>
             )}
@@ -203,15 +203,15 @@ export default function LectureViewerPage() {
 
         {/* ========== SIDEBAR: COURSE LECTURES LIST ========== */}
         <div className="lg:col-span-1">
-          <div className="bg-[#141414] rounded-[20px] border border-[#262626] overflow-hidden sticky top-24">
-            <div className="px-5 pt-5 pb-3 border-b border-[#262626]">
+          <div className="bg-white rounded-studio border border-stone-200 overflow-hidden sticky top-24">
+            <div className="px-5 pt-5 pb-3 border-b border-stone-200">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-[#a8f1e0]" />
-                <h3 className="font-display text-sm font-bold text-white uppercase tracking-wider">
+                <BookOpen className="h-4 w-4 text-[#a05120]" />
+                <h3 className="font-display text-sm font-bold text-[#111111] uppercase tracking-wider">
                   Course Syllabus
                 </h3>
               </div>
-              <p className="text-xs text-[#8e8e8e] mt-0.5">
+              <p className="text-xs text-stone-400 mt-0.5">
                 {siblingLectures.length} lecture{siblingLectures.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -225,15 +225,15 @@ export default function LectureViewerPage() {
                     href={`/student/lectures/${sl.id}`}
                     className={`flex items-center gap-3 px-4 py-3.5 transition-colors ${
                       isActive
-                        ? 'bg-[#181818] border-l-2 border-[#a8f1e0]'
-                        : 'hover:bg-[#181818] border-l-2 border-transparent'
+                        ? 'bg-stone-50 border-l-2 border-[#a8f1e0]'
+                        : 'hover:bg-stone-50 border-l-2 border-transparent'
                     }`}
                   >
                     <span
-                      className={`shrink-0 w-8 h-8 rounded-[20px] flex items-center justify-center text-xs font-bold transition-all ${
+                      className={`shrink-0 w-8 h-8 rounded-studio flex items-center justify-center text-xs font-bold transition-all ${
                         isActive
-                          ? 'bg-[#a8f1e0] text-[#0c0c0c] shadow-sm'
-                          : 'bg-[#1c1c1c] text-[#d4d4d4] border border-[#383838]'
+                          ? 'bg-[#a8f1e0] text-[#111111] shadow-sm'
+                          : 'bg-stone-100 text-stone-600 border border-stone-300'
                       }`}
                     >
                       {idx + 1}
@@ -241,13 +241,13 @@ export default function LectureViewerPage() {
                     <div className="flex-1 min-w-0">
                       <p
                         className={`text-sm font-semibold truncate ${
-                          isActive ? 'text-[#a8f1e0]' : 'text-white'
+                          isActive ? 'text-[#a05120]' : 'text-[#111111]'
                         }`}
                       >
                         {sl.title}
                       </p>
                       {sl.course_chapters?.title && (
-                        <p className="text-[10px] font-bold text-[#ffb956] truncate mt-0.5">
+                        <p className="text-[10px] font-bold text-amber-700 truncate mt-0.5">
                           Chapter: {sl.course_chapters.title}
                         </p>
                       )}

@@ -80,7 +80,7 @@ export function ChapterSelect({ supabase, courseId, value, onChange, className =
 
   if (isLoading) {
     return (
-      <div className={`animate-pulse h-11 bg-[#181818] rounded-[20px] border border-[#383838] ${className}`} />
+      <div className={`animate-pulse h-11 bg-stone-200 rounded-studio border border-stone-300 ${className}`} />
     );
   }
 
@@ -92,7 +92,7 @@ export function ChapterSelect({ supabase, courseId, value, onChange, className =
           value={newChapterTitle}
           onChange={(e) => setNewChapterTitle(e.target.value)}
           placeholder="New Chapter Title..."
-          className="flex-1 w-full rounded-[20px] border border-[#383838] focus:border-[#a8f1e0] focus:outline-none text-xs h-11 px-3.5 bg-[#181818] text-white placeholder:text-[#737373]"
+          className="flex-1 w-full rounded-studio border border-stone-400 focus:border-[#a05120] focus:outline-none text-xs h-11 px-3.5 bg-white text-[#111111] placeholder:text-stone-400"
           autoFocus
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -108,9 +108,9 @@ export function ChapterSelect({ supabase, courseId, value, onChange, className =
           type="button"
           onClick={handleCreateSubmit}
           disabled={isSubmitting || !newChapterTitle.trim()}
-          className="h-11 px-4 rounded-[20px] bg-[#a8f1e0] text-[#0c0c0c] font-bold text-xs hover:bg-[#9ee4a0] disabled:opacity-50 transition-colors flex items-center justify-center shrink-0 shadow-sm"
+          className="h-11 px-4 rounded-studio bg-[#a8f1e0] text-[#111111] font-bold text-xs hover:bg-[#9ee4a0] disabled:opacity-50 transition-colors flex items-center justify-center shrink-0 shadow-sm"
         >
-          {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin text-[#0c0c0c]" /> : 'Add'}
+          {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin text-[#111111]" /> : 'Add'}
         </button>
         <button
           type="button"
@@ -118,7 +118,7 @@ export function ChapterSelect({ supabase, courseId, value, onChange, className =
             setIsCreating(false);
             setNewChapterTitle('');
           }}
-          className="h-11 px-3 rounded-[20px] bg-[#1f1f1f] border border-[#383838] text-[#8e8e8e] hover:text-white font-bold text-xs transition-colors shrink-0"
+          className="h-11 px-3 rounded-studio bg-stone-200 border border-stone-300 text-stone-500 hover:text-[#111111] font-bold text-xs transition-colors shrink-0"
         >
           Cancel
         </button>
@@ -131,15 +131,15 @@ export function ChapterSelect({ supabase, courseId, value, onChange, className =
       <select
         value={value || 'none'}
         onChange={handleSelectChange}
-        className="flex-1 w-full rounded-[20px] border border-[#383838] text-xs focus:border-[#a8f1e0] focus:outline-none h-11 px-3.5 bg-[#181818] text-white"
+        className="flex-1 w-full rounded-studio border border-stone-400 text-xs focus:border-[#a05120] focus:outline-none h-11 px-3.5 bg-white text-[#111111]"
       >
-        <option value="none" className="bg-[#181818] text-white">No Chapter (General)</option>
+        <option value="none" className="bg-white text-[#111111]">No Chapter (General)</option>
         {chapters.map((ch) => (
-          <option key={ch.id} value={ch.id} className="bg-[#181818] text-white">
+          <option key={ch.id} value={ch.id} className="bg-white text-[#111111]">
             {ch.title}
           </option>
         ))}
-        <option value="create_new" className="font-bold text-[#a8f1e0] bg-[#181818]">
+        <option value="create_new" className="font-bold text-[#a05120] bg-white">
           + Create New Chapter...
         </option>
       </select>
@@ -147,9 +147,9 @@ export function ChapterSelect({ supabase, courseId, value, onChange, className =
         type="button"
         onClick={() => setIsCreating(true)}
         title="Add Chapter / Module"
-        className="h-11 px-3.5 rounded-[20px] bg-[#1f1f1f] hover:bg-[#252525] border border-[#444] text-[#a8f1e0] font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0"
+        className="h-11 px-3.5 rounded-studio bg-stone-200 hover:bg-stone-300 border border-stone-300 text-[#a05120] font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0"
       >
-        <PlusCircle className="h-3.5 w-3.5 text-[#a8f1e0]" />
+        <PlusCircle className="h-3.5 w-3.5 text-[#a05120]" />
         <span className="inline">+ Chapter</span>
       </button>
     </div>

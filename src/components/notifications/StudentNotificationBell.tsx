@@ -165,38 +165,38 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
     switch (type) {
       case 'grading_completed':
         return (
-          <div className="w-8 h-8 rounded-full bg-[#9ee4a0]/20 text-[#9ee4a0] border border-[#9ee4a0]/30 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0 shadow-xs">
             <FileCheck className="h-4 w-4" />
           </div>
         );
       case 'assignment_created':
         return (
-          <div className="w-8 h-8 rounded-full bg-[#9dc1ff]/20 text-[#9dc1ff] border border-[#9dc1ff]/30 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center shrink-0 shadow-xs">
             <BookOpen className="h-4 w-4" />
           </div>
         );
       case 'batch_enrolled':
         return (
-          <div className="w-8 h-8 rounded-full bg-[#e2bcc2]/20 text-[#e2bcc2] border border-[#e2bcc2]/30 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0 shadow-xs">
             <Layers className="h-4 w-4" />
           </div>
         );
       case 'quiz_created':
       case 'quiz_attempted':
         return (
-          <div className="w-8 h-8 rounded-full bg-[#ffb956]/20 text-[#ffb956] border border-[#ffb956]/30 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0 shadow-xs">
             <Sparkles className="h-4 w-4" />
           </div>
         );
       case 'lecture_created':
         return (
-          <div className="w-8 h-8 rounded-full bg-[#a8f1e0]/20 text-[#a8f1e0] border border-[#a8f1e0]/30 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center shrink-0 shadow-xs">
             <Video className="h-4 w-4" />
           </div>
         );
       default:
         return (
-          <div className="w-8 h-8 rounded-full bg-[#222222] text-[#d4d4d4] border border-[#383838] flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-stone-100 text-stone-600 border border-stone-300 flex items-center justify-center shrink-0 shadow-xs">
             <Bell className="h-4 w-4" />
           </div>
         );
@@ -207,7 +207,7 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative p-2.5 rounded-full text-[#b7b7b5] hover:text-white bg-[#181818] hover:bg-[#222222] border border-[#383838] focus:outline-none transition-colors"
+          className="relative p-2.5 rounded-full text-stone-500 hover:text-[#111111] bg-stone-50 hover:bg-stone-100 border border-stone-300 focus:outline-none transition-colors"
           aria-label="Student Notifications"
           title="Notifications"
         >
@@ -215,7 +215,7 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#a8f1e0] opacity-75" />
-              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#a8f1e0] text-[#0c0c0c] text-[9px] font-extrabold items-center justify-center shadow-sm">
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#a8f1e0] text-[#111111] text-[9px] font-extrabold items-center justify-center shadow-sm">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             </span>
@@ -225,14 +225,14 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
 
       <DropdownMenuContent
         align="end"
-        className="w-80 sm:w-96 rounded-[20px] p-0 shadow-2xl border border-[#383838] overflow-hidden bg-[#141414] text-white z-50"
+        className="w-80 sm:w-96 rounded-studio p-0 shadow-xl border border-stone-300 overflow-hidden bg-white text-[#111111] z-50"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-[#181818] border-b border-[#262626]">
+        <div className="flex items-center justify-between px-4 py-3 bg-stone-50 border-b border-stone-200">
           <div className="flex items-center gap-2">
-            <span className="font-heading font-bold text-sm text-white tracking-wide">Notifications</span>
+            <span className="font-heading font-bold text-sm text-[#111111] tracking-wide">Notifications</span>
             {unreadCount > 0 && (
-              <span className="bg-[#a8f1e0] text-[#0c0c0c] text-[10px] font-extrabold px-2 py-0.5 rounded-[20px]">
+              <span className="bg-[#a8f1e0] text-[#111111] text-[10px] font-extrabold px-2 py-0.5 rounded-studio">
                 {unreadCount} new
               </span>
             )}
@@ -240,7 +240,7 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[#a8f1e0] hover:text-[#9ee4a0] hover:underline transition-colors"
+              className="flex items-center gap-1 text-[11px] font-semibold text-[#a05120] hover:text-[#864319] hover:underline transition-colors"
             >
               <CheckCheck className="h-3 w-3" />
               Mark all read
@@ -249,16 +249,16 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
         </div>
 
         {/* Notifications List */}
-        <div className="max-h-80 overflow-y-auto divide-y divide-[#222222]">
+        <div className="max-h-80 overflow-y-auto divide-y divide-stone-200">
           {loading ? (
-            <div className="py-8 text-center text-xs text-[#8e8e8e]">Loading notifications...</div>
+            <div className="py-8 text-center text-xs text-stone-400">Loading notifications...</div>
           ) : notifications.length === 0 ? (
             <div className="py-10 text-center px-4">
-              <div className="w-10 h-10 rounded-full bg-[#1c1c1c] border border-[#2e2e2e] text-[#8e8e8e] flex items-center justify-center mx-auto mb-2">
+              <div className="w-10 h-10 rounded-full bg-stone-100 border border-stone-200 text-stone-400 flex items-center justify-center mx-auto mb-2">
                 <Bell className="h-5 w-5" />
               </div>
-              <p className="text-xs font-semibold text-white">No notifications yet</p>
-              <p className="text-[11px] text-[#8e8e8e] mt-0.5">
+              <p className="text-xs font-semibold text-[#111111]">No notifications yet</p>
+              <p className="text-[11px] text-stone-400 mt-0.5">
                 Updates regarding your assignments, lectures, and grades will appear here.
               </p>
             </div>
@@ -280,7 +280,7 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
                   key={item.id}
                   onClick={() => handleItemClick(item)}
                   className={`group relative flex items-start gap-3 p-3 transition-colors cursor-pointer text-left ${
-                    !item.is_read ? 'bg-[#1c1c1c]/90' : 'hover:bg-[#1a1a1a]'
+                    !item.is_read ? 'bg-amber-50/60' : 'hover:bg-stone-50'
                   }`}
                 >
                   {getItemIcon(item.type)}
@@ -289,24 +289,24 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
                       <p
                         className={`text-xs truncate ${
                           !item.is_read
-                            ? 'font-bold text-white'
-                            : 'font-semibold text-[#d4d4d4]'
+                            ? 'font-bold text-[#111111]'
+                            : 'font-semibold text-stone-600'
                         }`}
                       >
                         {item.title}
                       </p>
-                      <span className="text-[10px] text-[#8e8e8e] shrink-0 flex items-center gap-0.5">
+                      <span className="text-[10px] text-stone-400 shrink-0 flex items-center gap-0.5">
                         <Clock className="h-2.5 w-2.5" />
                         {formatTimeAgo(item.created_at)}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#b7b7b5] mt-0.5 leading-relaxed line-clamp-2">
+                    <p className="text-[11px] text-stone-500 mt-0.5 leading-relaxed line-clamp-2">
                       {item.message}
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0 self-center">
                     {!item.is_read && (
-                      <span className="w-2 h-2 rounded-full bg-[#a8f1e0] shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[#a05120] shrink-0" />
                     )}
                     <button
                       type="button"
@@ -316,7 +316,7 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
                         e.stopPropagation();
                         handleDeleteNotification(item.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-[#262626] text-[#8e8e8e] hover:text-red-400 rounded transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-stone-100 text-stone-400 hover:text-red-600 rounded transition-all"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -344,15 +344,15 @@ export function StudentNotificationBell({ studentId }: StudentNotificationBellPr
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 bg-[#181818] border-t border-[#262626] flex items-center justify-between text-[11px] text-[#8e8e8e]">
+        <div className="px-4 py-2.5 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-400">
           <div className="flex items-center gap-1.5">
-            <span className="flex h-1.5 w-1.5 rounded-full bg-[#a8f1e0] animate-pulse" />
+            <span className="flex h-1.5 w-1.5 rounded-full bg-[#a05120] animate-pulse" />
             <span>Real-time channel active</span>
           </div>
           <Link
             href="/student/assignments"
             onClick={() => setIsOpen(false)}
-            className="font-semibold text-[#a8f1e0] hover:text-[#9ee4a0] flex items-center gap-1 transition-colors"
+            className="font-semibold text-[#a05120] hover:text-[#864319] flex items-center gap-1 transition-colors"
           >
             <span>My Assignments</span>
             <ExternalLink className="h-2.5 w-2.5" />

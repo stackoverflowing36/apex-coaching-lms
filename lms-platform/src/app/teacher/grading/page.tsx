@@ -139,14 +139,14 @@ export default function TeacherGradingHubPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center">
+            <div className="h-8 w-8 rounded-studio bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center">
               <CheckSquare className="h-4 w-4" />
             </div>
-            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-white tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
               Evaluation &amp; Grading Station
             </h1>
           </div>
-          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-[#b7b7b5]">
+          <p className="text-xs uppercase tracking-wider font-semibold font-condensed text-stone-500">
             Review student assignment uploads in real-time, grade solutions in split-screen, and return tailored feedback.
           </p>
         </div>
@@ -155,40 +155,40 @@ export default function TeacherGradingHubPage() {
       {/* Summary KPI Cards (Architectural 1px Studio Grid) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         
-        <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px] flex items-center gap-4">
-          <div className="w-11 h-11 rounded-[20px] bg-[#1c1c1c] text-[#ffb956] border border-[#383838] flex items-center justify-center flex-shrink-0">
+        <div className="studio-card p-5 bg-white border border-stone-200 rounded-studio flex items-center gap-4">
+          <div className="w-11 h-11 rounded-studio bg-stone-100 text-amber-700 border border-stone-300 flex items-center justify-center flex-shrink-0">
             <Clock className="h-5 w-5" />
           </div>
           <div>
-            <div className="font-display font-bold uppercase text-3xl text-white">
+            <div className="font-display font-bold uppercase text-3xl text-[#111111]">
               {loading ? '—' : pendingCount}
             </div>
-            <div className="text-[10px] font-bold text-[#ffb956] uppercase tracking-wider font-condensed">
+            <div className="text-[10px] font-bold text-amber-700 uppercase tracking-wider font-condensed">
               Pending Evaluation
             </div>
           </div>
         </div>
 
-        <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px] flex items-center gap-4">
-          <div className="w-11 h-11 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center flex-shrink-0">
+        <div className="studio-card p-5 bg-white border border-stone-200 rounded-studio flex items-center gap-4">
+          <div className="w-11 h-11 rounded-studio bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center flex-shrink-0">
             <CheckCircle2 className="h-5 w-5" />
           </div>
           <div>
-            <div className="font-display font-bold uppercase text-3xl text-white">
+            <div className="font-display font-bold uppercase text-3xl text-[#111111]">
               {loading ? '—' : gradedCount}
             </div>
-            <div className="text-[10px] font-bold text-[#a8f1e0] uppercase tracking-wider font-condensed">
+            <div className="text-[10px] font-bold text-[#a05120] uppercase tracking-wider font-condensed">
               Graded &amp; Returned
             </div>
           </div>
         </div>
 
-        <div className="studio-card p-5 bg-[#141414] border border-[#262626] rounded-[20px] flex items-center gap-4">
-          <div className="w-11 h-11 rounded-[20px] bg-[#1c1c1c] text-[#9dc1ff] border border-[#383838] flex items-center justify-center flex-shrink-0">
+        <div className="studio-card p-5 bg-white border border-stone-200 rounded-studio flex items-center gap-4">
+          <div className="w-11 h-11 rounded-studio bg-stone-100 text-[#9dc1ff] border border-stone-300 flex items-center justify-center flex-shrink-0">
             <FileText className="h-5 w-5" />
           </div>
           <div>
-            <div className="font-display font-bold uppercase text-3xl text-white">
+            <div className="font-display font-bold uppercase text-3xl text-[#111111]">
               {loading ? '—' : totalCount}
             </div>
             <div className="text-[10px] font-bold text-[#9dc1ff] uppercase tracking-wider font-condensed">
@@ -200,48 +200,48 @@ export default function TeacherGradingHubPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="studio-card p-4 sm:p-5 bg-[#141414] border border-[#262626] rounded-[20px] space-y-4">
+      <div className="studio-card p-4 sm:p-5 bg-white border border-stone-200 rounded-studio space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
           
           {/* Search Box */}
           <div className="sm:col-span-6 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8e8e8e]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
             <Input
               placeholder="Search by student name, assignment, or batch code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 rounded-[20px] text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+              className="pl-10 h-10 rounded-studio text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-400 focus:border-[#a05120]"
             />
           </div>
 
           {/* Status Tabs Filter */}
-          <div className="sm:col-span-3 flex items-center bg-[#181818] border border-[#383838] rounded-[20px] p-1">
+          <div className="sm:col-span-3 flex items-center bg-stone-50 border border-stone-300 rounded-studio p-1">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`flex-1 py-1.5 rounded-[20px] text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`flex-1 py-1.5 rounded-studio text-xs font-bold uppercase tracking-wider transition-all ${
                 statusFilter === 'all'
-                  ? 'bg-[#a8f1e0] text-[#0c0c0c] shadow-sm'
-                  : 'text-[#b7b7b5] hover:text-white'
+                  ? 'bg-[#a8f1e0] text-[#111111] shadow-sm'
+                  : 'text-stone-500 hover:text-[#111111]'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter('pending')}
-              className={`flex-1 py-1.5 rounded-[20px] text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`flex-1 py-1.5 rounded-studio text-xs font-bold uppercase tracking-wider transition-all ${
                 statusFilter === 'pending'
-                  ? 'bg-[#ffb956] text-[#0c0c0c] shadow-sm'
-                  : 'text-[#b7b7b5] hover:text-white'
+                  ? 'bg-[#ffb956] text-[#111111] shadow-sm'
+                  : 'text-stone-500 hover:text-[#111111]'
               }`}
             >
               Pending ({pendingCount})
             </button>
             <button
               onClick={() => setStatusFilter('graded')}
-              className={`flex-1 py-1.5 rounded-[20px] text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`flex-1 py-1.5 rounded-studio text-xs font-bold uppercase tracking-wider transition-all ${
                 statusFilter === 'graded'
-                  ? 'bg-[#9ee4a0] text-[#0c0c0c] shadow-sm'
-                  : 'text-[#b7b7b5] hover:text-white'
+                  ? 'bg-[#9ee4a0] text-[#111111] shadow-sm'
+                  : 'text-stone-500 hover:text-[#111111]'
               }`}
             >
               Graded
@@ -253,11 +253,11 @@ export default function TeacherGradingHubPage() {
             <select
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
-              className="w-full h-10 rounded-[20px] border border-[#383838] bg-[#181818] px-3.5 text-xs font-semibold uppercase tracking-wider text-white focus:border-[#a8f1e0] focus:outline-none"
+              className="w-full h-10 rounded-studio border border-stone-300 bg-stone-50 px-3.5 text-xs font-semibold uppercase tracking-wider text-[#111111] focus:border-[#a05120] focus:outline-none"
             >
-              <option value="all" className="bg-[#181818] text-white">All Batches</option>
+              <option value="all" className="bg-stone-50 text-[#111111]">All Batches</option>
               {courses.map((c) => (
-                <option key={c.id} value={c.id} className="bg-[#181818] text-white">
+                <option key={c.id} value={c.id} className="bg-stone-50 text-[#111111]">
                   {c.code} — {c.title}
                 </option>
               ))}
@@ -268,19 +268,19 @@ export default function TeacherGradingHubPage() {
       </div>
 
       {/* Submissions Table */}
-      <div className="studio-card overflow-hidden bg-[#141414] border border-[#262626] rounded-[20px]">
+      <div className="studio-card overflow-hidden bg-white border border-stone-200 rounded-studio">
         {loading ? (
-          <div className="py-24 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
-            <div className="w-10 h-10 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
+          <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+            <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a8f1e0] rounded-full animate-spin" />
             <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading submissions queue...</p>
           </div>
         ) : filteredSubmissions.length === 0 ? (
           <div className="py-16 text-center space-y-3">
-            <FileText className="h-10 w-10 text-[#8e8e8e] mx-auto" />
-            <h3 className="font-display font-bold uppercase text-base text-white tracking-tight">
+            <FileText className="h-10 w-10 text-stone-400 mx-auto" />
+            <h3 className="font-display font-bold uppercase text-base text-[#111111] tracking-tight">
               No Submissions Matching Filters
             </h3>
-            <p className="text-xs text-[#8e8e8e] max-w-sm mx-auto">
+            <p className="text-xs text-stone-400 max-w-sm mx-auto">
               Try adjusting your batch filter or search query.
             </p>
           </div>
@@ -288,7 +288,7 @@ export default function TeacherGradingHubPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-[#262626] bg-[#181818] text-[10px] font-bold uppercase tracking-wider text-[#b7b7b5] font-condensed">
+                <tr className="border-b border-stone-200 bg-stone-50 text-[10px] font-bold uppercase tracking-wider text-stone-500 font-condensed">
                   <th className="py-3.5 px-6">Student</th>
                   <th className="py-3.5 px-6">Assignment / Batch</th>
                   <th className="py-3.5 px-6">Submitted On</th>
@@ -311,20 +311,20 @@ export default function TeacherGradingHubPage() {
                   return (
                     <tr
                       key={sub.id}
-                      className="hover:bg-[#181818]/60 transition-colors group"
+                      className="hover:bg-stone-50/60 transition-colors group"
                     >
                       {/* Student Column */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8 border border-[#383838]">
+                          <Avatar className="h-8 w-8 border border-stone-300">
                             <AvatarImage src={sub.users?.avatar_url} />
-                            <AvatarFallback className="bg-[#1c1c1c] text-[#a8f1e0] font-bold text-[10px]">
+                            <AvatarFallback className="bg-stone-100 text-[#a05120] font-bold text-[10px]">
                               {initials}
                             </AvatarFallback>
                           </Avatar>
                           <div className="space-y-0.5">
-                            <div className="font-semibold text-white">{studentName}</div>
-                            <div className="text-[10px] text-[#8e8e8e] truncate max-w-[150px] font-condensed">
+                            <div className="font-semibold text-[#111111]">{studentName}</div>
+                            <div className="text-[10px] text-stone-400 truncate max-w-[150px] font-condensed">
                               {sub.users?.email}
                             </div>
                           </div>
@@ -334,7 +334,7 @@ export default function TeacherGradingHubPage() {
                       {/* Assignment Column */}
                       <td className="py-4 px-6">
                         <div className="space-y-0.5">
-                          <div className="font-semibold text-white">
+                          <div className="font-semibold text-[#111111]">
                             {sub.assignments?.title || 'Practice Sheet'}
                           </div>
                           <Badge variant="stone" className="text-[10px] px-1.5 py-0 uppercase font-semibold">
@@ -344,7 +344,7 @@ export default function TeacherGradingHubPage() {
                       </td>
 
                       {/* Submitted On Column */}
-                      <td className="py-4 px-6 text-[#8e8e8e] font-condensed whitespace-nowrap">
+                      <td className="py-4 px-6 text-stone-400 font-condensed whitespace-nowrap">
                         {new Date(sub.submitted_at).toLocaleDateString(undefined, {
                           month: 'short',
                           day: 'numeric',
@@ -366,11 +366,11 @@ export default function TeacherGradingHubPage() {
                       {/* Score Column */}
                       <td className="py-4 px-6">
                         {isGraded && sub.marks_obtained !== null ? (
-                          <span className="font-bold text-xs text-white bg-[#1c1c1c] px-2.5 py-1 rounded-[20px] border border-[#383838] font-condensed">
+                          <span className="font-bold text-xs text-[#111111] bg-stone-100 px-2.5 py-1 rounded-studio border border-stone-300 font-condensed">
                             {sub.marks_obtained} / {sub.assignments?.max_marks || 100}
                           </span>
                         ) : (
-                          <span className="text-[#8e8e8e] font-medium">—</span>
+                          <span className="text-stone-400 font-medium">—</span>
                         )}
                       </td>
 
@@ -382,7 +382,7 @@ export default function TeacherGradingHubPage() {
                               href={sub.checked_copy_url || sub.checkedCopyUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="p-1.5 rounded-[20px] bg-[#1c1c1c] text-[#ffb956] hover:bg-[#252525] border border-[#383838] transition-colors"
+                              className="p-1.5 rounded-studio bg-stone-100 text-amber-700 hover:bg-stone-200 border border-stone-300 transition-colors"
                               title="View Returned Checked Copy"
                             >
                               <ExternalLink className="h-3.5 w-3.5" />
@@ -390,10 +390,10 @@ export default function TeacherGradingHubPage() {
                           )}
                           <Link href={`/teacher/grading/${sub.id}`}>
                             <button
-                              className={`text-xs font-bold uppercase tracking-wider py-1.5 px-4 rounded-[20px] transition-all ${
+                              className={`text-xs font-bold uppercase tracking-wider py-1.5 px-4 rounded-studio transition-all ${
                                 isGraded
-                                  ? 'border border-[#383838] bg-[#181818] text-white hover:border-[#a8f1e0] hover:text-[#a8f1e0]'
-                                  : 'bg-[#ffb956] text-[#0c0c0c] hover:bg-[#e5a64d]'
+                                  ? 'border border-stone-300 bg-stone-50 text-[#111111] hover:border-[#a05120] hover:text-[#a05120]'
+                                  : 'bg-[#ffb956] text-[#111111] hover:bg-[#e5a64d]'
                               }`}
                             >
                               {isGraded ? 'Review & Edit' : 'Grade Paper'}
@@ -404,7 +404,7 @@ export default function TeacherGradingHubPage() {
                           <button
                             type="button"
                             onClick={() => setSubmissionToDelete(sub)}
-                            className="p-1.5 rounded-[20px] text-[#8e8e8e] hover:text-[#ff6b6b] hover:bg-[#2a1717] border border-transparent hover:border-[#ff6b6b]/40 transition-colors"
+                            className="p-1.5 rounded-studio text-stone-400 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-[#ff6b6b]/40 transition-colors"
                             title="Delete student submission"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -422,15 +422,15 @@ export default function TeacherGradingHubPage() {
 
       {/* Delete Submission Confirmation Modal */}
       <Dialog open={!!submissionToDelete} onOpenChange={(open) => !open && setSubmissionToDelete(null)}>
-        <DialogContent className="rounded-[20px] p-6 max-w-sm bg-[#141414] border border-[#383838] text-white">
+        <DialogContent className="rounded-studio p-6 max-w-sm bg-white border border-stone-300 text-[#111111]">
           <DialogHeader className="space-y-2 text-left">
-            <DialogTitle className="font-heading font-extrabold text-lg text-[#ff6b6b] flex items-center gap-2">
+            <DialogTitle className="font-heading font-extrabold text-lg text-red-600 flex items-center gap-2">
               <Trash2 className="h-5 w-5" />
               Delete Submission?
             </DialogTitle>
-            <p className="text-xs text-[#b7b7b5] leading-relaxed">
+            <p className="text-xs text-stone-500 leading-relaxed">
               Are you sure you want to permanently delete the submission by{' '}
-              <strong className="text-white">
+              <strong className="text-[#111111]">
                 {submissionToDelete?.users?.full_name || 'this student'}
               </strong>{' '}
               for &quot;{submissionToDelete?.assignments?.title || 'Assignment'}&quot;?
@@ -443,7 +443,7 @@ export default function TeacherGradingHubPage() {
               size="sm"
               onClick={() => setSubmissionToDelete(null)}
               disabled={isDeleting}
-              className="rounded-[20px] text-xs font-bold border border-[#383838] bg-[#181818] text-white hover:bg-[#222]"
+              className="rounded-studio text-xs font-bold border border-stone-300 bg-stone-50 text-[#111111] hover:bg-stone-100"
             >
               Cancel
             </Button>
@@ -452,7 +452,7 @@ export default function TeacherGradingHubPage() {
               size="sm"
               onClick={handleConfirmDelete}
               disabled={isDeleting}
-              className="rounded-[20px] text-xs font-bold bg-[#ff6b6b] hover:bg-[#e05555] text-white shadow-md shadow-red-600/20"
+              className="rounded-studio text-xs font-bold bg-[#ff6b6b] hover:bg-[#e05555] text-[#111111] shadow-md shadow-red-600/20"
             >
               {isDeleting ? (
                 <span className="flex items-center gap-1.5">

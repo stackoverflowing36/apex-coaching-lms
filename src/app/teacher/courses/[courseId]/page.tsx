@@ -497,8 +497,8 @@ export default function CourseBuilderDetailPage() {
 
   if (loading && !course) {
     return (
-      <div className="py-24 flex flex-col items-center justify-center text-[#8e8e8e] gap-3">
-        <div className="w-10 h-10 border-2 border-[#262626] border-t-[#a8f1e0] rounded-full animate-spin" />
+      <div className="py-24 flex flex-col items-center justify-center text-stone-400 gap-3">
+        <div className="w-10 h-10 border-2 border-stone-200 border-t-[#a8f1e0] rounded-full animate-spin" />
         <p className="text-xs uppercase tracking-wider font-semibold font-condensed">Loading course builder...</p>
       </div>
     );
@@ -512,20 +512,20 @@ export default function CourseBuilderDetailPage() {
         <div className="space-y-1.5">
           <Link
             href="/teacher/courses"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#b7b7b5] hover:text-[#a8f1e0] transition-colors font-condensed"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-stone-500 hover:text-[#a05120] transition-colors font-condensed"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to All Batches
           </Link>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-white tracking-tight">
+            <h1 className="font-display font-bold uppercase text-2xl sm:text-3xl text-[#111111] tracking-tight">
               {course?.title || 'Classroom Batch'}
             </h1>
-            <Badge variant="mint" className="font-bold text-xs px-2.5 py-0.5 rounded-[20px]">
+            <Badge variant="mint" className="font-bold text-xs px-2.5 py-0.5 rounded-studio">
               {course?.code}
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-[#b7b7b5] max-w-2xl">
+          <p className="text-xs sm:text-sm text-stone-500 max-w-2xl">
             {course?.description || 'Manage lecture video links, notes documents, and syllabus PDFs for enrolled students.'}
           </p>
         </div>
@@ -535,7 +535,7 @@ export default function CourseBuilderDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-[20px] border-[#383838] bg-[#181818] text-[#a8f1e0] hover:bg-[#a8f1e0] hover:text-[#0c0c0c] text-xs font-bold h-9 transition-all"
+              className="rounded-studio border-stone-300 bg-stone-50 text-[#a05120] hover:bg-[#a8f1e0] hover:text-[#111111] text-xs font-bold h-9 transition-all"
             >
               <Eye className="h-3.5 w-3.5 mr-1.5" />
               Preview as Student
@@ -546,7 +546,7 @@ export default function CourseBuilderDetailPage() {
             variant="outline"
             size="sm"
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="rounded-[20px] border-[#522] bg-[#2a1717] text-[#ff6b6b] hover:bg-[#3a1d1d] text-xs font-bold h-9 shadow-xs transition-all"
+            className="rounded-studio border-red-200 bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold h-9 shadow-xs transition-all"
             title="Delete Classroom Batch"
           >
             <Trash2 className="h-3.5 w-3.5 mr-1.5" />
@@ -558,24 +558,24 @@ export default function CourseBuilderDetailPage() {
       {/* Tabs for Lecture Modules vs Syllabus Materials */}
       <Tabs defaultValue="lectures" className="space-y-6">
         <div className="overflow-x-auto pb-1 -mb-1">
-          <TabsList className="bg-[#181818] p-1 rounded-[20px] border border-[#2e2e2e] inline-flex flex-nowrap min-w-max">
+          <TabsList className="bg-stone-50 p-1 rounded-studio border border-stone-200 inline-flex flex-nowrap min-w-max">
             <TabsTrigger
               value="lectures"
-              className="rounded-[20px] text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 text-[#b7b7b5] data-[state=active]:bg-[#a8f1e0] data-[state=active]:text-[#0c0c0c] transition-all"
+              className="rounded-studio text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 text-stone-500 data-[state=active]:bg-[#a8f1e0] data-[state=active]:text-[#111111] transition-all"
             >
               <Video className="h-3.5 w-3.5 mr-1.5" />
               Lecture Modules ({lectures.length})
             </TabsTrigger>
             <TabsTrigger
               value="materials"
-              className="rounded-[20px] text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 text-[#b7b7b5] data-[state=active]:bg-[#a8f1e0] data-[state=active]:text-[#0c0c0c] transition-all"
+              className="rounded-studio text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 text-stone-500 data-[state=active]:bg-[#a8f1e0] data-[state=active]:text-[#111111] transition-all"
             >
               <FileText className="h-3.5 w-3.5 mr-1.5" />
               PDF Notes &amp; Syllabus ({materials.length})
             </TabsTrigger>
             <TabsTrigger
               value="assignments"
-              className="rounded-[20px] text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 text-[#b7b7b5] data-[state=active]:bg-[#a8f1e0] data-[state=active]:text-[#0c0c0c] transition-all"
+              className="rounded-studio text-xs font-bold uppercase tracking-wider px-4 sm:px-5 py-2 text-stone-500 data-[state=active]:bg-[#a8f1e0] data-[state=active]:text-[#111111] transition-all"
             >
               <FileCheck className="h-3.5 w-3.5 mr-1.5" />
               Assignments ({assignments.length})
@@ -589,34 +589,34 @@ export default function CourseBuilderDetailPage() {
         <TabsContent value="lectures" className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h2 className="font-display font-bold uppercase text-lg text-white">
+              <h2 className="font-display font-bold uppercase text-lg text-[#111111]">
                 Course Video Modules
               </h2>
-              <p className="text-xs text-[#8e8e8e]">
+              <p className="text-xs text-stone-400">
                 Organize the order of recorded lectures and interactive video archives.
               </p>
             </div>
 
             <Dialog open={isLectureDialogOpen} onOpenChange={setIsLectureDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-bold text-xs h-9 px-4 shadow-sm transition-all">
+                <Button className="rounded-studio bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#111111] font-bold text-xs h-9 px-4 shadow-sm transition-all">
                   <Plus className="h-3.5 w-3.5 mr-1" />
                   Add Lecture Module
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-[20px] p-5 sm:p-8 max-w-lg max-h-[88dvh] overflow-y-auto w-[calc(100%-1.5rem)] sm:w-full bg-[#141414] border border-[#383838] text-white">
+              <DialogContent className="rounded-studio p-5 sm:p-8 max-w-lg max-h-[88dvh] overflow-y-auto w-[calc(100%-1.5rem)] sm:w-full bg-white border border-stone-300 text-[#111111]">
                 <DialogHeader className="space-y-1 text-left">
-                  <DialogTitle className="font-display font-bold uppercase text-xl text-white">
+                  <DialogTitle className="font-display font-bold uppercase text-xl text-[#111111]">
                     Add Lecture to {course?.code}
                   </DialogTitle>
-                  <p className="text-xs text-[#b7b7b5]">
+                  <p className="text-xs text-stone-500">
                     Add video content from your device, Google Drive, or streaming links.
                   </p>
                 </DialogHeader>
 
                 <form onSubmit={handleAddLecture} className="space-y-4 pt-2">
                   <div className="space-y-1.5">
-                    <Label htmlFor="lecTitle" className="text-xs font-bold text-[#e2bcc2]">
+                    <Label htmlFor="lecTitle" className="text-xs font-bold text-rose-700">
                       Lecture Title
                     </Label>
                     <Input
@@ -624,24 +624,24 @@ export default function CourseBuilderDetailPage() {
                       placeholder="e.g. Chapter 4: Electric Potential & Capacitance"
                       value={lectureTitle}
                       onChange={(e) => setLectureTitle(e.target.value)}
-                      className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                      className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                       required
                     />
                   </div>
 
                   {/* Video Source Selector */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold text-[#e2bcc2]">
+                    <Label className="text-xs font-bold text-rose-700">
                       Video Source
                     </Label>
-                    <div className="grid grid-cols-3 gap-1 bg-[#181818] p-1 rounded-[20px] border border-[#383838]">
+                    <div className="grid grid-cols-3 gap-1 bg-stone-50 p-1 rounded-studio border border-stone-300">
                       <button
                         type="button"
                         onClick={() => setLectureVideoSource('upload')}
-                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-[20px] text-xs font-bold transition-all ${
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-studio text-xs font-bold transition-all ${
                           lectureVideoSource === 'upload'
-                            ? 'bg-[#a8f1e0] text-[#0c0c0c] shadow-sm'
-                            : 'text-[#b7b7b5] hover:text-white'
+                            ? 'bg-[#a8f1e0] text-[#111111] shadow-sm'
+                            : 'text-stone-500 hover:text-[#111111]'
                         }`}
                       >
                         <Upload className="h-3.5 w-3.5" />
@@ -650,10 +650,10 @@ export default function CourseBuilderDetailPage() {
                       <button
                         type="button"
                         onClick={() => setLectureVideoSource('gdrive')}
-                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-[20px] text-xs font-bold transition-all ${
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-studio text-xs font-bold transition-all ${
                           lectureVideoSource === 'gdrive'
-                            ? 'bg-[#a8f1e0] text-[#0c0c0c] shadow-sm'
-                            : 'text-[#b7b7b5] hover:text-white'
+                            ? 'bg-[#a8f1e0] text-[#111111] shadow-sm'
+                            : 'text-stone-500 hover:text-[#111111]'
                         }`}
                       >
                         <HardDrive className="h-3.5 w-3.5" />
@@ -662,10 +662,10 @@ export default function CourseBuilderDetailPage() {
                       <button
                         type="button"
                         onClick={() => setLectureVideoSource('url')}
-                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-[20px] text-xs font-bold transition-all ${
+                        className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-studio text-xs font-bold transition-all ${
                           lectureVideoSource === 'url'
-                            ? 'bg-[#a8f1e0] text-[#0c0c0c] shadow-sm'
-                            : 'text-[#b7b7b5] hover:text-white'
+                            ? 'bg-[#a8f1e0] text-[#111111] shadow-sm'
+                            : 'text-stone-500 hover:text-[#111111]'
                         }`}
                       >
                         <Link2 className="h-3.5 w-3.5" />
@@ -688,16 +688,16 @@ export default function CourseBuilderDetailPage() {
                           }}
                         />
                         {lectureVideoFile ? (
-                          <div className="flex items-center justify-between p-3 bg-[#181818] border border-[#383838] rounded-[20px]">
+                          <div className="flex items-center justify-between p-3 bg-stone-50 border border-stone-300 rounded-studio">
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-8 h-8 rounded-full bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center shrink-0">
                                 <Video className="h-4 w-4" />
                               </div>
                               <div className="min-w-0">
-                                <p className="text-xs font-bold text-white truncate">
+                                <p className="text-xs font-bold text-[#111111] truncate">
                                   {lectureVideoFile.name}
                                 </p>
-                                <p className="text-[10px] text-[#8e8e8e]">
+                                <p className="text-[10px] text-stone-400">
                                   {(lectureVideoFile.size / (1024 * 1024)).toFixed(1)} MB • Ready to upload
                                 </p>
                               </div>
@@ -710,7 +710,7 @@ export default function CourseBuilderDetailPage() {
                                 setLectureVideoFile(null);
                                 if (lectureFileInputRef.current) lectureFileInputRef.current.value = '';
                               }}
-                              className="text-[#8e8e8e] hover:text-[#ff6b6b] h-8 w-8 p-0 rounded-full"
+                              className="text-stone-400 hover:text-red-600 h-8 w-8 p-0 rounded-full"
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -718,13 +718,13 @@ export default function CourseBuilderDetailPage() {
                         ) : (
                           <label
                             htmlFor="lecture-video-input"
-                            className="block border-2 border-dashed border-[#383838] hover:border-[#a8f1e0] bg-[#181818] rounded-[20px] p-5 text-center cursor-pointer transition-all"
+                            className="block border-2 border-dashed border-stone-300 hover:border-[#a05120] bg-stone-50 rounded-studio p-5 text-center cursor-pointer transition-all"
                           >
-                            <Upload className="h-7 w-7 text-[#a8f1e0] mx-auto mb-1.5" />
-                            <p className="text-xs font-bold text-white">
+                            <Upload className="h-7 w-7 text-[#a05120] mx-auto mb-1.5" />
+                            <p className="text-xs font-bold text-[#111111]">
                               Tap here to choose video from device
                             </p>
-                            <p className="text-[10px] text-[#8e8e8e] mt-0.5">
+                            <p className="text-[10px] text-stone-400 mt-0.5">
                               MP4, WebM, MOV, or MKV (up to 500 MB)
                             </p>
                           </label>
@@ -739,14 +739,14 @@ export default function CourseBuilderDetailPage() {
                           placeholder="https://drive.google.com/file/d/.../view?usp=sharing"
                           value={lectureGDriveUrl}
                           onChange={(e) => setLectureGDriveUrl(e.target.value)}
-                          className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                          className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                           required={lectureVideoSource === 'gdrive'}
                         />
-                        <div className="rounded-[16px] bg-[#181818] border border-[#383838] p-2.5 text-[11px] text-[#b7b7b5] leading-relaxed">
-                          <p className="font-bold flex items-center gap-1 mb-0.5 text-[#a8f1e0]">
+                        <div className="rounded-[16px] bg-stone-50 border border-stone-300 p-2.5 text-[11px] text-stone-500 leading-relaxed">
+                          <p className="font-bold flex items-center gap-1 mb-0.5 text-[#a05120]">
                             <HardDrive className="h-3 w-3 shrink-0" /> Google Drive Link Sharing
                           </p>
-                          Ensure file permission in Google Drive is set to <strong className="text-white">&ldquo;Anyone with the link can view&rdquo;</strong>. The URL is automatically converted to an embeddable player for students.
+                          Ensure file permission in Google Drive is set to <strong className="text-[#111111]">&ldquo;Anyone with the link can view&rdquo;</strong>. The URL is automatically converted to an embeddable player for students.
                         </div>
                       </div>
                     )}
@@ -758,10 +758,10 @@ export default function CourseBuilderDetailPage() {
                           placeholder="https://www.youtube.com/watch?v=... or Vimeo / direct MP4 link"
                           value={lectureVideoUrl}
                           onChange={(e) => setLectureVideoUrl(e.target.value)}
-                          className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                          className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                           required={lectureVideoSource === 'url'}
                         />
-                        <p className="text-[10px] text-[#8e8e8e]">
+                        <p className="text-[10px] text-stone-400">
                           Supports YouTube, Vimeo, Loom, or direct .mp4 streaming links.
                         </p>
                       </div>
@@ -769,7 +769,7 @@ export default function CourseBuilderDetailPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-[#e2bcc2]">
+                    <Label className="text-xs font-bold text-rose-700">
                       Chapter / Module
                     </Label>
                     <ChapterSelect
@@ -781,7 +781,7 @@ export default function CourseBuilderDetailPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="notesUrl" className="text-xs font-bold text-[#e2bcc2]">
+                    <Label htmlFor="notesUrl" className="text-xs font-bold text-rose-700">
                       Accompanying Handout / Notes URL (Optional)
                     </Label>
                     <Input
@@ -789,14 +789,14 @@ export default function CourseBuilderDetailPage() {
                       placeholder="https://drive.google.com/... or Supabase PDF link"
                       value={lectureNotesUrl}
                       onChange={(e) => setLectureNotesUrl(e.target.value)}
-                      className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                      className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isAddingLecture}
-                    className="w-full rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-sm transition-all"
+                    className="w-full rounded-studio bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#111111] font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-sm transition-all"
                   >
                     {isAddingLecture ? (
                       <span className="flex items-center gap-2">
@@ -813,12 +813,12 @@ export default function CourseBuilderDetailPage() {
           </div>
 
           {lectures.length === 0 ? (
-            <div className="bg-[#141414] rounded-[20px] p-10 text-center border border-[#262626] space-y-3">
-              <Video className="h-10 w-10 text-[#8e8e8e] mx-auto" />
-              <h3 className="font-display font-bold uppercase text-base text-white">
+            <div className="bg-white rounded-studio p-10 text-center border border-stone-200 space-y-3">
+              <Video className="h-10 w-10 text-stone-400 mx-auto" />
+              <h3 className="font-display font-bold uppercase text-base text-[#111111]">
                 No Lectures in this Batch
               </h3>
-              <p className="text-xs text-[#b7b7b5] max-w-sm mx-auto">
+              <p className="text-xs text-stone-500 max-w-sm mx-auto">
                 Click &quot;Add Lecture Module&quot; above to create your first class video entry.
               </p>
             </div>
@@ -827,7 +827,7 @@ export default function CourseBuilderDetailPage() {
               {lectures.map((lecture, idx) => (
                 <div
                   key={lecture.id}
-                  className="bg-[#141414] rounded-[20px] p-4 sm:p-5 border border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#a8f1e0]/60 transition-colors"
+                  className="bg-white rounded-studio p-4 sm:p-5 border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#a05120]/60 transition-colors"
                 >
                   <div className="flex items-center gap-3.5">
                     {/* Move Up/Down Controls */}
@@ -835,7 +835,7 @@ export default function CourseBuilderDetailPage() {
                       <button
                         onClick={() => handleMove(idx, 'up')}
                         disabled={idx === 0}
-                        className="p-1 rounded-md text-[#8e8e8e] hover:text-[#a8f1e0] hover:bg-[#181818] disabled:opacity-30 disabled:hover:bg-transparent"
+                        className="p-1 rounded-md text-stone-400 hover:text-[#a05120] hover:bg-stone-50 disabled:opacity-30 disabled:hover:bg-transparent"
                         aria-label="Move up"
                       >
                         <ChevronUp className="h-3.5 w-3.5" />
@@ -843,19 +843,19 @@ export default function CourseBuilderDetailPage() {
                       <button
                         onClick={() => handleMove(idx, 'down')}
                         disabled={idx === lectures.length - 1}
-                        className="p-1 rounded-md text-[#8e8e8e] hover:text-[#a8f1e0] hover:bg-[#181818] disabled:opacity-30 disabled:hover:bg-transparent"
+                        className="p-1 rounded-md text-stone-400 hover:text-[#a05120] hover:bg-stone-50 disabled:opacity-30 disabled:hover:bg-transparent"
                         aria-label="Move down"
                       >
                         <ChevronDown className="h-3.5 w-3.5" />
                       </button>
                     </div>
 
-                    <div className="w-10 h-10 rounded-[20px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
+                    <div className="w-10 h-10 rounded-studio bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
                       {idx + 1}
                     </div>
 
                     <div className="space-y-0.5">
-                      <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2">
+                      <div className="font-bold text-sm sm:text-base text-[#111111] flex items-center gap-2">
                         {lecture.title}
                         {lecture.course_chapters?.title && (
                           <Badge variant="rust" className="text-[10px] px-1.5 py-0 font-bold">
@@ -863,8 +863,8 @@ export default function CourseBuilderDetailPage() {
                           </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-[#8e8e8e]">
-                        <span className="truncate max-w-[200px] sm:max-w-xs text-[#8e8e8e]">
+                      <div className="flex items-center gap-3 text-xs text-stone-400">
+                        <span className="truncate max-w-[200px] sm:max-w-xs text-stone-400">
                           {lecture.video_url || 'Embedded stream'}
                         </span>
                         {lecture.notes_url && (
@@ -872,7 +872,7 @@ export default function CourseBuilderDetailPage() {
                             href={lecture.notes_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-[#a8f1e0] hover:underline inline-flex items-center gap-1 font-semibold"
+                            className="text-[#a05120] hover:underline inline-flex items-center gap-1 font-semibold"
                           >
                             <FileText className="h-3 w-3" />
                             PDF Notes
@@ -882,10 +882,10 @@ export default function CourseBuilderDetailPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-0 border-[#262626]">
+                  <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-0 border-stone-200">
                     <button
                       onClick={() => handleDeleteLecture(lecture.id)}
-                      className="p-2 rounded-full text-[#8e8e8e] hover:text-[#ff6b6b] hover:bg-[#2a1717] transition-colors"
+                      className="p-2 rounded-full text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Delete Lecture"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -903,13 +903,13 @@ export default function CourseBuilderDetailPage() {
         <TabsContent value="materials" className="space-y-8">
           
           {/* Stylized Dropzone Upload Card */}
-          <div className="bg-[#141414] rounded-[20px] p-6 sm:p-8 border border-[#262626] space-y-6">
+          <div className="bg-white rounded-studio p-6 sm:p-8 border border-stone-200 space-y-6">
             <div className="space-y-1">
-              <h2 className="font-display font-bold uppercase text-lg text-white flex items-center gap-2">
-                <UploadCloud className="h-5 w-5 text-[#a8f1e0]" />
+              <h2 className="font-display font-bold uppercase text-lg text-[#111111] flex items-center gap-2">
+                <UploadCloud className="h-5 w-5 text-[#a05120]" />
                 Upload Syllabus PDFs &amp; Formula Handouts
               </h2>
-              <p className="text-xs text-[#b7b7b5]">
+              <p className="text-xs text-stone-500">
                 Uploaded files are stored in the secure cloud storage bucket and made available to all enrolled batch students.
               </p>
             </div>
@@ -919,10 +919,10 @@ export default function CourseBuilderDetailPage() {
               {/* Dropzone Box with Native Label Trigger for Mobile */}
               <label
                 htmlFor="course-material-upload"
-                className={`block border-2 border-dashed rounded-[20px] p-6 sm:p-8 text-center cursor-pointer transition-all ${
+                className={`block border-2 border-dashed rounded-studio p-6 sm:p-8 text-center cursor-pointer transition-all ${
                   selectedFile
                     ? 'border-[#a8f1e0] bg-[#a8f1e0]/10'
-                    : 'border-[#383838] bg-[#181818] hover:border-[#a8f1e0]/60'
+                    : 'border-stone-300 bg-stone-50 hover:border-[#a05120]/60'
                 }`}
               >
                 <input
@@ -942,27 +942,27 @@ export default function CourseBuilderDetailPage() {
 
                 {selectedFile ? (
                   <div className="space-y-2">
-                    <FileCheck className="h-10 w-10 text-[#a8f1e0] mx-auto" />
-                    <div className="font-bold text-sm sm:text-base text-white break-all">{selectedFile.name}</div>
-                    <div className="text-xs text-[#8e8e8e] font-medium">
+                    <FileCheck className="h-10 w-10 text-[#a05120] mx-auto" />
+                    <div className="font-bold text-sm sm:text-base text-[#111111] break-all">{selectedFile.name}</div>
+                    <div className="text-xs text-stone-400 font-medium">
                       {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to upload
                     </div>
-                    <span className="inline-block text-xs font-bold text-[#a8f1e0] bg-[#1c1c1c] px-3 py-1 rounded-[20px] border border-[#383838]">
+                    <span className="inline-block text-xs font-bold text-[#a05120] bg-stone-100 px-3 py-1 rounded-studio border border-stone-300">
                       Tap to choose another file
                     </span>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <UploadCloud className="h-10 w-10 text-[#a8f1e0] mx-auto" />
+                    <UploadCloud className="h-10 w-10 text-[#a05120] mx-auto" />
                     <div>
-                      <div className="font-bold text-sm sm:text-base text-white">
+                      <div className="font-bold text-sm sm:text-base text-[#111111]">
                         Tap here to select PDF, Notes or Photo from your device
                       </div>
-                      <div className="text-xs text-[#8e8e8e] mt-1">
+                      <div className="text-xs text-stone-400 mt-1">
                         Supports PDF, DOCX, PNG, JPG (Max 50MB)
                       </div>
                     </div>
-                    <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[20px] bg-[#a8f1e0] text-[#0c0c0c] font-bold text-xs shadow-sm hover:bg-[#9ee4a0] transition-colors">
+                    <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-studio bg-[#a8f1e0] text-[#111111] font-bold text-xs shadow-sm hover:bg-[#9ee4a0] transition-colors">
                       <UploadCloud className="h-3.5 w-3.5" />
                       <span>Browse Device / Mobile Files</span>
                     </div>
@@ -973,7 +973,7 @@ export default function CourseBuilderDetailPage() {
               {/* Title Input & Upload CTA */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                 <div className="sm:col-span-4 space-y-1.5">
-                  <Label htmlFor="matTitle" className="text-xs font-bold text-[#e2bcc2]">
+                  <Label htmlFor="matTitle" className="text-xs font-bold text-rose-700">
                     Document Title / Label
                   </Label>
                   <Input
@@ -981,11 +981,11 @@ export default function CourseBuilderDetailPage() {
                     placeholder="e.g. Complete Mechanics Formula Sheet 2026"
                     value={materialTitle}
                     onChange={(e) => setMaterialTitle(e.target.value)}
-                    className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                    className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                   />
                 </div>
                 <div className="sm:col-span-4 space-y-1.5">
-                  <Label className="text-xs font-bold text-[#e2bcc2]">
+                  <Label className="text-xs font-bold text-rose-700">
                     Chapter / Module
                   </Label>
                   <ChapterSelect
@@ -1001,7 +1001,7 @@ export default function CourseBuilderDetailPage() {
                   <Button
                     type="submit"
                     disabled={!selectedFile || isUploading}
-                    className="w-full rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-sm disabled:opacity-50 transition-all"
+                    className="w-full rounded-studio bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#111111] font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-sm disabled:opacity-50 transition-all"
                   >
                     {isUploading ? (
                       <span className="flex items-center gap-2">
@@ -1020,12 +1020,12 @@ export default function CourseBuilderDetailPage() {
 
           {/* Uploaded Materials Repository */}
           <div className="space-y-4">
-            <h3 className="font-display font-bold uppercase text-base text-white">
+            <h3 className="font-display font-bold uppercase text-base text-[#111111]">
               Uploaded Study Materials ({materials.length})
             </h3>
 
             {materials.length === 0 ? (
-              <div className="bg-[#141414] rounded-[20px] p-8 text-center border border-[#262626] text-[#8e8e8e] text-xs">
+              <div className="bg-white rounded-studio p-8 text-center border border-stone-200 text-stone-400 text-xs">
                 No syllabus documents or reference files uploaded for this batch yet.
               </div>
             ) : (
@@ -1033,14 +1033,14 @@ export default function CourseBuilderDetailPage() {
                 {materials.map((mat) => (
                   <div
                     key={mat.id}
-                    className="bg-[#141414] rounded-[20px] p-5 border border-[#262626] hover:border-[#a8f1e0]/60 transition-all flex flex-col justify-between space-y-4"
+                    className="bg-white rounded-studio p-5 border border-stone-200 hover:border-[#a05120]/60 transition-all flex flex-col justify-between space-y-4"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-[14px] bg-[#1c1c1c] text-[#ffb956] border border-[#383838] flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-[14px] bg-stone-100 text-amber-700 border border-stone-300 flex items-center justify-center flex-shrink-0">
                         <FileText className="h-5 w-5" />
                       </div>
                       <div className="space-y-0.5 overflow-hidden">
-                        <h4 className="font-bold text-xs sm:text-sm text-white truncate flex items-center gap-2">
+                        <h4 className="font-bold text-xs sm:text-sm text-[#111111] truncate flex items-center gap-2">
                           {mat.title}
                           {mat.course_chapters?.title && (
                             <Badge variant="rust" className="text-[10px] px-1.5 py-0 font-bold">
@@ -1048,18 +1048,18 @@ export default function CourseBuilderDetailPage() {
                             </Badge>
                           )}
                         </h4>
-                        <div className="text-[10px] font-semibold text-[#8e8e8e] uppercase tracking-wider">
+                        <div className="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">
                           {mat.file_type?.toUpperCase() || 'PDF'} • {new Date(mat.uploaded_at).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-[#262626]">
+                    <div className="flex items-center justify-between pt-2 border-t border-stone-200">
                       <a
                         href={mat.file_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs font-bold text-[#a8f1e0] hover:underline flex items-center gap-1"
+                        className="text-xs font-bold text-[#a05120] hover:underline flex items-center gap-1"
                       >
                         <span>Open Document</span>
                         <ExternalLink className="h-3 w-3" />
@@ -1067,7 +1067,7 @@ export default function CourseBuilderDetailPage() {
 
                       <button
                         onClick={() => handleDeleteMaterial(mat.id, mat.file_url)}
-                        className="p-1.5 rounded-full text-[#8e8e8e] hover:text-[#ff6b6b] hover:bg-[#2a1717] transition-colors"
+                        className="p-1.5 rounded-full text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                         title="Delete Material"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1087,34 +1087,34 @@ export default function CourseBuilderDetailPage() {
         <TabsContent value="assignments" className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h2 className="font-display font-bold uppercase text-lg text-white">
+              <h2 className="font-display font-bold uppercase text-lg text-[#111111]">
                 Assignments
               </h2>
-              <p className="text-xs text-[#8e8e8e]">
+              <p className="text-xs text-stone-400">
                 Create assignments and upload attachments for students to complete.
               </p>
             </div>
 
             <Dialog open={isAssignmentDialogOpen} onOpenChange={setIsAssignmentDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-bold text-xs h-9 px-4 shadow-sm transition-all">
+                <Button className="rounded-studio bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#111111] font-bold text-xs h-9 px-4 shadow-sm transition-all">
                   <Plus className="h-3.5 w-3.5 mr-1" />
                   Create Assignment
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-[20px] p-5 sm:p-8 max-w-lg max-h-[88dvh] overflow-y-auto w-[calc(100%-1.5rem)] sm:w-full bg-[#141414] border border-[#383838] text-white">
+              <DialogContent className="rounded-studio p-5 sm:p-8 max-w-lg max-h-[88dvh] overflow-y-auto w-[calc(100%-1.5rem)] sm:w-full bg-white border border-stone-300 text-[#111111]">
                 <DialogHeader className="space-y-1 text-left">
-                  <DialogTitle className="font-display font-bold uppercase text-xl text-white">
+                  <DialogTitle className="font-display font-bold uppercase text-xl text-[#111111]">
                     Create Assignment
                   </DialogTitle>
-                  <p className="text-xs text-[#b7b7b5]">
+                  <p className="text-xs text-stone-500">
                     Set a due date, max marks, and upload an optional attachment.
                   </p>
                 </DialogHeader>
 
                 <form onSubmit={handleCreateAssignment} className="space-y-4 pt-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="assignTitle" className="text-xs font-bold text-[#e2bcc2]">
+                    <Label htmlFor="assignTitle" className="text-xs font-bold text-rose-700">
                       Title
                     </Label>
                     <Input
@@ -1122,13 +1122,13 @@ export default function CourseBuilderDetailPage() {
                       placeholder="e.g. Chapter 4 Practice Sheet"
                       value={assignmentTitle}
                       onChange={(e) => setAssignmentTitle(e.target.value)}
-                      className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                      className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                       required
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-[#e2bcc2]">
+                    <Label className="text-xs font-bold text-rose-700">
                       Chapter / Module
                     </Label>
                     <ChapterSelect
@@ -1140,7 +1140,7 @@ export default function CourseBuilderDetailPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="assignDesc" className="text-xs font-bold text-[#e2bcc2]">
+                    <Label htmlFor="assignDesc" className="text-xs font-bold text-rose-700">
                       Instructions
                     </Label>
                     <textarea
@@ -1148,13 +1148,13 @@ export default function CourseBuilderDetailPage() {
                       placeholder="Instructions for the assignment..."
                       value={assignmentDescription}
                       onChange={(e) => setAssignmentDescription(e.target.value)}
-                      className="w-full rounded-[20px] border border-[#383838] bg-[#181818] text-white placeholder:text-[#737373] px-3 py-2 text-base sm:text-xs h-24 focus:border-[#a8f1e0] focus:outline-none"
+                      className="w-full rounded-studio border border-stone-300 bg-stone-50 text-[#111111] placeholder:text-stone-500 px-3 py-2 text-base sm:text-xs h-24 focus:border-[#a05120] focus:outline-none"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="assignDueDate" className="text-xs font-bold text-[#e2bcc2]">
+                      <Label htmlFor="assignDueDate" className="text-xs font-bold text-rose-700">
                         Due Date
                       </Label>
                       <Input
@@ -1162,12 +1162,12 @@ export default function CourseBuilderDetailPage() {
                         type="datetime-local"
                         value={assignmentDueDate}
                         onChange={(e) => setAssignmentDueDate(e.target.value)}
-                        className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white focus:border-[#a8f1e0]"
+                        className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] focus:border-[#a05120]"
                         required
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="assignMaxMarks" className="text-xs font-bold text-[#e2bcc2]">
+                      <Label htmlFor="assignMaxMarks" className="text-xs font-bold text-rose-700">
                         Max Marks
                       </Label>
                       <Input
@@ -1176,16 +1176,16 @@ export default function CourseBuilderDetailPage() {
                         min="1"
                         value={assignmentMaxMarks}
                         onChange={(e) => setAssignmentMaxMarks(Number(e.target.value))}
-                        className="rounded-[20px] h-11 text-base sm:text-xs bg-[#181818] border-[#383838] text-white placeholder:text-[#737373] focus:border-[#a8f1e0]"
+                        className="rounded-studio h-11 text-base sm:text-xs bg-stone-50 border-stone-300 text-[#111111] placeholder:text-stone-500 focus:border-[#a05120]"
                         required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-[#e2bcc2] flex items-center justify-between">
+                    <Label className="text-xs font-bold text-rose-700 flex items-center justify-between">
                       <span>Question Paper / Attachment (PDF or Image)</span>
-                      <span className="text-[10px] font-medium text-[#8e8e8e]">
+                      <span className="text-[10px] font-medium text-stone-400">
                         Optional
                       </span>
                     </Label>
@@ -1216,12 +1216,12 @@ export default function CourseBuilderDetailPage() {
                           handleAssignmentFileDrop(e.dataTransfer.files[0]);
                         }
                       }}
-                      className={`block relative border-2 border-dashed rounded-[20px] p-5 text-center cursor-pointer transition-all duration-200 ${
+                      className={`block relative border-2 border-dashed rounded-studio p-5 text-center cursor-pointer transition-all duration-200 ${
                         isAssignmentDragging
                           ? 'border-[#a8f1e0] bg-[#a8f1e0]/10 scale-[1.01]'
                           : assignmentFile
                           ? 'border-[#a8f1e0] bg-[#a8f1e0]/10'
-                          : 'border-[#383838] bg-[#181818] hover:border-[#a8f1e0]/60'
+                          : 'border-stone-300 bg-stone-50 hover:border-[#a05120]/60'
                       }`}
                     >
                       <input
@@ -1240,21 +1240,21 @@ export default function CourseBuilderDetailPage() {
                       {assignmentFile ? (
                         <div className="flex items-center justify-between gap-3 text-left">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-[14px] bg-[#1c1c1c] text-[#a8f1e0] border border-[#383838] flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-[14px] bg-stone-100 text-[#a05120] border border-stone-300 flex items-center justify-center shrink-0">
                               <FileCheck className="h-5 w-5" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-xs font-bold text-white truncate">
+                              <p className="text-xs font-bold text-[#111111] truncate">
                                 {assignmentFile.name}
                               </p>
-                              <p className="text-[10px] text-[#8e8e8e] font-medium">
+                              <p className="text-[10px] text-stone-400 font-medium">
                                 {(assignmentFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to attach
                               </p>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <span className="text-[10px] font-bold text-[#0c0c0c] bg-[#a8f1e0] px-2 py-0.5 rounded-[20px]">
+                            <span className="text-[10px] font-bold text-[#111111] bg-[#a8f1e0] px-2 py-0.5 rounded-studio">
                               Attached
                             </span>
                             <button
@@ -1267,7 +1267,7 @@ export default function CourseBuilderDetailPage() {
                                   assignmentFileInputRef.current.value = '';
                                 }
                               }}
-                              className="p-1.5 rounded-full text-[#8e8e8e] hover:text-[#ff6b6b] hover:bg-[#2a1717] transition-colors"
+                              className="p-1.5 rounded-full text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                               title="Remove attachment"
                             >
                               <X className="h-4 w-4" />
@@ -1279,14 +1279,14 @@ export default function CourseBuilderDetailPage() {
                           <UploadCloud
                             className={`h-8 w-8 mx-auto transition-colors ${
                               isAssignmentDragging
-                                ? 'text-[#a8f1e0] animate-bounce'
-                                : 'text-[#8e8e8e]'
+                                ? 'text-[#a05120] animate-bounce'
+                                : 'text-stone-400'
                             }`}
                           />
-                          <p className="text-xs font-bold text-white">
+                          <p className="text-xs font-bold text-[#111111]">
                             Tap to attach question paper or assignment document
                           </p>
-                          <p className="text-[10px] text-[#8e8e8e]">
+                          <p className="text-[10px] text-stone-400">
                             Supports PDF, DOCX, PNG, JPG (up to 30MB)
                           </p>
                         </div>
@@ -1297,7 +1297,7 @@ export default function CourseBuilderDetailPage() {
                   <Button
                     type="submit"
                     disabled={isCreatingAssignment}
-                    className="w-full rounded-[20px] bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#0c0c0c] font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-sm mt-2 transition-all"
+                    className="w-full rounded-studio bg-[#a8f1e0] hover:bg-[#9ee4a0] text-[#111111] font-bold text-xs sm:text-sm h-11 sm:h-12 shadow-sm mt-2 transition-all"
                   >
                     {isCreatingAssignment ? (
                       <span className="flex items-center gap-2">
@@ -1342,10 +1342,10 @@ export default function CourseBuilderDetailPage() {
               }
             }}
             onClick={() => setIsAssignmentDialogOpen(true)}
-            className={`border-2 border-dashed rounded-[20px] p-5 sm:p-6 text-center cursor-pointer transition-all duration-200 ${
+            className={`border-2 border-dashed rounded-studio p-5 sm:p-6 text-center cursor-pointer transition-all duration-200 ${
               isTabDragging
                 ? 'border-[#a8f1e0] bg-[#a8f1e0]/10 scale-[1.01]'
-                : 'border-[#383838] bg-[#141414] hover:border-[#a8f1e0]/60 shadow-sm'
+                : 'border-stone-300 bg-white hover:border-[#a05120]/60 shadow-sm'
             }`}
           >
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -1353,20 +1353,20 @@ export default function CourseBuilderDetailPage() {
                 <div
                   className={`w-12 h-12 rounded-[16px] flex items-center justify-center transition-transform shrink-0 ${
                     isTabDragging
-                      ? 'bg-[#a8f1e0] text-[#0c0c0c] scale-110 shadow-lg'
-                      : 'bg-[#181818] border border-[#383838] text-[#a8f1e0]'
+                      ? 'bg-[#a8f1e0] text-[#111111] scale-110 shadow-lg'
+                      : 'bg-stone-50 border border-stone-300 text-[#a05120]'
                   }`}
                 >
                   <UploadCloud className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-display font-bold uppercase text-sm sm:text-base text-white flex items-center gap-2">
+                  <h4 className="font-display font-bold uppercase text-sm sm:text-base text-[#111111] flex items-center gap-2">
                     {isTabDragging ? 'Release to Create Assignment!' : 'Drag & Drop Question Paper (PDF / Image)'}
-                    <span className="hidden sm:inline-block text-[10px] font-bold text-[#0c0c0c] bg-[#a8f1e0] px-2 py-0.5 rounded-[20px]">
+                    <span className="hidden sm:inline-block text-[10px] font-bold text-[#111111] bg-[#a8f1e0] px-2 py-0.5 rounded-studio">
                       Drag &amp; Drop
                     </span>
                   </h4>
-                  <p className="text-xs text-[#b7b7b5] mt-0.5">
+                  <p className="text-xs text-stone-500 mt-0.5">
                     Drop a question paper PDF or scanned worksheet here to automatically open the assignment creator
                   </p>
                 </div>
@@ -1375,7 +1375,7 @@ export default function CourseBuilderDetailPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="rounded-[20px] border-[#383838] bg-[#181818] text-[#a8f1e0] hover:bg-[#a8f1e0] hover:text-[#0c0c0c] text-xs font-bold h-9 px-3.5 transition-all"
+                  className="rounded-studio border-stone-300 bg-stone-50 text-[#a05120] hover:bg-[#a8f1e0] hover:text-[#111111] text-xs font-bold h-9 px-3.5 transition-all"
                 >
                   <UploadCloud className="h-3.5 w-3.5 mr-1.5" />
                   Drop or Browse
@@ -1385,12 +1385,12 @@ export default function CourseBuilderDetailPage() {
           </div>
 
           {assignments.length === 0 ? (
-            <div className="bg-[#141414] rounded-[20px] p-10 text-center border border-[#262626] space-y-3">
-              <FileCheck className="h-10 w-10 text-[#8e8e8e] mx-auto" />
-              <h3 className="font-display font-bold uppercase text-base text-white">
+            <div className="bg-white rounded-studio p-10 text-center border border-stone-200 space-y-3">
+              <FileCheck className="h-10 w-10 text-stone-400 mx-auto" />
+              <h3 className="font-display font-bold uppercase text-base text-[#111111]">
                 No Assignments Created
               </h3>
-              <p className="text-xs text-[#b7b7b5] max-w-sm mx-auto">
+              <p className="text-xs text-stone-500 max-w-sm mx-auto">
                 Create assignments with PDF or image attachments for students to submit.
               </p>
             </div>
@@ -1399,14 +1399,14 @@ export default function CourseBuilderDetailPage() {
               {assignments.map((assignment) => (
                 <div
                   key={assignment.id}
-                  className="bg-[#141414] rounded-[20px] p-4 sm:p-5 border border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#a8f1e0]/60 transition-colors"
+                  className="bg-white rounded-studio p-4 sm:p-5 border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#a05120]/60 transition-colors"
                 >
                   <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-[14px] bg-[#1c1c1c] text-[#ffb956] border border-[#383838] flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-[14px] bg-stone-100 text-amber-700 border border-stone-300 flex items-center justify-center flex-shrink-0">
                       <FileCheck className="h-5 w-5" />
                     </div>
                     <div className="space-y-0.5">
-                      <h4 className="font-bold text-sm sm:text-base text-white flex items-center gap-2">
+                      <h4 className="font-bold text-sm sm:text-base text-[#111111] flex items-center gap-2">
                         {assignment.title}
                         {assignment.course_chapters?.title && (
                           <Badge variant="rust" className="text-[10px] px-1.5 py-0 font-bold">
@@ -1414,17 +1414,17 @@ export default function CourseBuilderDetailPage() {
                           </Badge>
                         )}
                       </h4>
-                      <div className="flex items-center gap-3 text-xs text-[#8e8e8e]">
-                        <span className="flex items-center gap-1 text-[#ffb956]">
+                      <div className="flex items-center gap-3 text-xs text-stone-400">
+                        <span className="flex items-center gap-1 text-amber-700">
                           <Clock className="h-3 w-3" />
                           Due: {new Date(assignment.due_date).toLocaleDateString()}
                         </span>
                         <span>•</span>
-                        <span className="text-[#a8f1e0]">{assignment.max_marks} Marks</span>
+                        <span className="text-[#a05120]">{assignment.max_marks} Marks</span>
                         {assignment.description?.includes('[ATTACHMENT:') && (
                           <>
                             <span>•</span>
-                            <span className="text-[#a8f1e0] font-semibold flex items-center gap-1">
+                            <span className="text-[#a05120] font-semibold flex items-center gap-1">
                               <ExternalLink className="h-3 w-3" />
                               Has Attachment
                             </span>
@@ -1434,17 +1434,17 @@ export default function CourseBuilderDetailPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-0 border-[#262626]">
+                  <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-0 border-stone-200">
                     <Link
                       href={`/teacher/assignments/${assignment.id}`}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[20px] text-xs font-bold text-[#b7b7b5] hover:text-[#a8f1e0] hover:bg-[#181818] transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-studio text-xs font-bold text-stone-500 hover:text-[#a05120] hover:bg-stone-50 transition-colors"
                     >
                       <Eye className="h-3.5 w-3.5" />
                       View Details
                     </Link>
                     <Link
                       href={`/teacher/assignments/${assignment.id}`}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[20px] text-xs font-bold text-[#a8f1e0] hover:bg-[#181818] transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-studio text-xs font-bold text-[#a05120] hover:bg-stone-50 transition-colors"
                       title="Edit Assignment"
                     >
                       <Pencil className="h-3.5 w-3.5" />
@@ -1452,7 +1452,7 @@ export default function CourseBuilderDetailPage() {
                     </Link>
                     <button
                       onClick={() => handleDeleteAssignment(assignment.id)}
-                      className="p-2 rounded-full text-[#8e8e8e] hover:text-[#ff6b6b] hover:bg-[#2a1717] transition-colors"
+                      className="p-2 rounded-full text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Delete Assignment"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -1472,29 +1472,29 @@ export default function CourseBuilderDetailPage() {
           if (!open && !isDeletingCourse) setIsDeleteDialogOpen(false);
         }}
       >
-        <DialogContent className="rounded-[20px] p-6 sm:p-8 max-w-md bg-[#141414] border border-[#383838] text-white">
+        <DialogContent className="rounded-studio p-6 sm:p-8 max-w-md bg-white border border-stone-300 text-[#111111]">
           <DialogHeader className="space-y-2 text-left">
-            <div className="w-12 h-12 rounded-[16px] bg-[#2a1717] text-[#ff6b6b] border border-[#522] flex items-center justify-center mb-1">
+            <div className="w-12 h-12 rounded-[16px] bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mb-1">
               <AlertTriangle className="h-6 w-6" />
             </div>
-            <DialogTitle className="font-heading font-extrabold text-xl text-white">
+            <DialogTitle className="font-heading font-extrabold text-xl text-[#111111]">
               Delete Classroom Batch?
             </DialogTitle>
-            <div className="space-y-2 text-xs text-[#b7b7b5] leading-relaxed">
+            <div className="space-y-2 text-xs text-stone-500 leading-relaxed">
               <p>
                 Are you sure you want to permanently delete{' '}
-                <strong className="text-white font-bold">{course?.title}</strong>{' '}
-                <span className="text-[#ffb956] font-bold">({course?.code})</span>?
+                <strong className="text-[#111111] font-bold">{course?.title}</strong>{' '}
+                <span className="text-amber-700 font-bold">({course?.code})</span>?
               </p>
-              <div className="rounded-[16px] bg-[#2a1717] border border-[#522] p-3 text-[#e2bcc2] text-[11px] space-y-1.5">
-                <p className="font-bold flex items-center gap-1.5 text-[#ff6b6b]">
+              <div className="rounded-[16px] bg-red-50 border border-red-200 p-3 text-rose-700 text-[11px] space-y-1.5">
+                <p className="font-bold flex items-center gap-1.5 text-red-600">
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                   <span>Final Confirmation Required</span>
                 </p>
                 <p className="leading-normal">
                   This will permanently erase all video lectures, PDF syllabi & notes, quizzes, student assignments, submissions, and attendance records associated with this batch.
                 </p>
-                <p className="font-bold text-[#ff6b6b]">
+                <p className="font-bold text-red-600">
                   This action is irreversible and cannot be undone.
                 </p>
               </div>
@@ -1508,7 +1508,7 @@ export default function CourseBuilderDetailPage() {
               size="sm"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isDeletingCourse}
-              className="rounded-[20px] text-xs font-bold border border-[#383838] bg-[#181818] text-white hover:bg-[#222]"
+              className="rounded-studio text-xs font-bold border border-stone-300 bg-stone-50 text-[#111111] hover:bg-stone-100"
             >
               Cancel
             </Button>
@@ -1518,7 +1518,7 @@ export default function CourseBuilderDetailPage() {
               size="sm"
               onClick={handleDeleteCourse}
               disabled={isDeletingCourse}
-              className="rounded-[20px] text-xs font-bold bg-[#ff6b6b] hover:bg-[#e05555] text-white shadow-lg shadow-red-600/25 px-4 h-9"
+              className="rounded-studio text-xs font-bold bg-[#ff6b6b] hover:bg-[#e05555] text-[#111111] shadow-lg shadow-red-600/25 px-4 h-9"
             >
               {isDeletingCourse ? (
                 <span className="flex items-center gap-1.5">

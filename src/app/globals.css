@@ -3,42 +3,42 @@
 @tailwind utilities;
 
 /* ============================================================
-   SHADCN/UI CSS Variables — EduFlow Theme
-   Mapped to the emerald/orange design language
+   SHADCN/UI CSS Variables — EduFlow Light Editorial Theme
+   Mapped to warm stone/rust design language matching landing page
    ============================================================ */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 40 20% 98%;
+    --foreground: 0 0% 7%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 7%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 7%;
 
-    /* Primary = Emerald */
-    --primary: 160 84% 39%;
+    /* Primary = Rust */
+    --primary: 24 64% 38%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary = Subtle slate */
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary = Warm stone */
+    --secondary: 30 10% 96%;
+    --secondary-foreground: 0 0% 7%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 30 10% 96%;
+    --muted-foreground: 24 5% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 30 10% 96%;
+    --accent-foreground: 0 0% 7%;
 
-    /* Destructive = Orange/Red for CTAs */
-    --destructive: 24 95% 53%;
+    /* Destructive = Red */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 160 84% 39%;
+    --border: 24 6% 83%;
+    --input: 24 6% 83%;
+    --ring: 24 64% 38%;
 
     --radius: 1rem;
   }
@@ -74,27 +74,27 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-slate-300;
+    @apply rounded-full bg-stone-300;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    @apply bg-stone-400;
   }
 }
 
 /* ============================================================
-   Component Utilities — Studio Design System
+   Component Utilities — Light Editorial Design System
    ============================================================ */
 
 @layer utilities {
   /* Studio card base (architectural 1px border, crisp layout) */
   .studio-card {
-    @apply rounded-[20px] bg-[#141414] p-6 border border-[#262626] text-white transition-all duration-200;
+    @apply rounded-studio bg-white p-6 border border-stone-200 text-[#111111] transition-all duration-200;
   }
 
   /* Floating card base (legacy backwards-compatibility) */
   .card-float {
-    @apply rounded-[20px] bg-[#141414] p-6 border border-[#2a2a2a] text-white shadow-2xl transition-all duration-300;
+    @apply rounded-studio bg-white p-6 border border-stone-200 text-[#111111] shadow-card transition-all duration-300;
   }
 
   /* Pill button (rounded-pill style) */
@@ -112,7 +112,7 @@
   }
 
   .btn-studio-outline {
-    @apply btn-pill border border-[#383838] bg-[#181818] text-white hover:border-[#a8f1e0] hover:text-[#a8f1e0] active:scale-[0.98];
+    @apply btn-pill border border-stone-300 bg-white text-stone-700 hover:border-[#a05120] hover:text-[#a05120] active:scale-[0.98];
   }
 
   /* Primary CTA (mapped to Rust) */
